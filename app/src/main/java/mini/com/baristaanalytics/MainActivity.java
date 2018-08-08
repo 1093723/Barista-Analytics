@@ -1,8 +1,10 @@
 package mini.com.baristaanalytics;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityHandler;
@@ -48,5 +50,9 @@ public class MainActivity extends AppCompatActivity {
         }).execute();
 
 
+    }
+    public void registerClickFunction(View v){
+        Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+        startActivity(intent);
     }
 }
