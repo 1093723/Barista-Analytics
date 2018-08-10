@@ -1,9 +1,8 @@
 # Barista-Analytics
 Repository for Voice-Assistant coffee-ordering system.
-
 ## Setup instructions
 
-1. Clone the project into an empty directory.
+1. Clone the project into an empty directory with `https://github.com/1093723/Barista-Analytics.git`
 
 2. Open Android Studio, and open the cloned project
 
