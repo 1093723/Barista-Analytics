@@ -1,6 +1,8 @@
+# Barista-Analytics
 [![CircleCI](https://circleci.com/gh/Barista-Analytics/Barista-Analytics.svg?style=shield&circle-token=cdd3f8450e866d2e6267dc2c1b5d3f849d66ed00)](https://circleci.com/gh/Barista-Analytics/Barista-Analytics)
 
-# Barista-Analytics
+![API Level](https://img.shields.io/badge/API%20Level-24-brightgreen.svg)
+
 Repository for Voice-Assistant coffee-ordering system.
 ## Setup instructions
 
