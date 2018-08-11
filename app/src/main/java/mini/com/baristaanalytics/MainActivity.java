@@ -15,44 +15,18 @@ import com.amazonaws.mobile.client.AWSStartupResult;
 import com.amazonaws.mobile.config.AWSConfiguration;
 
 public class MainActivity extends AppCompatActivity {
-    private AWSCredentialsProvider credentialsProvider;
-    private AWSConfiguration configuration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
-            @Override
-            public void onComplete(AWSStartupResult awsStartupResult) {
-
-                // Obtain the reference to the AWSCredentialsProvider and AWSConfiguration objects
-                credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
-                configuration = AWSMobileClient.getInstance().getConfiguration();
-
-                // Use IdentityManager#getUserID to fetch the identity id.
-                IdentityManager.getDefaultIdentityManager().getUserID(new IdentityHandler() {
-                    @Override
-                    public void onIdentityId(String identityId) {
-                        Log.d("YourMainActivity", "Identity ID = " + identityId);
-
-                        // Use IdentityManager#getCachedUserID to
-                        //  fetch the locally cached identity id.
-                        final String cachedIdentityId =
-                                IdentityManager.getDefaultIdentityManager().getCachedUserID();
-                    }
-
-                    @Override
-                    public void handleError(Exception exception) {
-                        Log.d("YourMainActivity", "Error in retrieving the identity" + exception);
-                    }
-                });
-            }
-        }).execute();
-
 
     }
     public void registerClickFunction(View v){
-        Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+        Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
+    }
+    public void signInFunction(View v){
+        Intent x = new Intent(this,LoginActivity.class);
+        startActivity(x);
     }
 }
