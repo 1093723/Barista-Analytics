@@ -18,13 +18,13 @@
         tools:layout_editor_absoluteY="168dp" />
 
     <Button
-        android:onClick="registerSignUpFunction"
+        android:onClick="signInFunction"
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="197dp"
-        android:text="Sign Up" />
+        android:text="Already Have An Account? Sign In" />
 
 </RelativeLayout>
