@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Barista-Analytics.iml" filepath="$PROJECT_DIR$/Barista-Analytics.iml" />
-      <module fileurl="file://C:\Users\Sontaga\Documents\GitHub\Barista-Analytics\Barista-Analytics.iml" filepath="C:\Users\Sontaga\Documents\GitHub\Barista-Analytics\Barista-Analytics.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\Sontaga\Documents\GitHub\Barista-Analytics\app\app.iml" filepath="C:\Users\Sontaga\Documents\GitHub\Barista-Analytics\app\app.iml" />
     </modules>
   </component>
 </project>
