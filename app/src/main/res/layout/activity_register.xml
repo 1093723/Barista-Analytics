@@ -143,6 +143,8 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
+            android:onClick="addcustomer"
+            android:clickable="true"
             android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
