@@ -27,7 +27,11 @@
         <activity android:name=".RegisterActivity" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login">
+
+        </activity> <activity
+            android:name=".ProfileActivity"
+            android:label="Profile Activity"></activity>
     </application>
 
 </manifest>

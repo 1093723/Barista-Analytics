@@ -12,20 +12,16 @@ public class Customer {
     private String customerConfirmPassword;
     private String customerPhoneNumber;
 
-    public Customer(){
-
-    }
 
     public Customer(String customerFirstName, String customerLastName, String customerAge,
-                    String customerEmail, String customerUserName, String customerPassword,
-                    String customerConfirmPassword,String customerPhoneNumber) {
+                    String customerEmail, String customerUserName, String customerPassword
+                    ,String customerPhoneNumber) {
         this.customerFirstName = customerFirstName;
         this.customerLastName = customerLastName;
         this.CustomerAge = customerAge;
         this.customerEmail = customerEmail;
         this.customerUserName = customerUserName;
         this.customerPassword = customerPassword;
-        this.customerPassword = customerConfirmPassword;
         this.customerPhoneNumber = customerPhoneNumber;
     }
 
