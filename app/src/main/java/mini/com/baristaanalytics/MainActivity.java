@@ -22,4 +22,8 @@ public class MainActivity extends AppCompatActivity {
         Intent x = new Intent(this, LoginActivity.class );
         startActivity(x);
     }
+    public void registerVendor(View view){
+        Intent x = new Intent(this, RegisterVendorActivity.class);
+        startActivity(x);
+    }
 }

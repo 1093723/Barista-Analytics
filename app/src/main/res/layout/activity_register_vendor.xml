@@ -82,6 +82,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <Spinner
+                android:id="@+id/spinnerAdminRole"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:entries="@array/roles_array" />
+
             <EditText
                 android:id="@+id/textUsername"
                 android:layout_width="match_parent"
@@ -91,12 +98,6 @@
                 android:hint="Admin ID"
                 android:inputType="textPersonName" />
 
-            <Spinner
-                android:id="@+id/spinnerAdminRole"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:entries="@array/roles_array" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
