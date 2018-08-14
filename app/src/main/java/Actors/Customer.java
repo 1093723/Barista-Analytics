@@ -9,7 +9,6 @@ public class Customer {
     private String customerEmail;
     private String customerUserName;
     private String customerPassword;
-    private String customerConfirmPassword;
     private String customerPhoneNumber;
 
 
@@ -43,9 +42,7 @@ public class Customer {
     public String getCustomerPassword() {
         return customerPassword;
     }
-    public String getCustomerConfirmPassword() {
-        return customerConfirmPassword;
-    }
+
     public String getCustomerPhoneNumber() {
         return customerPhoneNumber;
     }

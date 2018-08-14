@@ -3,7 +3,7 @@
     android:background="#e3e3e3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity"
+    tools:context=".RegisterCustomerActivity"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="Welcome"
+            android:text="Register Customer"
             android:textColor="#333333"
             android:textSize="30sp" />
 

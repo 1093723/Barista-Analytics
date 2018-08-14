@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void registerClickFunction(View view) {
-        Intent x = new Intent(this, RegisterActivity.class );
+        Intent x = new Intent(this, RegisterCustomerActivity.class );
         startActivity(x);
     }
     public void signInFunction(View view) {
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(x);
     }
     public void registerVendor(View view){
-        Intent x = new Intent(this, RegisterVendorActivity.class);
+        Intent x = new Intent(this, RegisterAdminActivity.class);
         startActivity(x);
     }
 }
