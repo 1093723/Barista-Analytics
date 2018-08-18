@@ -34,7 +34,10 @@
         <activity
             android:name=".RegisterAdminActivity"
             android:label="Admin Registration" />
-        <activity android:name=".SpeechAPI"></activity>
+        <activity
+            android:name=".SpeechAPI"
+            android:label="Speech API">
+        </activity>
     </application>
 
 </manifest>
