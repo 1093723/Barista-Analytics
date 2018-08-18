@@ -26,4 +26,9 @@ public class MainActivity extends AppCompatActivity {
         Intent x = new Intent(this, RegisterAdminActivity.class);
         startActivity(x);
     }
+
+    public void SpeechToTxt(View view) {
+        Intent x = new Intent(this, SpeechAPI.class);
+        startActivity(x);
+    }
 }
