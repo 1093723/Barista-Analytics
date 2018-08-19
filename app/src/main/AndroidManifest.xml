@@ -29,15 +29,12 @@
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"></activity>
         <activity
-            android:name=".ProfileActivity"
+            android:name=".SpeechAPI"
             android:label="Profile Activity" />
         <activity
             android:name=".RegisterAdminActivity"
             android:label="Admin Registration" />
-        <activity
-            android:name=".SpeechAPI"
-            android:label="Speech API">
-        </activity>
+
     </application>
 
 </manifest>

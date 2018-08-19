@@ -36,7 +36,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -206,7 +205,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     if(task.isSuccessful()){
                         showProgress(false);
                         // User successfully logged in
-                        Intent x = new Intent(ctx,ProfileActivity.class);
+                        Intent x = new Intent(ctx,SpeechAPI.class);
                         startActivity(x);
                     }else {
                         Toast.makeText(ctx,task.getException().getMessage(),Toast.LENGTH_LONG).show();
