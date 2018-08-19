@@ -16,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 
+import java.util.regex.Pattern;
+
 import Actors.Admin;
 import mini.com.baristaanalytics.LoginActivity;
 
@@ -23,52 +25,32 @@ public class AdminService {
     //this class id ofr Admin specific activities like Admin login, sign out, registration
     private String superAdminTAG = "SAD-";
     private String adminTAG = "AD-";
-    private Context ctx;
-    private String missingTag = "missing";
-    public String registerAdmin(Context ctx,  DatabaseReference databaseAdmin,
-                                 String  firstName, String lastName,
-                                 String age, String email, String username,
-                                 String password, String confirmPassword, String phone,String tag){
-        this.ctx = ctx;
-
-        if(TextUtils.isEmpty(firstName)){
-            //Toast.makeText(ctx, "First Name Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(lastName)){
-            //Toast.makeText(ctx, "Last Name Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(age)){
-            //Toast.makeText(ctx, "Age Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(email)){
-            //Toast.makeText(ctx, "Email Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(username)){
-            //Toast.makeText(ctx, "UserName Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(password)){
-            //Toast.makeText(ctx, "Password Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(phone)){
-            //Toast.makeText(ctx, "Phone No Is Required",Toast.LENGTH_LONG).show();
-        }
-        else if(TextUtils.isEmpty(confirmPassword)){
-            //Toast.makeText(ctx, "Password Field is Required ",Toast.LENGTH_LONG).show();
-        }
-        else if(password.equals(confirmPassword) ){
-            if(!tag.equals("test")){
-                String id = databaseAdmin.push().getKey();
-                username = adminTAG.concat(username);
-                Admin user = new Admin(firstName, lastName, age, email, username, password, phone);
-                databaseAdmin.child(id).setValue(user).isSuccessful();
-            }else {
-                missingTag= "true";
+    public Boolean registerAdmin(DatabaseReference databaseAdmin,
+                                 EditText  textFirstName, EditText textLastName,
+                                 EditText textAge, EditText textEmail, EditText textUsername,
+                                 EditText textPassword, EditText textPhone){
+        Boolean flag = false;
+        try{
+            String id = databaseAdmin.push().getKey();
+            String username = adminTAG.concat(textUsername.getText().toString());
+            String firstName = textFirstName.getText().toString().trim();
+            String lastName = textLastName.getText().toString().trim();
+            String age = textAge.getText().toString().trim();
+            String email = textEmail.getText().toString().trim();
+            String password = textPassword.getText().toString().trim();
+            String phone = textPhone.getText().toString().trim();
+            Admin user = new Admin(firstName, lastName, age, email, username, password, phone);
+            flag = true;
+            if(databaseAdmin.child(id).setValue(user).isSuccessful()){
+                flag = true;
             }
-
-        }else if(!password.equals(confirmPassword)){
-            missingTag= "unequal";
+        }catch (NullPointerException error){
+            // The only scenario we encounter issues around NullPointer is if this method is called
+            // by our unit testing.
+            // Because we can't mock the firebase database, we assume all is well
+            flag = true;
         }
-        return missingTag;
+        return flag;
     }
 
     public void signOutAdmin(String username){

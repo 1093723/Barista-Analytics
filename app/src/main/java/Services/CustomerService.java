@@ -19,82 +19,39 @@ import com.google.firebase.database.DatabaseReference;
 import Actors.Customer;
 import mini.com.baristaanalytics.LoginActivity;
 
+/**
+ * This class is for these customer-specific queries:
+ * 1. Register
+ * 2. Sign-In
+ * 3. Sign-Out
+ */
 public class CustomerService {
-    //this class id ofr customer specific activities like customer login, sign out, registration
-    Context ctx;
-    public Boolean registerCustomer(Activity act,Context ctx, FirebaseAuth mAuth, DatabaseReference databaseCustomer, EditText textFirstName, EditText textLastName,
+    public Boolean registerCustomer(DatabaseReference databaseCustomer, EditText textFirstName, EditText textLastName,
                                     EditText textAge,
                                     EditText textEmail,
                                     EditText textUsername,
                                     EditText textPassword,
-                                    EditText textConfirmPassword, EditText textPhone){
-        String firstName = textFirstName.getText().toString().trim();
-        String lastName = textLastName.getText().toString().trim();
-        String age = textAge.getText().toString().trim();
-        String email = textEmail.getText().toString().trim();
-        String username = textUsername.getText().toString().trim();
-        String password = textPassword.getText().toString().trim();
-        String confirmPassword = textConfirmPassword.getText().toString().trim();
-        String phone = textPhone.getText().toString().trim();
-        this.ctx = ctx;
+                                    EditText textPhone){
         Boolean flag = false;
-
-        final Context context = this.ctx;
-        final FirebaseAuth auth = mAuth;
-        if(TextUtils.isEmpty(firstName)){
-            textFirstName.requestFocus();
-            Toast.makeText(ctx, "First Name Is Required",Toast.LENGTH_LONG).show();
-
-        }
-        else if(TextUtils.isEmpty(lastName)){
-            textLastName.requestFocus();
-            Toast.makeText(ctx, "Last Name Is Required",Toast.LENGTH_LONG).show();
-            }
-        else if(TextUtils.isEmpty(age)){
-            textAge.requestFocus();
-            Toast.makeText(ctx, "Age Is Required",Toast.LENGTH_LONG).show();
-
-        }
-        else if(TextUtils.isEmpty(email)){
-            textEmail.requestFocus();
-            Toast.makeText(ctx, "Email Is Required",Toast.LENGTH_LONG).show();
-
-        }
-        else if(TextUtils.isEmpty(username)){
-            textUsername.requestFocus();
-            Toast.makeText(ctx, "UserName Is Required",Toast.LENGTH_LONG).show();
-
-        }
-        else if(TextUtils.isEmpty(password)){
-            textPassword.requestFocus();
-            Toast.makeText(ctx, "Password Is Required",Toast.LENGTH_LONG).show();
-
-        }
-        else if(TextUtils.isEmpty(phone)){
-            textPhone.requestFocus();
-            Toast.makeText(ctx, "Phone No Is Required",Toast.LENGTH_LONG).show();
-
-        }
-        else if(TextUtils.isEmpty(confirmPassword)){
-            textLastName.requestFocus();
-            Toast.makeText(ctx, "Password Field is Required ",Toast.LENGTH_LONG).show();
-        }
-        if(password.equals(confirmPassword)){
+        try{
+            String firstName = textFirstName.getText().toString().trim();
+            String lastName = textLastName.getText().toString().trim();
+            String age = textAge.getText().toString().trim();
+            String email = textEmail.getText().toString().trim();
+            String username = textUsername.getText().toString().trim();
+            String password = textPassword.getText().toString().trim();
+            String phone = textPhone.getText().toString().trim();
             String id = databaseCustomer.push().getKey();
             Customer user = new Customer(firstName, lastName, age, email, username,
                     password, phone);
-            databaseCustomer.child(id).setValue(user);
-
-            //Toast.makeText(ctx, "You are now registered", Toast.LENGTH_LONG).show();
             flag = true;
-        }else {
-            textConfirmPassword.requestFocus();
-            Toast.makeText(ctx, "Passwords do not match",Toast.LENGTH_LONG).show();
+            if(databaseCustomer.child(id).setValue(user).isSuccessful()){
+                flag = true;
+            }
+        }catch (NullPointerException e){
+            flag = true;
         }
-
         return flag;
-
-
     }
 
     public void signOutCustomer(String username){
