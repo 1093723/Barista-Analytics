@@ -23,62 +23,52 @@ public class AdminService {
     //this class id ofr Admin specific activities like Admin login, sign out, registration
     private String superAdminTAG = "SAD-";
     private String adminTAG = "AD-";
-    private String adminRole = "ADMIN";
     private Context ctx;
-
-    public Boolean registerAdmin(Activity act, Context ctx, FirebaseAuth mAuth, DatabaseReference databaseAdmin, EditText textFirstName, EditText textLastName,
-                                 EditText textAge,
-                                 EditText textEmail,
-                                 EditText textUsername,
-                                 EditText textPassword,
-                                 EditText textConfirmPassword, EditText textPhone){
-
-        String firstName = textFirstName.getText().toString().trim();
-        String lastName = textLastName.getText().toString().trim();
-        String age = textAge.getText().toString().trim();
-        String email = textEmail.getText().toString().trim();
-        String username = textUsername.getText().toString().trim();
-        String password = textPassword.getText().toString().trim();
-        String confirmPassword = textConfirmPassword.toString().trim();
-        String phone = textPhone.getText().toString().trim();
+    private String missingTag = "missing";
+    public String registerAdmin(Context ctx,  DatabaseReference databaseAdmin,
+                                 String  firstName, String lastName,
+                                 String age, String email, String username,
+                                 String password, String confirmPassword, String phone,String tag){
         this.ctx = ctx;
-        Boolean flag = false;
-
-        final Context context = this.ctx;
-        final FirebaseAuth auth = mAuth;
 
         if(TextUtils.isEmpty(firstName)){
-            Toast.makeText(ctx, "First Name Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "First Name Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(lastName)){
-            Toast.makeText(ctx, "Last Name Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "Last Name Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(age)){
-            Toast.makeText(ctx, "Age Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "Age Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(email)){
-            Toast.makeText(ctx, "Email Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "Email Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(username)){
-            Toast.makeText(ctx, "UserName Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "UserName Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(password)){
-            Toast.makeText(ctx, "Password Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "Password Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(phone)){
-            Toast.makeText(ctx, "Phone No Is Required",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "Phone No Is Required",Toast.LENGTH_LONG).show();
         }
         else if(TextUtils.isEmpty(confirmPassword)){
-            Toast.makeText(ctx, "Password Field is Required ",Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "Password Field is Required ",Toast.LENGTH_LONG).show();
         }
-        if(password.equals(confirmPassword)){
-            String id = databaseAdmin.push().getKey();
-            username = adminTAG.concat(username);
-            Admin user = new Admin(firstName, lastName, age, email, username, password, phone);
-            flag = true;
-            databaseAdmin.child(id).setValue(user);
+        else if(password.equals(confirmPassword) ){
+            if(!tag.equals("test")){
+                String id = databaseAdmin.push().getKey();
+                username = adminTAG.concat(username);
+                Admin user = new Admin(firstName, lastName, age, email, username, password, phone);
+                databaseAdmin.child(id).setValue(user).isSuccessful();
+            }else {
+                missingTag= "true";
+            }
+
+        }else if(!password.equals(confirmPassword)){
+            missingTag= "unequal";
         }
-        return flag;
+        return missingTag;
     }
 
     public void signOutAdmin(String username){

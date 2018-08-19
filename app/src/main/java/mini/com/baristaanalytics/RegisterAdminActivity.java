@@ -46,36 +46,52 @@ public class RegisterAdminActivity extends AppCompatActivity {
         final EditText textPassword = (EditText) findViewById(R.id.textPassword);
         final EditText textConfirmPassword = (EditText) findViewById(R.id.textConfirmPassword);
         final EditText textPhone = (EditText) findViewById(R.id.textPhone);
+        String firstName = textFirstName.getText().toString().trim();
+        String lastName = textLastName.getText().toString().trim();
+        String age = textAge.getText().toString().trim();
+        String email = textEmail.getText().toString().trim();
+        String username = textUsername.getText().toString().trim();
+        String password = textPassword.getText().toString().trim();
+        String confirmPassword = textConfirmPassword.toString().trim();
+        String phone = textPhone.getText().toString().trim();
         AdminService registration = new AdminService();
-        Boolean check = registration.registerAdmin(activity,ctx, mAuth,databaseAdmin,textFirstName,textLastName,textAge,
-                textEmail,textUsername,textPassword,textConfirmPassword,textPhone);
-        if(check){
-            String email = textEmail.getText().toString();
-            String password = textPassword.getText().toString();
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                Toast.makeText(ctx, "You're now registered",
+        String check = registration.registerAdmin(ctx, databaseAdmin,firstName,lastName,age,
+                email,username,password,confirmPassword,phone,"real");
+        if(check.equals("true")){
+            signUpWithUserNamePassword(email,password);
+        }
+    }
+
+    private boolean signUpWithUserNamePassword(String email, String password) {
+        Boolean check = true;
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+
+                            Toast.makeText(ctx, "You're now registered",
+                                    Toast.LENGTH_LONG).show();
+                            Intent sign_in = new Intent(ctx,LoginActivity.class);
+                            startActivity(sign_in);
+
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            if(task.getException() instanceof FirebaseAuthUserCollisionException){
+                                Toast.makeText(ctx, "User already exists",
                                         Toast.LENGTH_LONG).show();
                                 Intent sign_in = new Intent(ctx,LoginActivity.class);
                                 startActivity(sign_in);
-
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                if(task.getException() instanceof FirebaseAuthUserCollisionException){
-                                    Toast.makeText(ctx, "User already exists",
-                                            Toast.LENGTH_LONG).show();
-                                }
-
                             }
-
-                            // ...
                         }
-                    });
+                    }
+                });
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user == null){
+            check = false;
         }
+        return check;
     }
 }
