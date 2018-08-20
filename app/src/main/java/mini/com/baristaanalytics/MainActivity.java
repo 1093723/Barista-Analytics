@@ -31,4 +31,9 @@ public class MainActivity extends AppCompatActivity {
         Intent x = new Intent(this, SpeechAPI.class);
         startActivity(x);
     }
+
+    public void showMeMaps(View view) {
+        Intent x = new Intent(this, MapsActivity.class);
+        startActivity(x);
+    }
 }
