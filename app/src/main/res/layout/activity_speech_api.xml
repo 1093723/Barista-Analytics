@@ -28,7 +28,6 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:background="@null"
-            android:onClick="promptSpeechInput"
             android:src="@drawable/ico_mic" />
 
     </RelativeLayout>
