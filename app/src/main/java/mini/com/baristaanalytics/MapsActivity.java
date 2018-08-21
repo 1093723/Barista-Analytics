@@ -2,6 +2,8 @@ package mini.com.baristaanalytics;
 
 import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +12,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -21,8 +28,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static final int ERROR_DIALOG_REQUEST = 9001;
@@ -36,6 +48,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Boolean mPermissionGranted = false;
     private GoogleMap gMap;
     private FusedLocationProviderClient mproviderClient;
+    private EditText textInputSearch;
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -51,6 +64,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
             gMap.setMyLocationEnabled(true);
+            gMap.getUiSettings().setZoomControlsEnabled(true);
         }
     }
 
@@ -59,10 +73,57 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_api);
         Log.d(TAG,"onCreate: Activity started");
+        textInputSearch = (EditText)findViewById(R.id.textInputSearch);
         if(isServiceOK()){
             get_permission_location();
         }
+        init();
     }
+
+    /**
+     *
+     */
+    private void init(){
+        Log.d(TAG, "init(): initializing the editor listener");
+        textInputSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
+                if(actionID == EditorInfo.IME_ACTION_SEARCH
+                        || actionID ==  EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+                    // Execute method for searching for the address
+                    geoLocate();
+                }
+                return false;
+            }
+        });
+        hideSoftKeyboard();
+    }
+
+    private void geoLocate() {
+        Log.d(TAG,"geoLocate(): navigating to location.");
+        String lcoation_search = textInputSearch.getText().toString();
+        if(!lcoation_search.isEmpty()){
+            Geocoder geocoder = new Geocoder(this);
+            List<Address> addressList = new ArrayList<>();
+            try {
+                Log.d(TAG, "geoLocate(): Could not find location");
+                addressList = geocoder.getFromLocationName(lcoation_search,1);
+
+            }catch (IOException e){
+                Log.d(TAG, "geoLocate(): Could not find location");
+            }
+            if(addressList.size() > 0){
+                Address address = addressList.get(0);
+                Log.d(TAG,"geoLocate(): location found" + address.toString());
+                //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+                moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM,
+                        address.getAddressLine(0));
+            }
+        }
+    }
+
     /**
      * This method is for getting the device location
      */
@@ -80,7 +141,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Log.d(TAG, "getDeviceLocation(): Location found");
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                                    DEFAULT_ZOOM, "My Location");
                         }else {
                             Log.d(TAG, "getDeviceLocation(): Location not found");
                             Toast.makeText(MapsActivity.this,
@@ -101,10 +162,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @param latLng (contains the longitude and latitude values)
      * @param zoom
      */
-    private void moveCamera(LatLng latLng, float zoom){
+    private void moveCamera(LatLng latLng, float zoom, String title){
         Log.d(TAG, "moveCamera(); moving camera to lat: " + latLng.latitude +
                 ". Longitude: " + latLng.longitude);
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
+        if(!title.equals("My Location")){
+            MarkerOptions options = new MarkerOptions()
+                    .position(latLng)
+                    .title(title);
+            gMap.addMarker(options);
+        }
+        hideSoftKeyboard();
     }
 
     /**
@@ -188,5 +256,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "We cant make a map request", Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    /**
+     *
+     */
+    private void hideSoftKeyboard(){
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 }
