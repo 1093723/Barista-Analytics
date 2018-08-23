@@ -31,6 +31,14 @@
           }
         },
         {
+          "client_id": "114533826598-guf4tmrph1gi7tpg956lioi6gdp6i60m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mini.com.baristaanalytics",
+            "certificate_hash": "223f1660fd73bce8b875e7c68f2d0dd5399a6b96"
+          }
+        },
+        {
           "client_id": "114533826598-j1o5tku3suvbgnh4tkndrcfftk9k5bbi.apps.googleusercontent.com",
           "client_type": 3
         }

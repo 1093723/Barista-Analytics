@@ -1,0 +1,26 @@
+{
+  "COFFEEPLACES" : {
+    "1" : {
+      "name" : "Doubleshot Coffee And Tea",
+      "AddressLine" : "15 Melle Street, Corner, Juta St, Braamfontein, Johannesburg, 2001",
+      "contactNumber" : "0111005241",
+      "open_Hours_Midweek" : "08:00",
+      "close_Hours_midweek" : "16:30",
+      "is_Open_Saturday" : "1",
+      "open_Hours_Saturday" : "08:00",
+      "close_hours_Saturday" : "16:30",
+      "is_Open_Sunday":"0"
+    },
+    "2" : {
+      "name" : "Okoa Coffee Co.",
+      "AddressLine" : "Okoa Coffee Co., Corner of North West Engineering Building, Yale Rd, Johannesburg, 2000",
+      "contactNumber" : "0646793607",
+      "open_Hours_Midweek" : "08:00",
+      "close_Hours_midweek" : "16:00",
+      "is_Open_Saturday" : "0",
+      "open_Hours_Saturday" : "0",
+      "close_hours_Saturday" : "0",
+      "is_Open_Sunday":"0"
+    }
+  }
+}
