@@ -43,6 +43,8 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support:support-annotations:27.1.1'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.amazonaws:aws-android-sdk-polly:2.6.+'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
