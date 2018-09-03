@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,14 +16,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Actors.MyAdapter;
-import Actors.message_Item;
+import Utilities.MyAdapter;
+import Utilities.message_Item;
 
 import static android.content.ContentValues.TAG;
 
@@ -36,6 +35,7 @@ public class SpeechAPI extends AppCompatActivity{
     private List<message_Item> message_items = new ArrayList<>();
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,14 @@ public class SpeechAPI extends AppCompatActivity{
         //message_items = new ArrayList<>();
         // hide the action bar
         //getActionBar().hide();
-
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR){
+                    textToSpeech.setLanguage(Locale.ENGLISH);
+                }
+            }
+        });
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -94,10 +101,34 @@ public class SpeechAPI extends AppCompatActivity{
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    // result.get(0) contains the result from the user
                     message_Item message_item = new message_Item(result.get(0));
                     message_items.add(message_item);
                     Log.d(TAG, "The array size is: " + message_items.size());
                     initRecyclerView();
+                    // Say anything related to 'like' or 'coffee' to trigger the maps
+                    if(result.get(0).contains("like") && result.get(0).contains("coffee")){
+                        Intent x = new Intent(this, MapsActivity.class);
+                        String toSpeak = "Proceeding to user registration";
+                        textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH,null);
+                        startActivity(x);
+                        finish();
+                    }
+                    else if((result.get(0).contains("registration") ||
+                            result.get(0).contains("register")) &&
+                            (result.get(0).contains("user") || result.get(0).contains("customer"))){
+                        Intent x = new Intent(this, RegisterCustomerActivity.class);
+                        String toSpeak = "Let's get you signed in so you can order coffee";
+                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        startActivity(x);
+                    }else if((result.get(0).contains("registration") ||
+                            result.get(0).contains("register")) &&
+                            (result.get(0).contains("admin") || result.get(0).contains("administrator"))){
+                        Intent x = new Intent(this, RegisterAdminActivity.class);
+                        String toSpeak = "Proceeding to administrator registration";
+                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        startActivity(x);
+                    }
                     //message.setText(message_items.size());
                 }
                 break;

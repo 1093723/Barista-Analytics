@@ -18,7 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 
 import Services.AdminService;
-import Services.ServiceHelper;
+import Services.ActorsServiceHelper;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -84,7 +84,7 @@ public class RegistrationUnitTests {
         final EditText lastname = Mockito.mock(EditText.class);
         Mockito.when(lastname.getText()).thenReturn(new MockEditable(lname));
         details.add(lastname);
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
 
         assertFalse(helper.validate_edittext(details));
     }
@@ -117,7 +117,7 @@ public class RegistrationUnitTests {
         final EditText lastname = Mockito.mock(EditText.class);
         Mockito.when(lastname.getText()).thenReturn(new MockEditable(lname));
         details.add(lastname);
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
 
         assertTrue(helper.validate_edittext(details));
     }
@@ -133,7 +133,7 @@ public class RegistrationUnitTests {
 
         final EditText confirm = Mockito.mock(EditText.class);
         Mockito.when(confirm.getText()).thenReturn(new MockEditable(pass));
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
         assertFalse(helper.validate_password(password,confirm));
     }
     @Test
@@ -145,7 +145,7 @@ public class RegistrationUnitTests {
 
         final EditText confirm = Mockito.mock(EditText.class);
         Mockito.when(confirm.getText()).thenReturn(new MockEditable(pass));
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
         assertTrue(helper.validate_password(password,confirm));
     }
     // Test validity of email address
@@ -158,7 +158,7 @@ public class RegistrationUnitTests {
         // Symbols before the @
         String email_third="dlasnd!@#@live.com.";
 
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
         assertFalse(helper.validate_email(email));
         assertFalse(helper.validate_email(email_two));
         assertFalse(helper.validate_email(email_third));
@@ -170,7 +170,7 @@ public class RegistrationUnitTests {
         // outlook with two dots
         String email_two="mail@live.co.uk";
 
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
         assertTrue(helper.validate_email(email));
         assertTrue(helper.validate_email(email_two));
     }
@@ -187,7 +187,7 @@ public class RegistrationUnitTests {
         final EditText phone_three= Mockito.mock(EditText.class);
         Mockito.when(phone_three.getText()).thenReturn(new MockEditable("00148866968"));
 
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
         assertFalse(helper.validate_phone(editText));
         assertFalse(helper.validate_phone(phone_two));
         assertFalse(helper.validate_phone(phone_three));

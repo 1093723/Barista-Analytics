@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -49,16 +50,14 @@ import java.util.List;
 import java.util.Locale;
 
 import Actors.Barista;
-import Actors.message_Item;
-
-import static android.content.ContentValues.TAG;
+import Utilities.message_Item;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
-    public static final int ERROR_DIALOG_REQUEST = 9001;
+    private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final float DEFAULT_ZOOM = 15f;
-    public String TAG = "SEARCH COFFEE PLACES: ACTIVITY";
-    public static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    public static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private String TAG = "SEARCH COFFEE PLACES: ACTIVITY";
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     // vars
@@ -68,6 +67,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText textInputSearch;
     private DatabaseReference ref;
     private ArrayList<Barista> locations;
+    private TextToSpeech textToSpeech;
 
     private List<message_Item> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
@@ -101,6 +101,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG,"onCreate: Activity started");
         textInputSearch = (EditText)findViewById(R.id.textInputSearch);
         locations = new ArrayList<>();
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+             if(status != TextToSpeech.ERROR){
+                 textToSpeech.setLanguage(Locale.ENGLISH);
+             }
+            }
+        });
         init();
         if(isServiceOK()){
             get_permission_location();
@@ -140,11 +148,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 id+=1;
             }
         }
-        Toast.makeText(this, locations.get(0).getAddressLine() + " " + locations.get(1).getAddressLine(), Toast.LENGTH_SHORT).show();
     }
 
     /**
-     *
+     *This is for searching for available coffee places
      */
     private void init(){
         Log.d(TAG, "init(): initializing the editor listener");
@@ -210,7 +217,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d(TAG,"geoLocate(): location found" + address.toString());
                     //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
                     moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM,
-                            address.getAddressLine(0));
+                            locations.get(i).getName());
                 }
             }
         }else {
@@ -263,6 +270,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             MarkerOptions options = new MarkerOptions()
                     .position(latLng)
                     .title(title);
+
             gMap.addMarker(options);
         }
         hideSoftKeyboard();
@@ -394,6 +402,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     message_Item message_item = new message_Item(result.get(0));
                     message_items.add(message_item);
                     decodeUserInput(result.get(0));
+                    if((result.get(0).contains("registration") ||
+                            result.get(0).contains("register")) &&
+                            (result.get(0).contains("user") || result.get(0).contains("customer"))){
+                        Intent x = new Intent(this, RegisterCustomerActivity.class);
+                        String toSpeak = "Proceeding to user registration";
+                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        startActivity(x);
+                    }else if((result.get(0).contains("registration") ||
+                            result.get(0).contains("register")) &&
+                            (result.get(0).contains("admin") || result.get(0).contains("administrator"))){
+                        Intent x = new Intent(this, RegisterAdminActivity.class);
+                        String toSpeak = "Proceeding to administrator registration";
+                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        startActivity(x);
+                    }
                 }
                 break;
             }

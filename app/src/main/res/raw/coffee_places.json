@@ -22,5 +22,23 @@
       "close_hours_Saturday" : "0",
       "is_Open_Sunday":"0"
     }
+  },
+  "OkoaMenu" : {
+    "1" : {
+      "name" : "Americano",
+      "price_small" : "25.00",
+      "price_tall" : "30.00",
+      "size_available" : "S/M",
+      "ingredients" : "08:00"
+    }
+  },
+  "DoubleshotMenu": {
+    "1" : {
+      "name" : "Frappe",
+      "price_small" : "25.00",
+      "price_tall" : "35.00",
+      "size_available" : "S/M",
+      "ingredients" : "08:00"
+    }
   }
 }

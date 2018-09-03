@@ -1,4 +1,4 @@
-package Actors;
+package Utilities;
 
 public class message_Item {
     private String text;

@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // This class is to contain methods which are common across all services to reduce code redundancies
-public class ServiceHelper {
+public class ActorsServiceHelper {
     // static regex's since they does not change
     private static final String EMAIL_REGEX = "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
     private static final String PHONE_REGEX = "[0](\\d{9})|([0](\\d{2})( |-)((\\d{3}))( |-)(\\d{4}))|[0](\\d{2})( |-)(\\d{7})";
@@ -19,7 +19,7 @@ public class ServiceHelper {
     private Matcher email_matcher;
     private Matcher phone_matcher;
     // Static
-    public ServiceHelper(){
+    public ActorsServiceHelper(){
         // initialize the phone_pattern object
         email_pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);
         phone_pattern = Pattern.compile(PHONE_REGEX, Pattern.CASE_INSENSITIVE);

@@ -1,4 +1,4 @@
-package Actors;
+package Utilities;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

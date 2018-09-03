@@ -111,7 +111,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Password"
-                android:inputType="numberPassword" />
+                android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -125,7 +125,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Confirm Password"
-                android:inputType="numberPassword" />
+                android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout

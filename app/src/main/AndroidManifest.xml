@@ -13,6 +13,8 @@
 
     <permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0"/>
-        <activity android:name=".MainActivity">
+        <activity android:name=".SpeechAPI">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,9 +34,6 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"></activity>
-        <activity
-            android:name=".SpeechAPI"
-            android:label="Profile Activity" />
         <activity
             android:name=".RegisterAdminActivity"
             android:label="Admin Registration" />

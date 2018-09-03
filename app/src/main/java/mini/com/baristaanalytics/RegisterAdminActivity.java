@@ -22,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 import Services.AdminService;
-import Services.ServiceHelper;
+import Services.ActorsServiceHelper;
 
 public class RegisterAdminActivity extends AppCompatActivity {
 
@@ -64,7 +64,7 @@ public class RegisterAdminActivity extends AppCompatActivity {
         registrationDetails.add(textPhone);
         /******************************************************************************************/
 
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
         if(helper.validate_edittext(registrationDetails)) {
             // No field is left empty
             if (helper.validate_password(textPassword, textConfirmPassword)) {

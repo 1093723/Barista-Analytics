@@ -22,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 import Services.CustomerService;
-import Services.ServiceHelper;
+import Services.ActorsServiceHelper;
 
 public class RegisterCustomerActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -60,7 +60,7 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         final EditText textPhone = (EditText) findViewById(R.id.textPhone);
         registrationDetails.add(textPhone);
         /******************************************************************************************/
-        ServiceHelper helper = new ServiceHelper();
+        ActorsServiceHelper helper = new ActorsServiceHelper();
 
         if(helper.validate_edittext(registrationDetails)){
             // No field is left empty
