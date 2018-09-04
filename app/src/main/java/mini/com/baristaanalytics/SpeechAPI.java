@@ -8,7 +8,6 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,7 +48,6 @@ public class SpeechAPI extends AppCompatActivity{
     private List<MessageItem> message_items = new ArrayList<>();
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
-    private TextToSpeech textToSpeech;
 
     //AWS Polly Vars
     CognitoCachingCredentialsProvider credentialsProvider;
@@ -79,15 +77,6 @@ public class SpeechAPI extends AppCompatActivity{
         btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
         initPollyClient();
         setupNewMediaPlayer();
-
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR){
-                    textToSpeech.setLanguage(Locale.ENGLISH);
-                }
-            }
-        });
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -143,7 +132,7 @@ public class SpeechAPI extends AppCompatActivity{
                             // Set text to synthesize.
                             .withText(words)
                             // Set voice selected by the user.
-                            .withVoiceId(voices.get(32).getId())
+                            .withVoiceId(voices.get(33).getId())
                             // Set format to MP3.
                             .withOutputFormat(OutputFormat.Mp3);
 
@@ -216,8 +205,6 @@ public class SpeechAPI extends AppCompatActivity{
     /**
      * AWS Polly Media Player
      */
-
-
     void setupNewMediaPlayer() {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -266,7 +253,6 @@ public class SpeechAPI extends AppCompatActivity{
                         message_items.add(message);
                         //Trigger AWS Polly
                         setupPlayButton("We're Almost There");
-                        //textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH,null);
                         startActivity(x);
                         finish();
                     }
@@ -275,14 +261,14 @@ public class SpeechAPI extends AppCompatActivity{
                             (result.get(0).contains("user") || result.get(0).contains("customer"))){
                         Intent x = new Intent(this, RegisterCustomerActivity.class);
                         String toSpeak = "Let's get you signed in so you can order coffee";
-                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        setupPlayButton(toSpeak);
                         startActivity(x);
                     }else if((result.get(0).contains("registration") ||
                             result.get(0).contains("register")) &&
                             (result.get(0).contains("admin") || result.get(0).contains("administrator"))){
                         Intent x = new Intent(this, RegisterAdminActivity.class);
                         String toSpeak = "Proceeding to administrator registration";
-                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        setupPlayButton(toSpeak);
                         startActivity(x);
                     }
                     //message.setText(message_items.size());

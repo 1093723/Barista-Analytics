@@ -8,9 +8,11 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -25,6 +27,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.polly.AmazonPollyPresigningClient;
+import com.amazonaws.services.polly.model.DescribeVoicesRequest;
+import com.amazonaws.services.polly.model.DescribeVoicesResult;
+import com.amazonaws.services.polly.model.OutputFormat;
+import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
+import com.amazonaws.services.polly.model.Voice;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,6 +52,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +60,8 @@ import java.util.Locale;
 import Actors.Barista;
 import Services.MapsServices;
 import Utilities.MessageItem;
+
+import static android.content.ContentValues.TAG;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
     // vars
@@ -72,11 +85,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapsServices mapsServices;
 
     // Speech to text
-    private TextToSpeech textToSpeech;
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
+    // AWS Polly vars
+    CognitoCachingCredentialsProvider credentialsProvider;
+    private List<Voice> voices;
+    // Amazon Polly permissions.
+    private static final String COGNITO_POOL_ID = "CHANGEME";
+
+    // Region of Amazon Polly.
+    private static final Regions MY_REGION = Regions.US_EAST_1;
+    private AmazonPollyPresigningClient client;
+
+    // AWS Media Player
+    MediaPlayer mediaPlayer;
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        setupVoicesList();
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         //Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
@@ -103,15 +132,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ctx = this;
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
+        initPollyClient();
+        setupNewMediaPlayer();
         init();
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-             if(status != TextToSpeech.ERROR){
-                 textToSpeech.setLanguage(Locale.ENGLISH);
-             }
-            }
-        });
         if(mapsServices.isServiceOK(this)){
             get_permission_location();
         }
@@ -236,9 +259,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
     }
-
-
-
     /**
      * This method is to initialize the user interface of the Maps API
      */
@@ -274,7 +294,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this, permissions,LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult(): Request user permission");
@@ -296,10 +315,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
-
-
-
     /**
      * Showing google speech input dialog
      * */
@@ -338,16 +353,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if((result.get(0).contains("registration") ||
                             result.get(0).contains("register")) &&
                             (result.get(0).contains("user") || result.get(0).contains("customer"))){
-                        Intent x = new Intent(this, RegisterCustomerActivity.class);
                         String toSpeak = "Proceeding to user registration";
-                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        setupPlayButton(toSpeak);
+                        Intent x = new Intent(this, RegisterCustomerActivity.class);
                         startActivity(x);
                     }else if((result.get(0).contains("registration") ||
                             result.get(0).contains("register")) &&
                             (result.get(0).contains("admin") || result.get(0).contains("administrator"))){
                         Intent x = new Intent(this, RegisterAdminActivity.class);
                         String toSpeak = "Proceeding to administrator registration";
-                        textToSpeech.speak(toSpeak,TextToSpeech.QUEUE_FLUSH,null);
+                        setupPlayButton(toSpeak);
                         startActivity(x);
                     }
                 }
@@ -359,6 +374,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void decodeUserInput(String s) {
         if(s.contains("show") || s.contains("available")){
+            String toSpeak = "I currently support these locations on the map. I hope they are " +
+                    "near your address";
+            setupPlayButton(toSpeak);
             geoLocate(mapsServices.getLocations());
         }else {
             Toast.makeText(this, "Command Not Found", Toast.LENGTH_SHORT).show();
@@ -374,5 +392,131 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void getDeviceLocation(View view) {
         getDeviceLocation();
+    }
+
+    /********************AWS POLLY Text To Speech************************/
+
+
+
+    /**
+     * Initialize amazon polly
+     */
+    private void initPollyClient() {
+        // Initialize the Amazon Cognito credentials provider.
+        credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "us-east-1:7e3cee5d-a9dc-4951-8d7c-63275541e8e3", // Identity pool ID
+                Regions.US_EAST_1 // Region
+        );
+
+        // Create a client that supports generation of presigned URLs.
+        client = new AmazonPollyPresigningClient(credentialsProvider);
+    }
+
+    /**
+     * Setup responding to the user
+     */
+    private void setupPlayButton(String words){
+        MessageItem item = new MessageItem(words);
+        message_items.add(item);
+        // Create speech synthesis request.
+        SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
+                new SynthesizeSpeechPresignRequest()
+                        // Set text to synthesize.
+                        .withText(words)
+                        // Set voice selected by the user.
+                        .withVoiceId(voices.get(33).getId())
+                        // Set format to MP3.
+                        .withOutputFormat(OutputFormat.Mp3);
+
+        // Get the presigned URL for synthesized speech audio stream.
+        URL presignedSynthesizeSpeechUrl =
+                client.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
+
+        Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
+
+        // Create a media player to play the synthesized audio stream.
+        if (mediaPlayer.isPlaying()) {
+            setupNewMediaPlayer();
+        }
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            // Set media player's data source to previously obtained URL.
+            mediaPlayer.setDataSource(presignedSynthesizeSpeechUrl.toString());
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to set data source for the media player! " + e.getMessage());
+        }
+
+        // Start the playback asynchronously (since the data source is a network stream).
+        mediaPlayer.prepareAsync();
+    }
+
+    /**
+     * Setup Polly Voices List
+     */
+    void setupVoicesList() {
+        // Asynchronously get available Polly voices.
+        new GetPollyVoices().execute();
+
+    }
+
+    /**
+     * AWS Polly Media Player
+     */
+    void setupNewMediaPlayer() {
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+                setupNewMediaPlayer();
+            }
+        });
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.start();
+                //playButton.setEnabled(true);
+            }
+        });
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                //playButton.setEnabled(true);
+                return false;
+            }
+        });
+    }
+
+    private class GetPollyVoices extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (voices != null) {
+                return null;
+            }
+
+            // Create describe voices request.
+            DescribeVoicesRequest describeVoicesRequest = new DescribeVoicesRequest();
+
+            DescribeVoicesResult describeVoicesResult;
+            try {
+                // Synchronously ask the Polly Service to describe available TTS voices.
+                describeVoicesResult = client.describeVoices(describeVoicesRequest);
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Unable to get available voices. " + e.getMessage());
+                return null;
+            }
+
+            // Get list of voices from the result.
+            voices = describeVoicesResult.getVoices();
+
+            // Log a message with a list of available TTS voices.
+            Log.i(TAG, "Available Polly voices: " + voices);
+
+            return null;
+        }
+
+
     }
 }
