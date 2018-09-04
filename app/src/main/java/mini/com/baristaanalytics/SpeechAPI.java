@@ -15,9 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Utilities.MyAdapter;
-import Utilities.message_Item;
+import Adapter.RecyclerViewAdapter;
+import Utilities.MessageItem;
 
 import static android.content.ContentValues.TAG;
 
@@ -48,7 +46,7 @@ public class SpeechAPI extends AppCompatActivity{
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
 
-    private List<message_Item> message_items = new ArrayList<>();
+    private List<MessageItem> message_items = new ArrayList<>();
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
     private TextToSpeech textToSpeech;
@@ -105,7 +103,7 @@ public class SpeechAPI extends AppCompatActivity{
         if(words.equals("welcome")){
             String welcome_message = "Hello. I'm Bruce. Your voice-assistant Barista throughout your " +
                     "use of the application. I can help you search for coffee places and view available coffee shops near you";
-            message_Item item = new message_Item(welcome_message);
+            MessageItem item = new MessageItem(welcome_message);
             message_items.add(item);
             // Create speech synthesis request.
             SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
@@ -256,7 +254,7 @@ public class SpeechAPI extends AppCompatActivity{
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     // result.get(0) contains the result from the user
-                    message_Item message_item = new message_Item(result.get(0));
+                    MessageItem message_item = new MessageItem(result.get(0));
                     message_items.add(message_item);
                     Log.d(TAG, "The array size is: " + message_items.size());
                     initRecyclerView();
@@ -264,7 +262,7 @@ public class SpeechAPI extends AppCompatActivity{
                     if(result.get(0).contains("like") && result.get(0).contains("coffee")){
                         Intent x = new Intent(this, MapsActivity.class);
                         String toSpeak = "Proceeding to user registration";
-                        message_Item message = new message_Item(toSpeak);
+                        MessageItem message = new MessageItem(toSpeak);
                         message_items.add(message);
                         //Trigger AWS Polly
                         setupPlayButton("We're Almost There");
@@ -305,7 +303,7 @@ public class SpeechAPI extends AppCompatActivity{
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyAdapter(message_items,this);
+        adapter = new RecyclerViewAdapter(message_items,this);
         recyclerView.setAdapter(adapter);
     }
 

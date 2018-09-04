@@ -1,4 +1,4 @@
-package Utilities;
+package Adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,16 +11,17 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import Utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 import static android.content.ContentValues.TAG;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private List<message_Item> message_items;
+    private List<MessageItem> message_items;
     private Context context;
 
-    public MyAdapter(List<message_Item> message_items, Context context) {
+    public RecyclerViewAdapter(List<MessageItem> message_items, Context context) {
         this.message_items = message_items;
         this.context = context;
     }
@@ -36,7 +37,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: called");
-        message_Item message_item = message_items.get(position);
+        MessageItem message_item = message_items.get(position);
         holder.message.setText(message_item.getText());
 
     }

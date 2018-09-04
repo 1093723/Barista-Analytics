@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import Services.AdminService;
 import Services.ActorsServiceHelper;
+import Services.CustomerService;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -56,7 +57,36 @@ public class RegistrationUnitTests {
         final EditText lastname = Mockito.mock(EditText.class);
         Mockito.when(lastname.getText()).thenReturn(new MockEditable(lname));
         assertTrue(adminService.registerAdmin(reference,firstname,lastname,age,email,username,password,phone));
+
     }
+
+    /**
+     * This method tests for a valid database registration
+     *
+     * */
+    @Test
+    public void database_CustomerRegistration_ReturnsTrue() {
+        String uname = "soy",pword = "1234",confirm = "1234",mail="validemail@mail.com",old = "21",phone_no="0814754016",
+                fname="mosaic",lname="mosaic";
+
+        CustomerService customerService = new CustomerService();
+        final EditText username = Mockito.mock(EditText.class);
+        Mockito.when(username.getText()).thenReturn(new MockEditable(uname));
+        final EditText password = Mockito.mock(EditText.class);
+        Mockito.when(password.getText()).thenReturn(new MockEditable(pword));
+        final EditText email = Mockito.mock(EditText.class);
+        Mockito.when(email.getText()).thenReturn(new MockEditable(mail));
+        final EditText age = Mockito.mock(EditText.class);
+        Mockito.when(age.getText()).thenReturn(new MockEditable(old));
+        final EditText phone = Mockito.mock(EditText.class);
+        Mockito.when(phone.getText()).thenReturn(new MockEditable(phone_no));
+        final EditText firstname = Mockito.mock(EditText.class);
+        Mockito.when(firstname.getText()).thenReturn(new MockEditable(fname));
+        final EditText lastname = Mockito.mock(EditText.class);
+        Mockito.when(lastname.getText()).thenReturn(new MockEditable(lname));
+        assertTrue(customerService.registerCustomer(reference,firstname,lastname,age,email,username,password,phone));
+    }
+
     // Test missing fields
     @Test
     public void textfield_validation_ReturnsFalse() {

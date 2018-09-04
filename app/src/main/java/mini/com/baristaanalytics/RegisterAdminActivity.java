@@ -44,6 +44,14 @@ public class RegisterAdminActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * This method is prompted when the 'register' button is clicked on the Activity
+     * Get all Edit-texts
+     * Validate them
+     * Register the admin details onto firebase
+     * Register admin for email-password sign-in
+     * @param view
+     */
     public void addAdministrator(View view) {
         /*********************Prepare fields for validation by Service Helper**********************/
         final EditText textFirstName = (EditText) findViewById(R.id.textFirstName);

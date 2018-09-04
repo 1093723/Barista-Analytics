@@ -1,8 +1,8 @@
 package mini.com.baristaanalytics;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -20,14 +20,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -50,26 +47,34 @@ import java.util.List;
 import java.util.Locale;
 
 import Actors.Barista;
-import Utilities.message_Item;
+import Services.MapsServices;
+import Utilities.MessageItem;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
-    private static final int ERROR_DIALOG_REQUEST = 9001;
-    private static final float DEFAULT_ZOOM = 15f;
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
+    // vars
     private String TAG = "SEARCH COFFEE PLACES: ACTIVITY";
+    private EditText textInputSearch;
+    private Context ctx;
+
+    // Location-Permission related vars
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-
-    // vars
+    private static final float DEFAULT_ZOOM = 15f;
     private Boolean mPermissionGranted = false;
-    private GoogleMap gMap;
-    private FusedLocationProviderClient mproviderClient;
-    private EditText textInputSearch;
-    private DatabaseReference ref;
-    private ArrayList<Barista> locations;
-    private TextToSpeech textToSpeech;
 
-    private List<message_Item> message_items = new ArrayList<>();
+    // Firebase
+    private DatabaseReference ref;
+
+    // Google Maps
+    private FusedLocationProviderClient mproviderClient;
+    private GoogleMap gMap;
+    private MapsServices mapsServices;
+
+    // Speech to text
+    private TextToSpeech textToSpeech;
+    // Array of input speech from user
+    private List<MessageItem> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
     @Override
@@ -78,6 +83,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG, "onMapReady : Map is ready");
         gMap = googleMap;
         if (mPermissionGranted) {
+            // Permission granted by the user
             getDeviceLocation();
             if (ActivityCompat.checkSelfPermission(this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -87,20 +93,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             gMap.setMyLocationEnabled(true);
             gMap.setBuildingsEnabled(true);
-            gMap.getUiSettings().setZoomControlsEnabled(true);
-            gMap.getUiSettings().setMyLocationButtonEnabled(true);
-            gMap.getUiSettings().setCompassEnabled(true);
-            gMap.getUiSettings().setRotateGesturesEnabled(true);
         }
     }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps_api);
+        setContentView(R.layout.activity_maps);
         Log.d(TAG,"onCreate: Activity started");
-        textInputSearch = (EditText)findViewById(R.id.textInputSearch);
-        locations = new ArrayList<>();
+        ctx = this;
+        textInputSearch = findViewById(R.id.textInputSearch);
+        mapsServices = new MapsServices();
+        init();
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -109,8 +112,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
              }
             }
         });
-        init();
-        if(isServiceOK()){
+        if(mapsServices.isServiceOK(this)){
             get_permission_location();
         }
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -118,7 +120,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                process_locations(dataSnapshot);
+                mapsServices.process_locations(dataSnapshot);
             }
 
             @Override
@@ -128,28 +130,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
     }
-
-    private void process_locations(DataSnapshot dataSnapshot) {
-        Integer id = 1;
-
-        for(DataSnapshot ds: dataSnapshot.getChildren()){
-            while (ds.hasChild(id.toString())){
-                Barista barista = new Barista();
-                barista.setName(ds.child(id.toString()).getValue(Barista.class).getName());
-                barista.setAddressLine(ds.child(id.toString()).getValue(Barista.class).getAddressLine());
-                barista.setContactNumber(ds.child(id.toString()).getValue(Barista.class).getContactNumber());
-                barista.setOpen_Hours_Midweek(ds.child(id.toString()).getValue(Barista.class).getOpen_Hours_Midweek());
-                barista.setClose_Hours_midweek(ds.child(id.toString()).getValue(Barista.class).getClose_Hours_midweek());
-                barista.setIs_Open_Saturday(ds.child(id.toString()).getValue(Barista.class).getIs_Open_Saturday());
-                barista.setClose_hours_Saturday(ds.child(id.toString()).getValue(Barista.class).getOpen_Hours_Saturday());
-                barista.setClose_Hours_midweek(ds.child(id.toString()).getValue(Barista.class).getClose_hours_Saturday());
-                barista.setIs_Open_Sunday(ds.child(id.toString()).getValue(Barista.class).getIs_Open_Sunday());
-                locations.add(barista);
-                id+=1;
-            }
-        }
-    }
-
     /**
      *This is for searching for available coffee places
      */
@@ -168,7 +148,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
-        hideSoftKeyboard();
+        mapsServices.hideSoftKeyboard(this);
     }
 
     private void geoLocate() {
@@ -188,7 +168,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Address address = addressList.get(0);
                 Log.d(TAG,"geoLocate(): location found" + address.toString());
                 //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-                moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM,
+                mapsServices.moveCamera(this,gMap,new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM,
                         address.getAddressLine(0));
             }
         }
@@ -216,7 +196,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Address address = addressList.get(0);
                     Log.d(TAG,"geoLocate(): location found" + address.toString());
                     //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-                    moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM,
+                    mapsServices.moveCamera(this,gMap,new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM,
                             locations.get(i).getName());
                 }
             }
@@ -240,7 +220,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if(task.isSuccessful()){
                             Log.d(TAG, "getDeviceLocation(): Location found");
                             Location currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
+                            mapsServices.moveCamera(ctx,gMap,new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
                                     DEFAULT_ZOOM, "My Location");
                         }else {
                             Log.d(TAG, "getDeviceLocation(): Location not found");
@@ -257,24 +237,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /**
-     * This method recenters the position of the zoom to the devices' currrent location on the map
-     * @param latLng (contains the longitude and latitude values)
-     * @param zoom
-     */
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera(); moving camera to lat: " + latLng.latitude +
-                ". Longitude: " + latLng.longitude);
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
-        if(!title.equals("My Location")){
-            MarkerOptions options = new MarkerOptions()
-                    .position(latLng)
-                    .title(title);
 
-            gMap.addMarker(options);
-        }
-        hideSoftKeyboard();
-    }
 
     /**
      * This method is to initialize the user interface of the Maps API
@@ -334,37 +297,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /**
-     * This method checks if the user can access google maps functionality
-     * @return boolean True: Maps functionality can be accessed
-     *                 False: Maps functionality can't be accessed
-     *
-     */
-    public boolean isServiceOK(){
-        Log.d(TAG,"isServiceOK");
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
-        if(available == ConnectionResult.SUCCESS){
-            // Nothing is wrong
-            Log.d(TAG, "Google Play Services OK");
-            return true;
-        }else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
-            // Error occured but we can fix it
-            Log.d(TAG, "Error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, available,ERROR_DIALOG_REQUEST);
-            dialog.show();
-        }else {
-            // Maps API Can't Be Reached
-            Toast.makeText(this, "We cant make a map request", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
 
-    /**
-     *
-     */
-    private void hideSoftKeyboard(){
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    }
 
 
     /**
@@ -399,7 +332,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    message_Item message_item = new message_Item(result.get(0));
+                    MessageItem message_item = new MessageItem(result.get(0));
                     message_items.add(message_item);
                     decodeUserInput(result.get(0));
                     if((result.get(0).contains("registration") ||
@@ -426,7 +359,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void decodeUserInput(String s) {
         if(s.contains("show") || s.contains("available")){
-            geoLocate(locations);
+            geoLocate(mapsServices.getLocations());
         }else {
             Toast.makeText(this, "Command Not Found", Toast.LENGTH_SHORT).show();
         }
@@ -437,5 +370,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    public void getDeviceLocation(View view) {
+        getDeviceLocation();
     }
 }

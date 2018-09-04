@@ -1,10 +1,10 @@
 package Utilities;
 
-public class message_Item {
+public class MessageItem {
     private String text;
 
 
-    public message_Item(String text) {
+    public MessageItem(String text) {
         this.text = text;
     }
 
