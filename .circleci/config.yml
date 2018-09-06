@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    machine:
+      environment:
+        COVERALLS_REPO_TOKEN: 2BhvN1APFI7VmAXMY1xqXu4DqjkSjrPhA
     working_directory: ~/code
     docker:
       - image: circleci/android:api-24-alpha
