@@ -23,7 +23,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +45,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -122,6 +126,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             gMap.setMyLocationEnabled(true);
             gMap.setBuildingsEnabled(true);
+        }
+
+        if(gMap != null){
+            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                @Override
+                public View getInfoWindow(Marker marker) {
+                    return null;
+                }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+                    View v = getLayoutInflater().inflate(R.layout.activity_view_place, null);
+                    TextView placeName = v.findViewById(R.id.place_name);
+                    TextView placeAddress = v.findViewById(R.id.place_address);
+                    RatingBar ratingBar = v.findViewById(R.id.ratingBar);
+                    ImageView imageView = v.findViewById(R.id.photo);
+                    Button button = v.findViewById(R.id.back_to_results);
+
+                    placeName.setText(marker.getTitle());
+                    placeAddress.setText("Latitude : " + marker.getPosition().latitude +
+                            ". Longitude" + marker.getPosition().longitude);
+
+                    return v;
+                }
+            });
         }
     }
     @Override
