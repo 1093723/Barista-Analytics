@@ -2,6 +2,7 @@ package Actors;
 
 public class Customer {
 
+
     // this class is for attributes defining a customer
     private String customerFirstName;
     private String customerLastName;
