@@ -3,11 +3,15 @@ package mini.com.baristaanalytics;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,11 +38,13 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.RecyclerViewAdapter;
+import Utilities.ConnectivityReceiver;
 import Utilities.MessageItem;
+import Utilities.MyApplication;
 
 import static android.content.ContentValues.TAG;
 
-public class SpeechAPI extends AppCompatActivity{
+public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener{
     Context ctx;
     private TextView message;
     private ImageButton btnSpeak;
@@ -63,6 +69,8 @@ public class SpeechAPI extends AppCompatActivity{
     // AWS Media Player
     MediaPlayer mediaPlayer;
 
+    ConnectivityReceiver connectivityReceiver;
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -72,10 +80,12 @@ public class SpeechAPI extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speech_api);
+        btnSpeak = findViewById(R.id.btnSpeak);
         ctx = this;
-        message = (TextView) findViewById(R.id.message);
-        btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
+        message = findViewById(R.id.message);
+        checkConnection();
         initPollyClient();
+        //Snackbar snack = (Snackbar) findViewById(R.id.fab);
         setupNewMediaPlayer();
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
@@ -84,6 +94,61 @@ public class SpeechAPI extends AppCompatActivity{
                 promptSpeechInput();
             }
         });
+    }
+    /***
+     * Internet-related permissions
+     */
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showToast(isConnected);
+        if(!isConnected){
+
+            btnSpeak.setClickable(false);
+        }else {
+            btnSpeak.setClickable(true);
+            initPollyClient();
+        }
+    }
+
+    private void showToast(boolean isConnected) {
+        String message;
+        boolean flag = true;
+        int color;
+        if (isConnected) {
+            message = "Good! Connected to Internet";
+
+        } else {
+            message = "Sorry! Not connected to internet";
+            color = Color.RED;
+            btnSpeak.setClickable(false);
+        }
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showToast(isConnected);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(connectivityReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        connectivityReceiver = new ConnectivityReceiver();
+        registerReceiver(connectivityReceiver, intentFilter);
+
+        /*register connection status listener*/
+        MyApplication.getInstance().setConnectivityListener(this);
     }
     /**
      * Setup responding to the user

@@ -4,12 +4,15 @@ import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -25,6 +28,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -63,11 +67,13 @@ import java.util.Locale;
 
 import Actors.Barista;
 import Services.MapsServices;
+import Utilities.ConnectivityReceiver;
 import Utilities.MessageItem;
+import Utilities.MyApplication;
 
 import static android.content.ContentValues.TAG;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, ConnectivityReceiver.ConnectivityReceiverListener{
     // vars
     private String TAG = "SEARCH COFFEE PLACES: ACTIVITY";
     private EditText textInputSearch;
@@ -103,8 +109,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
+    private ImageButton btn;
     // AWS Media Player
-    MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer;
+
+    private ConnectivityReceiver connectivityReceiver;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -158,12 +167,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Log.d(TAG,"onCreate: Activity started");
+        checkConnection();
         ctx = this;
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
         initPollyClient();
         setupNewMediaPlayer();
         init();
+        btn = findViewById(R.id.btnSpeak);
         if(mapsServices.isServiceOK(this)){
             get_permission_location();
         }
@@ -181,6 +192,66 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+    }
+    /***
+     * Internet-related permissions
+     */
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showToast(isConnected);
+        if(!isConnected){
+
+            btn.setClickable(false);
+        }else {
+            btn.setClickable(true);
+            //initPollyClient();
+        }
+    }
+
+    private void showToast(boolean isConnected) {
+        String message;
+        boolean flag = true;
+        int color;
+        if (isConnected) {
+            message = "Good! Connected to Internet";
+            btn.setClickable(true);
+
+        } else {
+            message = "Sorry! Not connected to internet";
+            color = Color.RED;
+            btn.setClickable(false);
+            //mEmailSignInButton.setClickable(false);
+        }
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showToast(isConnected);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        connectivityReceiver = new ConnectivityReceiver();
+        registerReceiver(connectivityReceiver, intentFilter);
+
+        /*register connection status listener*/
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(connectivityReceiver);
     }
     /**
      *This is for searching for available coffee places

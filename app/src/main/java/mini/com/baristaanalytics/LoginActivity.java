@@ -5,7 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -40,12 +43,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
+import Utilities.ConnectivityReceiver;
+import Utilities.MyApplication;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, ConnectivityReceiver.ConnectivityReceiverListener {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -70,9 +76,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    Button mEmailSignInButton;
     // Sign in with email and password
     private FirebaseAuth mAuth;
+
+    ConnectivityReceiver connectivityReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,6 +114,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        checkConnection();
     }
 
     private void populateAutoComplete() {
@@ -304,6 +314,66 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
+    }
+
+    /***
+     * Internet-related permissions
+     */
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showToast(isConnected);
+        if(!isConnected){
+
+            mEmailSignInButton.setClickable(false);
+        }else {
+            mEmailSignInButton.setClickable(true);
+            //initPollyClient();
+        }
+    }
+
+    private void showToast(boolean isConnected) {
+        String message;
+        boolean flag = true;
+        int color;
+        if (isConnected) {
+            message = "Good! Connected to Internet";
+            mEmailSignInButton.setClickable(true);
+
+        } else {
+            message = "Sorry! Not connected to internet";
+            color = Color.RED;
+            //btnSpeak.setClickable(false);
+            mEmailSignInButton.setClickable(false);
+        }
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showToast(isConnected);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        connectivityReceiver = new ConnectivityReceiver();
+        registerReceiver(connectivityReceiver, intentFilter);
+
+        /*register connection status listener*/
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(connectivityReceiver);
     }
 
 

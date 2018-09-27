@@ -20,12 +20,14 @@
 
 
     <application
+        android:name="Utilities.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0"/>
         <activity android:name=".SpeechAPI">
             <intent-filter>
@@ -43,6 +45,14 @@
             android:label="Admin Registration" />
         <activity android:name=".MapsActivity"
             android:label="Maps Activity"/>
+
+        <receiver
+            android:name="Utilities.ConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
