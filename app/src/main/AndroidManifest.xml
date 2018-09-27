@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- To do with testing and adb permissions -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    
     <permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
