@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -13,14 +15,18 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -44,13 +50,11 @@ import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -58,22 +62,36 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import Actors.Barista;
+import Adapter.ImageAdapter;
 import Services.MapsServices;
+import Utilities.AsyncTaskLoadImage;
 import Utilities.ConnectivityReceiver;
 import Utilities.MessageItem;
 import Utilities.MyApplication;
+import Utilities.Upload;
 
-import static android.content.ContentValues.TAG;
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback/*, ConnectivityReceiver.ConnectivityReceiverListener*/{
+    private RecyclerView mRecyclerView;
+    private ImageAdapter mAdapter;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, ConnectivityReceiver.ConnectivityReceiverListener{
+    private List<Upload> mUploads;
+
+    // Firebase vars
+    private DatabaseReference mDatabaseRef;
+    private DatabaseReference mDatabaseRefPhotos;
+    private StorageReference mStorageRef;
     // vars
     private String TAG = "SEARCH COFFEE PLACES: ACTIVITY";
     private EditText textInputSearch;
@@ -86,8 +104,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final float DEFAULT_ZOOM = 15f;
     private Boolean mPermissionGranted = false;
 
-    // Firebase
-    private DatabaseReference ref;
 
     // Google Maps
     private FusedLocationProviderClient mproviderClient;
@@ -148,14 +164,43 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public View getInfoContents(Marker marker) {
                     View v = getLayoutInflater().inflate(R.layout.activity_view_place, null);
                     TextView placeName = v.findViewById(R.id.place_name);
-                    TextView placeAddress = v.findViewById(R.id.place_address);
-                    RatingBar ratingBar = v.findViewById(R.id.ratingBar);
-                    ImageView imageView = v.findViewById(R.id.photo);
-                    Button button = v.findViewById(R.id.back_to_results);
+                    String place = marker.getTitle();
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
 
+                    final ImageView imageView = v.findViewById(R.id.photo);
                     placeName.setText(marker.getTitle());
-                    placeAddress.setText("Latitude : " + marker.getPosition().latitude +
-                            ". Longitude" + marker.getPosition().longitude);
+                    if(place.contains("Okoa")){
+                        String okoa_coffee_place = "Corner of North West Engineering Building, Yale Rd, ";
+                        String address = "https://b.zmtcdn.com/data/pictures/6/18276956/313e117fe15fdcc7d54248298062f7b9_featured_v2.jpg";
+                        final TextView txtView  = v.findViewById(R.id.place_address);
+                        txtView.setText(okoa_coffee_place);
+                        try {
+
+                            URL url = new URL(address);
+                            imageView.setImageBitmap(BitmapFactory.decodeStream((InputStream)url.getContent()));
+                        } catch (IOException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }else {
+                        String address = "http://4.bp.blogspot.com/-FMz3ya9WnUc/TzdqPqE3QeI/AAAAAAAAAWw/MhM1pR_vN3g/s1600/double-shot-1.gif";
+                        String double_coffee_place = "15 Melle Street, Corner, Juta St, Braamfontein";
+                        final TextView txtView  = v.findViewById(R.id.place_address);
+                        txtView.setText(double_coffee_place);
+
+                        try {
+
+                            URL url = new URL(address);
+                            imageView.setImageBitmap(BitmapFactory.decodeStream((InputStream)url.getContent()));
+                        } catch (IOException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
+
+
+                    /*String latLong = "Latitude : " + marker.getPosition().latitude +
+                            ". Longitude" + marker.getPosition().longitude;
+                    placeAddress.setText(latLong);*/
 
                     return v;
                 }
@@ -167,20 +212,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Log.d(TAG,"onCreate: Activity started");
-        checkConnection();
         ctx = this;
+        btn = findViewById(R.id.btnSpeak);
+        //checkConnection();
+
+        //mRecyclerView = findViewById(R.id.recyclerViewPlaces);
+        //mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mUploads = new ArrayList<>();
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
+
         initPollyClient();
         setupNewMediaPlayer();
         init();
-        btn = findViewById(R.id.btnSpeak);
         if(mapsServices.isServiceOK(this)){
             get_permission_location();
         }
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        ref = database.getReference();
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabaseRef = database.getReference();
+        mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mapsServices.process_locations(dataSnapshot);
@@ -202,26 +253,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         showToast(isConnected);
         if(!isConnected){
 
-            btn.setClickable(false);
+            this.btn.setClickable(false);
         }else {
-            btn.setClickable(true);
+            this.btn.setClickable(true);
             //initPollyClient();
         }
     }
 
     private void showToast(boolean isConnected) {
-        String message;
-        boolean flag = true;
-        int color;
+        String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
-            btn.setClickable(true);
+            this.btn.setClickable(true);
 
         } else {
             message = "Sorry! Not connected to internet";
-            color = Color.RED;
-            btn.setClickable(false);
-            //mEmailSignInButton.setClickable(false);
+            this.btn.setClickable(false);
         }
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
@@ -229,7 +276,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Callback will be triggered when there is change in
      * network connection
      */
-    @Override
+    /*@Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         showToast(isConnected);
     }
@@ -244,7 +291,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         connectivityReceiver = new ConnectivityReceiver();
         registerReceiver(connectivityReceiver, intentFilter);
 
-        /*register connection status listener*/
+        register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
     }
 
@@ -252,7 +299,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onPause(){
         super.onPause();
         unregisterReceiver(connectivityReceiver);
-    }
+    }*/
     /**
      *This is for searching for available coffee places
      */
@@ -450,6 +497,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     MessageItem message_item = new MessageItem(result.get(0));
                     message_items.add(message_item);
                     decodeUserInput(result.get(0));
+
                     if((result.get(0).contains("registration") ||
                             result.get(0).contains("register")) &&
                             (result.get(0).contains("user") || result.get(0).contains("customer"))){
@@ -464,6 +512,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String toSpeak = "Proceeding to administrator registration";
                         setupPlayButton(toSpeak);
                         startActivity(x);
+                    }else{
+
                     }
                 }
                 break;
@@ -619,4 +669,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     }
+
+
 }

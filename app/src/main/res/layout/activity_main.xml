@@ -54,4 +54,10 @@
         android:onClick="SpeechToTxt"
         android:text="SpeechAPI" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="ViewImages"
+        android:text="View Images"/>
+
 </RelativeLayout>

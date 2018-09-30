@@ -28,8 +28,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0"/>
-        <activity android:name=".SpeechAPI">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0"/>
+        <activity android:name=".MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,7 +44,7 @@
         <activity
             android:name=".RegisterAdminActivity"
             android:label="Admin Registration" />
-        <activity android:name=".MapsActivity"
+        <activity android:name=".SpeechAPI"
             android:label="Maps Activity"/>
 
         <receiver
