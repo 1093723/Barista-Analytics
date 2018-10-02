@@ -46,7 +46,7 @@
             android:label="Admin Registration" />
         <activity android:name=".SpeechAPI"
             android:label="Maps Activity"/>
-
+        <activity android:name=".ProcessOrderActivity"/>
         <receiver
             android:name="Utilities.ConnectivityReceiver"
             android:enabled="true">

@@ -109,6 +109,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient mproviderClient;
     private GoogleMap gMap;
     private MapsServices mapsServices;
+    public String place;
 
     // Speech to text
     // Array of input speech from user
@@ -135,11 +136,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onPostCreate(savedInstanceState);
         setupVoicesList();
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         //Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onMapReady : Map is ready");
         gMap = googleMap;
+        gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Intent x = new Intent(MapsActivity.this,ProcessOrderActivity.class);
+                x.putExtra("Okoa",place);
+                startActivity(x);
+            } });
         if (mPermissionGranted) {
             // Permission granted by the user
             getDeviceLocation();
@@ -164,7 +173,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public View getInfoContents(Marker marker) {
                     View v = getLayoutInflater().inflate(R.layout.activity_view_place, null);
                     TextView placeName = v.findViewById(R.id.place_name);
-                    String place = marker.getTitle();
+
+                    place = marker.getTitle();
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                     StrictMode.setThreadPolicy(policy);
 
@@ -207,6 +217,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -574,37 +585,42 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setupPlayButton(String words){
         MessageItem item = new MessageItem(words);
         message_items.add(item);
-        // Create speech synthesis request.
-        SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
-                new SynthesizeSpeechPresignRequest()
-                        // Set text to synthesize.
-                        .withText(words)
-                        // Set voice selected by the user.
-                        .withVoiceId(voices.get(33).getId())
-                        // Set format to MP3.
-                        .withOutputFormat(OutputFormat.Mp3);
+        if(voices != null){
+            // Create speech synthesis request.
+            SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
+                    new SynthesizeSpeechPresignRequest()
+                            // Set text to synthesize.
+                            .withText(words)
+                            // Set voice selected by the user.
+                            .withVoiceId(voices.get(33).getId())
+                            // Set format to MP3.
+                            .withOutputFormat(OutputFormat.Mp3);
 
-        // Get the presigned URL for synthesized speech audio stream.
-        URL presignedSynthesizeSpeechUrl =
-                client.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
+            // Get the presigned URL for synthesized speech audio stream.
+            URL presignedSynthesizeSpeechUrl =
+                    client.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
 
-        Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
+            Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
 
-        // Create a media player to play the synthesized audio stream.
-        if (mediaPlayer.isPlaying()) {
-            setupNewMediaPlayer();
+            // Create a media player to play the synthesized audio stream.
+            if (mediaPlayer.isPlaying()) {
+                setupNewMediaPlayer();
+            }
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            try {
+                // Set media player's data source to previously obtained URL.
+                mediaPlayer.setDataSource(presignedSynthesizeSpeechUrl.toString());
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to set data source for the media player! " + e.getMessage());
+            }
+
+            // Start the playback asynchronously (since the data source is a network stream).
+            mediaPlayer.prepareAsync();
+        }else {
+            Toast.makeText(ctx, "Unable to get voice response.", Toast.LENGTH_LONG).show();
         }
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-        try {
-            // Set media player's data source to previously obtained URL.
-            mediaPlayer.setDataSource(presignedSynthesizeSpeechUrl.toString());
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to set data source for the media player! " + e.getMessage());
-        }
-
-        // Start the playback asynchronously (since the data source is a network stream).
-        mediaPlayer.prepareAsync();
     }
 
     /**
@@ -675,5 +691,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
+    public void processOrder(View v){
+        Intent x = new Intent(this,ProcessOrderActivity.class);
+        x.putExtra("Okoa",place);
+        startActivity(x);
+    }
 }
