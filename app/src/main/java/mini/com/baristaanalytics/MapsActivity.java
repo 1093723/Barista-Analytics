@@ -390,8 +390,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if(task.isSuccessful()){
                             Log.d(TAG, "getDeviceLocation(): Location found");
                             Location currentLocation = (Location) task.getResult();
-                            mapsServices.moveCamera(ctx,gMap,new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM, "My Location");
+                            if(currentLocation != null){
+                                mapsServices.moveCamera(ctx,gMap,new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
+                                        DEFAULT_ZOOM, "My Location");
+                            }else {
+                                Toast.makeText(MapsActivity.this,
+                                        "Please turn on location services.", Toast.LENGTH_SHORT).show();
+                            }
                         }else {
                             Log.d(TAG, "getDeviceLocation(): Location not found");
                             Toast.makeText(MapsActivity.this,
