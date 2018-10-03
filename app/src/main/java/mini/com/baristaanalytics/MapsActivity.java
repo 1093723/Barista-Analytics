@@ -82,7 +82,7 @@ import Utilities.MessageItem;
 import Utilities.MyApplication;
 import Utilities.Upload;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback/*, ConnectivityReceiver.ConnectivityReceiverListener*/{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
 
@@ -90,8 +90,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Firebase vars
     private DatabaseReference mDatabaseRef;
-    private DatabaseReference mDatabaseRefPhotos;
-    private StorageReference mStorageRef;
     // vars
     private String TAG = "SEARCH COFFEE PLACES: ACTIVITY";
     private EditText textInputSearch;
@@ -206,12 +204,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Log.e(TAG, e.getMessage());
                         }
                     }
-
-
-                    /*String latLong = "Latitude : " + marker.getPosition().latitude +
-                            ". Longitude" + marker.getPosition().longitude;
-                    placeAddress.setText(latLong);*/
-
                     return v;
                 }
             });
@@ -225,11 +217,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG,"onCreate: Activity started");
         ctx = this;
         btn = findViewById(R.id.btnSpeak);
-        //checkConnection();
-
-        //mRecyclerView = findViewById(R.id.recyclerViewPlaces);
-        //mRecyclerView.setHasFixedSize(true);
-        //mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        checkConnection();
         mUploads = new ArrayList<>();
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
@@ -263,7 +251,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         boolean isConnected = ConnectivityReceiver.isConnected();
         showToast(isConnected);
         if(!isConnected){
-
             this.btn.setClickable(false);
         }else {
             this.btn.setClickable(true);
@@ -275,11 +262,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
-            this.btn.setClickable(true);
+            //this.btn.setClickable(true);
 
         } else {
-            message = "Sorry! Not connected to internet";
-            this.btn.setClickable(false);
+            message = "Sorry! Please connect to the internet to proceed";
+            //this.btn.setClickable(false);
         }
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
@@ -287,30 +274,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Callback will be triggered when there is change in
      * network connection
      */
-    /*@Override
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         showToast(isConnected);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        connectivityReceiver = new ConnectivityReceiver();
-        registerReceiver(connectivityReceiver, intentFilter);
-
-        register connection status listener
-        MyApplication.getInstance().setConnectivityListener(this);
-    }
-
-    @Override
     protected void onPause(){
         super.onPause();
-        unregisterReceiver(connectivityReceiver);
-    }*/
+        //unregisterReceiver(connectivityReceiver);
+    }
     /**
      *This is for searching for available coffee places
      */
@@ -482,20 +467,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Showing google speech input dialog
      * */
     public void promptSpeechInput(View view) {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                getString(R.string.speech_prompt));
-        try {
-            //initRecyclerView();
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-        } catch (ActivityNotFoundException a) {
-            Toast.makeText(getApplicationContext(),
-                    getString(R.string.speech_not_supported),
-                    Toast.LENGTH_SHORT).show();
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        if(isConnected){
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                    getString(R.string.speech_prompt));
+            try {
+                //initRecyclerView();
+                startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+            } catch (ActivityNotFoundException a) {
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.speech_not_supported),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            showToast(isConnected);
         }
+
     }
     /**
      * Receiving speech input
