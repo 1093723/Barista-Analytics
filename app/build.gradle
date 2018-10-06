@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.amazonaws:aws-android-sdk-polly:2.6.+'
 
-    implementation 'com.squareup.picasso:picasso:2.5.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

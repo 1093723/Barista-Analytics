@@ -56,7 +56,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +68,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,7 +94,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Upload> mUploads;
 
     // Firebase vars
+    private FirebaseDatabase firebaseDatabase;
     private DatabaseReference mDatabaseRef;
+    private DatabaseReference mDatabaseCoffeePlace1;
+    private DatabaseReference mDatabaseCoffeePlace2;
     private DatabaseReference mDatabaseRefPhotos;
     private StorageReference mStorageRef;
     // vars
@@ -104,6 +112,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final float DEFAULT_ZOOM = 15f;
     private Boolean mPermissionGranted = false;
 
+    //Initialization of variables for information
+    //Very bad way of doing this
+    private String name;
+    private String AddressLine;
+    private String contactNumber;
+    private String open_Hours_Midweek;
+    private String close_Hours_midweek;
+    private String is_Open_Saturday;
+    private String open_Hours_Saturday;
+    private String close_hours_Saturday;
+    private String is_Open_Sunday;
+    //Image link
+    private String imageLink;
 
     // Google Maps
     private FusedLocationProviderClient mproviderClient;
@@ -137,6 +158,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupVoicesList();
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         //Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
@@ -168,19 +190,101 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public View getInfoWindow(Marker marker) {
                     return null;
                 }
+                /*  private FirebaseUser user;
+                    private FirebaseDatabase dataRef;
+                    private String userID;
+                    private FirebaseAuth mAuth;
+
+                    //Variables here.
+                    private FirebaseDatabase firebaseDatabase;
+                    private DatabaseReference mDatabaseRef;
+                    private DatabaseReference mDatabaseCoffeePlace1;
+                    private DatabaseReference getmDatabaseCoffeePlace2;
+                    private DatabaseReference mDatabaseRefPhotos;
+                    private StorageReference mStorageRef; */
+
 
                 @Override
                 public View getInfoContents(Marker marker) {
-                    View v = getLayoutInflater().inflate(R.layout.activity_view_place, null);
+                    final View v = getLayoutInflater().inflate(R.layout.activity_view_place, null);
                     TextView placeName = v.findViewById(R.id.place_name);
-
                     place = marker.getTitle();
+                    Log.d(TAG, "Marker title is: " + marker.getTitle());
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                     StrictMode.setThreadPolicy(policy);
 
                     final ImageView imageView = v.findViewById(R.id.photo);
                     placeName.setText(marker.getTitle());
-                    if(place.contains("Okoa")){
+
+                    final TextView address_textview = v.findViewById(R.id.place_address);
+
+                    firebaseDatabase = FirebaseDatabase.getInstance();
+                    mDatabaseRef = firebaseDatabase.getReference().child("COFFEEPLACES/");
+                    // mDatabaseCoffeePlace1 = firebaseDatabase.getReference().child("1");
+                    // mDatabaseCoffeePlace2 = firebaseDatabase.getReference().child("2");
+                    String myAddress;
+                    // final String address;
+                    if(place.equals("Okoa Coffee Co.")){
+                        mDatabaseRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                mStorageRef = FirebaseStorage.getInstance().getReference();
+                                mStorageRef.child("Okoa Coffee").child("WhatsApp Image 2018-09-26 at 9.46.39 PM.jpeg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        imageLink = uri.toString();
+                                    }
+                                });
+                                AddressLine = dataSnapshot.child("2").child("AddressLine").getValue().toString();
+                                contactNumber = dataSnapshot.child("2").child("contactNumber").getValue().toString();
+                                Picasso.with(getApplicationContext()).load(imageLink).into(imageView);
+                                // address_line = address;
+                                Log.d(TAG, " (from mDatabase) address is: " + AddressLine);
+
+                                //address_textview.setText(address_line);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        address_textview.setText(AddressLine);
+                    }
+                    else if(place.equals("Doubleshot Coffee And Tea")){
+                        mDatabaseRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                mStorageRef = FirebaseStorage.getInstance().getReference();
+                                mStorageRef.child("Doubleshot Coffee").child("DoubleShot.jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        imageLink = uri.toString();
+                                        Log.d(TAG, "imageLink is " + imageLink);
+                                    }
+                                });
+                                AddressLine = dataSnapshot.child("2").child("AddressLine").getValue().toString();
+                                contactNumber = dataSnapshot.child("2").child("contactNumber").getValue().toString();
+                                Picasso.with(getApplicationContext()).load(imageLink).into(imageView);
+                                Log.d(TAG, "The image has been loaded.");
+                                AddressLine = dataSnapshot.child("1").child("AddressLine").getValue().toString();
+                                // address_line = address;
+                                Log.d(TAG, " (from mDatabase) address is: " + AddressLine);
+                                //address_textview.setText(address_line);
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        address_textview.setText(AddressLine);
+                    }
+
+
+
+                    /*if(place.contains("Okoa")){
                         String okoa_coffee_place = "Corner of North West Engineering Building, Yale Rd, ";
                         String address = "https://b.zmtcdn.com/data/pictures/6/18276956/313e117fe15fdcc7d54248298062f7b9_featured_v2.jpg";
                         final TextView txtView  = v.findViewById(R.id.place_address);
@@ -205,13 +309,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } catch (IOException e) {
                             Log.e(TAG, e.getMessage());
                         }
-                    }
+                    }*/
+
 
 
                     /*String latLong = "Latitude : " + marker.getPosition().latitude +
                             ". Longitude" + marker.getPosition().longitude;
                     placeAddress.setText(latLong);*/
-
+                    Log.d(TAG, "We are done, we have managed to get to the end of the activity.");
                     return v;
                 }
             });
@@ -233,7 +338,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mUploads = new ArrayList<>();
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
-
+        FirebaseApp.initializeApp(this);
         initPollyClient();
         setupNewMediaPlayer();
         init();
@@ -242,6 +347,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         mDatabaseRef = database.getReference();
+
+
+
         mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
