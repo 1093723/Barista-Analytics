@@ -4,18 +4,13 @@ import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -25,18 +20,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,12 +54,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,18 +65,24 @@ import java.util.Locale;
 import Actors.Barista;
 import Adapter.ImageAdapter;
 import Services.MapsServices;
-import Utilities.AsyncTaskLoadImage;
 import Utilities.ConnectivityReceiver;
 import Utilities.MessageItem;
 import Utilities.MyApplication;
 import Utilities.Upload;
+import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryCold;
+import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryHot;
+import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
+import mini.com.baristaanalytics.Okoa.OkoaCategoryHot;
+import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
+import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
 
     private List<Upload> mUploads;
-
+    //Order Specific
+    private String hot_cold_option;
     // Firebase vars
     private DatabaseReference mDatabaseRef;
     // vars
@@ -143,9 +138,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                Intent x = new Intent(MapsActivity.this,ProcessOrderActivity.class);
-                x.putExtra("Okoa",place);
-                startActivity(x);
+                if(place.contains("Okoa")){
+                    String Hot = "Would you like a hot one?";
+                    setupPlayButton(Hot);
+                    //Intent okoa = new Intent(MapsActivity.this, OkoaCategories.class);
+                    //startActivity(okoa);
+                }else if(place.contains("Doubleshot")){
+                    String Hot = "Would you like Something to cool a hot summer day?";
+                    setupPlayButton(Hot);
+                    //Intent doubleshot = new Intent(MapsActivity.this, DoubleshotCategories.class);
+                    //startActivity(doubleshot);
+
+                }
             } });
         if (mPermissionGranted) {
             // Permission granted by the user
@@ -530,13 +534,43 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void decodeUserInput(String s) {
+
         if(s.contains("show") || s.contains("available")){
             String toSpeak = "I currently support these locations on the map. I hope they are " +
                     "near your address";
             setupPlayButton(toSpeak);
             geoLocate(mapsServices.getLocations());
-        }else {
-            Toast.makeText(this, "Command Not Found", Toast.LENGTH_SHORT).show();
+        }
+        else if(place != null){
+            if(place.contains("Okoa")){
+                if(s.contains("hot")){
+                    setupPlayButton("Let's get you a hot one from Okoa!");
+                    Intent okoa_hot = new Intent(MapsActivity.this, OkoaCategoryHot.class);
+                    startActivity(okoa_hot);
+                }else {
+                    setupPlayButton("Cold beverages from Okoa coming up!");
+                    Intent okoa_cold = new Intent(MapsActivity.this, OkoaCategoryCold.class);
+                    startActivity(okoa_cold);
+                }
+
+            }else if(place.contains("Doubleshot")){
+                if(s.contains("hot")){
+                    setupPlayButton("Let's get you something warm from Doubleshot!");
+                    Intent dblshot_hot = new Intent(MapsActivity.this,
+                            DoubleshotCategoryCold.class);
+                    startActivity(dblshot_hot);
+                }else {
+                    setupPlayButton("Time to cool down with a cold beverage from Doubleshot!");
+                    Intent dblshot_cold = new Intent(MapsActivity.this,
+                            DoubleshotCategoryHot.class);
+                    startActivity(dblshot_cold);
+                }
+            }
+        }
+
+        else {
+            String didnt_recognize = "I'm sorry but I didn't get that.";
+            setupPlayButton(didnt_recognize);
         }
     }
 
@@ -682,9 +716,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    public void processOrder(View v){
-        Intent x = new Intent(this,ProcessOrderActivity.class);
-        x.putExtra("Okoa",place);
-        startActivity(x);
-    }
 }

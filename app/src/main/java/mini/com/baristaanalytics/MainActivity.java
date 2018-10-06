@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import Utilities.StateManagement;
+import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
+import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class MainActivity extends AppCompatActivity {
 

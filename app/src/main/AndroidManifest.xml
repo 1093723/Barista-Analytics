@@ -12,12 +12,11 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- To do with testing and adb permissions -->
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    
-    <permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name="Utilities.MyApplication"
@@ -27,9 +26,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
-            android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0"/>
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
+
         <activity android:name=".MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,16 +37,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterCustomerActivity" />
+        <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
         <activity
-            android:name=".RegisterAdminActivity"
+            android:name=".Registration.RegisterAdminActivity"
             android:label="Admin Registration" />
-        <activity android:name=".SpeechAPI"
-            android:label="Maps Activity"/>
-        <activity android:name=".ProcessOrderActivity"/>
+        <activity
+            android:name=".SpeechAPI"
+            android:label="Maps Activity" />
+        <activity android:name=".ProcessOrderActivity" />
+
         <receiver
             android:name="Utilities.ConnectivityReceiver"
             android:enabled="true">
@@ -54,6 +56,13 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
+        <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
+        <activity android:name=".Okoa.OkoaCategoryHot" />
+        <activity android:name=".Okoa.OkoaCategoryCold" />
+        <activity android:name=".Okoa.OkoaSize" />
+        <activity android:name=".Doubleshot.DoubleShotSize"></activity>
     </application>
 
 </manifest>

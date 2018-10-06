@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics;
+package mini.com.baristaanalytics.Registration;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,6 +23,8 @@ import java.util.ArrayList;
 
 import Services.AdminService;
 import Services.ActorsServiceHelper;
+import mini.com.baristaanalytics.LoginActivity;
+import mini.com.baristaanalytics.R;
 
 public class RegisterAdminActivity extends AppCompatActivity {
 

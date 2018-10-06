@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics;
+package mini.com.baristaanalytics.Registration;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,6 +23,8 @@ import java.util.ArrayList;
 
 import Services.CustomerService;
 import Services.ActorsServiceHelper;
+import mini.com.baristaanalytics.LoginActivity;
+import mini.com.baristaanalytics.R;
 
 public class RegisterCustomerActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
