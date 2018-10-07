@@ -158,22 +158,28 @@ public class OkoaCategoryCold extends AppCompatActivity {
     }
 
     private void decodeUserInput(String s) {
+        // Check what the user gave as input
+        // It can be an americano
+        Intent okoa = new Intent(this, OkoaSize.class);
+        String coffeeName = "coffeeName";
+        String almostThere;
         if(s.contains("Frappe")){
-            Intent okoa = new Intent(this, OkoaSize.class);
             // Add the coffee name to the intent and retrieve it in the OkoaSize class
-            okoa.putExtra("coffeeName","Frappe");
+            almostThere = s + " coming up. Let's confirm the size";
+            setupPlayButton(almostThere);
+            // Send the name of the coffee to the next screen
+            // Make sure the key 'coffeeName' is the same in OkoaCategoryCold,OkoaCategoryHot,
+            // DoubleshotCategoryHot, and DoubleshotCategoryCold when transitioning activities
+            okoa.putExtra(coffeeName,"Frappe");
             startActivity(okoa);
             // User would like americano
         }
-        else if(s.contains("Chai Latte")){
+        else if(s.contains("Slush")){
             // User would like a Chai Latte
-            Intent okoa = new Intent(this, OkoaSize.class);
             // Add the coffee name to the intent and retrieve it in the OkoaSize class
-            okoa.putExtra("coffeeName","Chai Latte");
-            startActivity(okoa);
-        }else {
-            Intent okoa = new Intent(this, OkoaSize.class);
-            // Add the coffee name to the intent and retrieve it in the OkoaSize class
+            almostThere = s + " coming up. Let's confirm the size";
+            setupPlayButton(almostThere);
+            okoa.putExtra(coffeeName,"Slush Poppy");
             startActivity(okoa);
         }
     }

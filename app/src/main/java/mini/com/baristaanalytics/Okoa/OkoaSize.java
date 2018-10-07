@@ -55,6 +55,8 @@ public class OkoaSize extends AppCompatActivity {
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
+    // Order-related vars
+    private String coffeeName;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -78,7 +80,6 @@ public class OkoaSize extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG,"onActivityResult(): Result from speech to text");
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
@@ -97,6 +98,10 @@ public class OkoaSize extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_size);
+
+
+
+
     }
 
     public void promptSpeechInput(View view) {

@@ -54,6 +54,9 @@ public class DoubleShotSize extends AppCompatActivity {
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
+
+    // Order-related vars
+    private String coffeeName;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -103,6 +106,8 @@ public class DoubleShotSize extends AppCompatActivity {
         setupNewMediaPlayer();
         String Greeting = "How many of those would you like?";
         setupPlayButton(Greeting);
+
+
     }
 
     public void promptSpeechInput(View view) {
