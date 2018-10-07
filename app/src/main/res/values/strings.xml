@@ -3,7 +3,7 @@
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
+    <string name="prompt_email" translatable="false">Email</string>
     <string-array name="roles_array">
         <item>Admin</item>
         <item>Super Admin</item>
@@ -25,4 +25,29 @@
 
     <string name="google_maps_API_key" templateMergeStrategy="preserve" translatable="false">AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0</string>
 
+    <!-- Order-Related arrays and attributes -->
+    <string-array name="promptOrder">
+        <item>I'd like to make an order</item>
+        <item>I would like to make an order</item>
+        <item>I'd like some coffee</item>
+        <item>I would like some coffee</item>
+    </string-array>
+    <string-array name="beverageName">
+        <item>What beverage would you like?</item>
+        <item>What do you feel like?</item>
+        <item>Which beverage would you prefer?</item>
+    </string-array>
+    <string-array name="beverageSize">
+        <item>Which size would you like?</item>
+        <item>Which size would you prefer?</item>
+    </string-array>
+    <string-array name="beverageType">
+        <item>Cold drink for the scorching heat?</item>
+        <item>What do you think about having a warm beverage as your first cup for the day?</item>
+        <item>I suggest something cold to cool you down. Do you agree?</item>
+    </string-array>
+    <string-array name="beverageQuantity">
+        <item>Drinking for two?</item>
+        <item>How many of those will you like?</item>
+    </string-array>
 </resources>

@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
@@ -122,8 +123,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
-
+    //AWS Lex tools
+    private String response_to_q;
     private ConnectivityReceiver connectivityReceiver;
+
+    // Order-related vars
+    private String[] ready_to_order;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -138,7 +143,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                if(place.contains("Okoa")){
+                /*if(place.contains("Okoa")){
                     String Hot = "Would you like a hot one?";
                     setupPlayButton(Hot);
                     //Intent okoa = new Intent(MapsActivity.this, OkoaCategories.class);
@@ -149,7 +154,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //Intent doubleshot = new Intent(MapsActivity.this, DoubleshotCategories.class);
                     //startActivity(doubleshot);
 
-                }
+                }*/
             } });
         if (mPermissionGranted) {
             // Permission granted by the user
@@ -221,14 +226,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG,"onCreate: Activity started");
         ctx = this;
         btn = findViewById(R.id.btnSpeak);
-        checkConnection();
         mUploads = new ArrayList<>();
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
 
+        checkConnection();
+
         initPollyClient();
         setupNewMediaPlayer();
         init();
+
         if(mapsServices.isServiceOK(this)){
             get_permission_location();
         }
@@ -508,24 +515,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     MessageItem message_item = new MessageItem(result.get(0));
                     message_items.add(message_item);
                     decodeUserInput(result.get(0));
-
-                    if((result.get(0).contains("registration") ||
-                            result.get(0).contains("register")) &&
-                            (result.get(0).contains("user") || result.get(0).contains("customer"))){
-                        String toSpeak = "Proceeding to user registration";
-                        setupPlayButton(toSpeak);
-                        Intent x = new Intent(this, RegisterCustomerActivity.class);
-                        startActivity(x);
-                    }else if((result.get(0).contains("registration") ||
-                            result.get(0).contains("register")) &&
-                            (result.get(0).contains("admin") || result.get(0).contains("administrator"))){
-                        Intent x = new Intent(this, RegisterAdminActivity.class);
-                        String toSpeak = "Proceeding to administrator registration";
-                        setupPlayButton(toSpeak);
-                        startActivity(x);
-                    }else{
-
-                    }
                 }
                 break;
             }
@@ -542,35 +531,49 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             geoLocate(mapsServices.getLocations());
         }
         else if(place != null){
-            if(place.contains("Okoa")){
-                if(s.contains("hot")){
+            Resources res = getResources();
+            String[] prompt_Order = res.getStringArray(R.array.promptOrder);
+            int size = prompt_Order.length;
+            // Assume user is not ready to order
+            // Check if assumption is true in the promptOrder array in strings.xml
+            for(int i = 0;i < size;i++){
+                if(prompt_Order[i].contains(s)){
+                    // Trigger Bruce to ask hot/cold
+                    String Hot = "Would you like a hot or cold beverage?";
+                    setupPlayButton(Hot);
+                    break;
+                }
+            }
+            if(s.contains("yes") || s.contains("hot")){
+                if(place.contains("Okoa")){
                     setupPlayButton("Let's get you a hot one from Okoa!");
                     Intent okoa_hot = new Intent(MapsActivity.this, OkoaCategoryHot.class);
                     startActivity(okoa_hot);
                 }else {
+                    setupPlayButton("Let's get you something warm from Doubleshot!");
+                    Intent dblshot_hot = new Intent(MapsActivity.this,
+                            DoubleshotCategoryHot.class);
+                    startActivity(dblshot_hot);
+                }
+
+            }else if(s.contains("no") || s.contains("cold")){
+                if(place.contains("Okoa")){
                     setupPlayButton("Cold beverages from Okoa coming up!");
                     Intent okoa_cold = new Intent(MapsActivity.this, OkoaCategoryCold.class);
                     startActivity(okoa_cold);
-                }
-
-            }else if(place.contains("Doubleshot")){
-                if(s.contains("hot")){
-                    setupPlayButton("Let's get you something warm from Doubleshot!");
-                    Intent dblshot_hot = new Intent(MapsActivity.this,
-                            DoubleshotCategoryCold.class);
-                    startActivity(dblshot_hot);
                 }else {
                     setupPlayButton("Time to cool down with a cold beverage from Doubleshot!");
                     Intent dblshot_cold = new Intent(MapsActivity.this,
-                            DoubleshotCategoryHot.class);
+                            DoubleshotCategoryCold.class);
                     startActivity(dblshot_cold);
                 }
             }
         }
-
         else {
-            String didnt_recognize = "I'm sorry but I didn't get that.";
-            setupPlayButton(didnt_recognize);
+            // We are here if place is null. i.e if user did not select a coffee place
+            String chooseRestaurant = "Please choose a restaurant before beginning the ordering" +
+                    "process.";
+            setupPlayButton(chooseRestaurant);
         }
     }
 
