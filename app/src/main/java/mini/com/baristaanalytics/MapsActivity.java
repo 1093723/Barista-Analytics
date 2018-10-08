@@ -240,7 +240,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             get_permission_location();
         }
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        mDatabaseRef = database.getReference();
+        mDatabaseRef = database.getReference("COFFEEPLACES");
         mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -364,10 +364,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Geocoder geocoder = new Geocoder(this);
                 List<Address> addressList = new ArrayList<>();
                 try {
-                    Log.d(TAG, "geoLocate(): Could not find location");
-                    addressList = geocoder.getFromLocationName(location,1);
+                    Log.d(TAG, "geoLocate(): Could not find location : " + location);
+                    addressList = geocoder.getFromLocationName(location,2);
                 }catch (IOException e){
-                    Log.d(TAG, "geoLocate(): Could not find location");
+                    Log.d(TAG, "geoLocate(): Could not find location : " +  location);
                 }
                 if(addressList.size() > 0){
                     Address address = addressList.get(0);
@@ -525,10 +525,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void decodeUserInput(String s) {
 
         if(s.contains("show") || s.contains("available")){
-            String toSpeak = "I currently support these locations on the map. I hope they are " +
-                    "near your address";
-            setupPlayButton(toSpeak);
-            geoLocate(mapsServices.getLocations());
+            if (!mapsServices.getLocations().isEmpty()) {
+                String toSpeak = "I currently support these locations on the map. I hope they are " +
+                        "near your address";
+                Log.d(TAG,mapsServices.getLocations().get(0).getAddressLine());
+                Log.d(TAG,mapsServices.getLocations().get(1).getAddressLine());
+                setupPlayButton(toSpeak);
+                geoLocate(mapsServices.getLocations());
+            }else {
+                String toSpeak = "Coffee places near you seem to be closed. Check again at " +
+                        "a later time and you just might be lucky.";
+                setupPlayButton(toSpeak);
+            }
+
         }
         else if(place != null){
             Resources res = getResources();
