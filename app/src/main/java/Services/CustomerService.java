@@ -2,7 +2,7 @@ package Services;
 
 import android.widget.EditText;
 import com.google.firebase.database.DatabaseReference;
-import Actors.Customer;
+import Model.Customer;
 /**
  * This class is for these customer-specific queries:
  * 1. Register

@@ -63,7 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Actors.Barista;
+import Model.Barista;
 import Adapter.ImageAdapter;
 import Services.MapsServices;
 import Utilities.ConnectivityReceiver;
@@ -74,8 +74,6 @@ import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryCold;
 import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryHot;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryHot;
-import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
     private RecyclerView mRecyclerView;

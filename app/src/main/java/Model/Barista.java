@@ -1,4 +1,4 @@
-package Actors;
+package Model;
 
 public class Barista {
     private String name;

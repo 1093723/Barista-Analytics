@@ -16,7 +16,7 @@ import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 
-import Actors.Barista;
+import Model.Barista;
 import mini.com.baristaanalytics.MapsActivity;
 
 public class MapsServices {

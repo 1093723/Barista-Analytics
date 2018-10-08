@@ -1,4 +1,4 @@
-package Order;
+package Model;
 
 public class CoffeeOrder {
     private int orderID;

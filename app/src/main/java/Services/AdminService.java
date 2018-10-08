@@ -4,7 +4,7 @@ import android.widget.EditText;
 
 import com.google.firebase.database.DatabaseReference;
 
-import Actors.Admin;
+import Model.Admin;
 
 public class AdminService {
     //this class id ofr Admin specific activities like Admin login, sign out, registration

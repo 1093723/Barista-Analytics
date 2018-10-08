@@ -7,10 +7,15 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.speech.RecognizerIntent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -22,6 +27,11 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,11 +39,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import Adapter.FoodViewHolder;
+import Interface.ItemClickListener;
+import Model.Beverage;
 import Utilities.ConnectivityReceiver;
 import Utilities.MessageItem;
 import mini.com.baristaanalytics.R;
-import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class OkoaCategoryHot extends AppCompatActivity {
     private String TAG = "OKOA HOT";
@@ -57,7 +68,12 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     //Order-Related Variables
     private String coffeeName;
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager layoutManager;
+    FirebaseDatabase database;
+    DatabaseReference coffeeList;
 
+    FirebaseRecyclerAdapter<Beverage, FoodViewHolder> adapter;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -103,11 +119,59 @@ public class OkoaCategoryHot extends AppCompatActivity {
         setContentView(R.layout.activity_okoa_category_hot);
         Log.d(TAG,"onCreate:Activity Started");
         this.ctx = this;
+        // Firebase
+        database = FirebaseDatabase.getInstance();
+        coffeeList = database.getReference("CoffeeMenuOkoa");
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewFoods);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        loadCoffeeList();
 
         initPollyClient();
         setupNewMediaPlayer();
         String Greeting = "What beverage would you like?";
         setupPlayButton(Greeting);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+    private void loadCoffeeList() {
+        FirebaseRecyclerOptions<Beverage> options =
+                new FirebaseRecyclerOptions.Builder<Beverage>()
+                        .setQuery(coffeeList.orderByChild("beverage_category").equalTo("hot"), Beverage.class)
+                        .build();
+                Log.d(TAG,"getting model model ");
+        adapter = new FirebaseRecyclerAdapter<Beverage, FoodViewHolder>(options){
+            @Override
+            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull Beverage model) {
+                holder.food_txt_viewName.setText(model.getBeverage_name());
+                Picasso.with(getBaseContext()).load(model.getBeverage_image())
+                        .into(holder.food_image);
+                final Beverage beverage = model;
+                holder.setItemClickListener(new ItemClickListener() {
+                    @Override
+                    public void onClick(View view, int position, boolean isLongClick) {
+                        Toast.makeText(OkoaCategoryHot.this, beverage.getBeverage_name(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.food_item, parent, false);
+
+                return new FoodViewHolder(view);
+            }
+        };
+        // Set adapter
+        Log.d(TAG,"setting adapter");
+        recyclerView.setAdapter(adapter);
     }
 
     public void promptSpeechInput(View view) {
