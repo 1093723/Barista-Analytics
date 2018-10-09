@@ -19,18 +19,18 @@ jobs:
           command: ./gradlew androidDependencies
       - run:
           name: Setup dependencies
-          command: |
+          command:
             sudo composer self-update
             composer install -n --prefer-dist
       - run:
           name: Setup Code Climate test-reporter
-          command: |
+          command:
           # download test reporter as a static binary
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
       - run:
           name: Run tests
-          command: |
+          command:
             sudo docker-java-ext-enable xdebug
           # notify Code Climate of a pending test report using `before-build`
             ./cc-test-reporter before-build
