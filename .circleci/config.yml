@@ -4,9 +4,12 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-24-alpha
-    environment:
-      JVM_OPTS: -Xmx3200m
-      CC_TEST_REPORTER_ID: 9866523
+        environment:
+          JVM_OPTS: -Xmx3200m
+      - image: circleci/openjdk:8-jdk-browsers
+        environment:
+          CC_TEST_REPORTER_ID: 9866523
+
     steps:
       - checkout
       - restore_cache:
@@ -14,11 +17,6 @@ jobs:
 #      - run:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
-      - run:
-          name: Setup dependencies
-          command: |
-            sudo composer self-update
-            composer install -n --prefer-dist
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
