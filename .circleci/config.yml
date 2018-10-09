@@ -1,16 +1,12 @@
 version: 2
-defaults: &defaults
-  working_directory: ~/repo
-  docker:
-    - image: circleci/android:api-24-alpha
-      environment:
-        JVM_OPTS: -Xmx3200m
-    - image: circleci/openjdk:8-jdk-browsers
-      environment:
-        CC_TEST_REPORTER_ID: 9866523
 jobs:
   build:
     working_directory: ~/code
+    docker:
+      - image: circleci/android:api-24-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+
     steps:
       - checkout
       - restore_cache:
@@ -33,69 +29,4 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
-
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
-  backend-tests:
-      <<: *defaults
-      steps:
-        - checkout
-        - attach_workspace:
-            at: ~/repo/tmp
-        - run:
-            name: Setup dependencies
-            command: |
-              bundle install --without production --path=${BUNDLE_PATH:-vendor/bundle}
-              bundle exec rake db:create db:migrate
-        - run:
-            name: Run backend tests
-            command: |
-              bundle exec rake
-              ./tmp/cc-test-reporter format-coverage -t simplecov -o tmp/codeclimate.backend.json coverage/backend/.resultset.json
-        - persist_to_workspace:
-            root: tmp
-            paths:
-              - codeclimate.backend.json
-    frontend-tests:
-      <<: *defaults
-      steps:
-        - checkout
-        - attach_workspace:
-            at: ~/repo/tmp
-        - run: npm install
-        - run:
-            name: Run frontend testss
-            command: |
-              npm test
-              ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.frontend.json coverage/frontend/lcov.info
-        - persist_to_workspace:
-            root: tmp
-            paths:
-              - codeclimate.frontend.json
-  upload-coverage:
-      <<: *defaults
-      environment:
-        - CC_TEST_REPORTER_ID: 9866523
-      steps:
-        - attach_workspace:
-            at: ~/repo/tmp
-        - run:
-            name: Upload coverage results to Code Climate
-            command: |
-              ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -p 2 -o tmp/codeclimate.total.json
-              ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.total.json
-workflows:
-  version: 2
-
-  commit:
-    jobs:
-      - build
-      - backend-tests:
-          requires:
-            - build
-      - frontend-tests:
-          requires:
-             - build
-      - upload-coverage:
-          requires:
-             - backend-tests
-             - frontend-tests
