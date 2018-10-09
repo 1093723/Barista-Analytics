@@ -42,8 +42,8 @@ import java.util.Locale;
 import Adapter.FoodViewHolder;
 import Interface.ItemClickListener;
 import Model.Beverage;
-import Utilities.ConnectivityReceiver;
-import Utilities.MessageItem;
+import utilities.ConnectivityReceiver;
+import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 public class OkoaCategoryHot extends AppCompatActivity {

@@ -43,8 +43,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-import Utilities.ConnectivityReceiver;
-import Utilities.MyApplication;
+import utilities.ConnectivityReceiver;
+import utilities.MyApplication;
 
 import static android.Manifest.permission.READ_CONTACTS;
 

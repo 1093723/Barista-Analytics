@@ -37,9 +37,9 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.RecyclerViewAdapter;
-import Utilities.ConnectivityReceiver;
-import Utilities.MessageItem;
-import Utilities.MyApplication;
+import utilities.ConnectivityReceiver;
+import utilities.MessageItem;
+import utilities.MyApplication;
 import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 

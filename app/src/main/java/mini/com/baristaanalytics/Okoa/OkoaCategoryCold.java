@@ -29,11 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Utilities.ConnectivityReceiver;
-import Utilities.MessageItem;
+import utilities.ConnectivityReceiver;
+import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
-import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class OkoaCategoryCold extends AppCompatActivity {
     private String TAG = "OKOA COLD";

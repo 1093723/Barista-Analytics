@@ -19,7 +19,7 @@
     <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:name="Utilities.MyApplication"
+        android:name="utilities.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -50,7 +50,7 @@
         <activity android:name=".ProcessOrderActivity" />
 
         <receiver
-            android:name="Utilities.ConnectivityReceiver"
+            android:name="utilities.ConnectivityReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
