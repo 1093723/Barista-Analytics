@@ -29,9 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Utilities.ConnectivityReceiver;
-import Utilities.MessageItem;
-import mini.com.baristaanalytics.Doubleshot.DoubleShotSize;
+import utilities.ConnectivityReceiver;
+import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 public class OkoaSize extends AppCompatActivity {

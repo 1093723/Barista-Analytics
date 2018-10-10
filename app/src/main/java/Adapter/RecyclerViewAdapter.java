@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import Utilities.MessageItem;
+import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 import static android.content.ContentValues.TAG;

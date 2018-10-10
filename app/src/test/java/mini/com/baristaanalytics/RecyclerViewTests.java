@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import Utilities.MessageItem;
+import utilities.MessageItem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

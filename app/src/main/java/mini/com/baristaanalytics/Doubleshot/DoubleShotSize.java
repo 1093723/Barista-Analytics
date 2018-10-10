@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Utilities.ConnectivityReceiver;
-import Utilities.MessageItem;
+import utilities.ConnectivityReceiver;
+import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 public class DoubleShotSize extends AppCompatActivity {
