@@ -43,6 +43,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
+import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import utilities.ConnectivityReceiver;
 import utilities.MyApplication;
 
@@ -215,7 +216,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     if(task.isSuccessful()){
                         showProgress(false);
                         // User successfully logged in
-                        Intent x = new Intent(ctx,SpeechAPI.class);
+                        Intent x = new Intent(ctx,OkoaCoffeeDetails.class);
                         startActivity(x);
                     }else {
                         Toast.makeText(ctx,task.getException().getMessage(),Toast.LENGTH_LONG).show();

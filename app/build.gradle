@@ -32,8 +32,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:23.1.1' // appcompat library
-    implementation 'com.android.support:design:23.1.1'       //design support library
+    implementation 'com.cepheuen.elegant-number-button:lib:1.0.2'
+    implementation 'com.felipecsl:gifimageview:2.2.0'
+    implementation 'com.android.support:appcompat-v7:26.+' // appcompat library
+    implementation 'com.android.support:design:26.+'       //design support library
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.google.firebase:firebase-core:16.0.0'

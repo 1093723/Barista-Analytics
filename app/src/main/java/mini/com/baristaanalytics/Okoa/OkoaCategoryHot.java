@@ -145,10 +145,10 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 new FirebaseRecyclerOptions.Builder<Beverage>()
                         .setQuery(coffeeList.orderByChild("beverage_category").equalTo("hot"), Beverage.class)
                         .build();
-                Log.d(TAG,"getting model model ");
+        Log.d(TAG,"getting model model ");
         adapter = new FirebaseRecyclerAdapter<Beverage, FoodViewHolder>(options){
             @Override
-            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull Beverage model) {
+            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull final Beverage model) {
                 holder.food_txt_viewName.setText(model.getBeverage_name());
                 Picasso.with(getBaseContext()).load(model.getBeverage_image())
                         .into(holder.food_image);
@@ -157,8 +157,30 @@ public class OkoaCategoryHot extends AppCompatActivity {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
                         Toast.makeText(OkoaCategoryHot.this, beverage.getBeverage_name(), Toast.LENGTH_SHORT).show();
+
+                        Intent OrderDetailsMenu = new Intent(OkoaCategoryHot.this, OkoaCoffeeDetails.class);
+
+                        String beverage_name = model.getBeverage_name();
+                        String beverage_description = model.getBeverage_description();
+                        String beverage_image = model.getBeverage_image();
+                        String beverage_category = model.getBeverage_category();
+                        String price_small = model.getPrice_small().toString();
+                        String price_medium = model.getPrice_medium();
+                        String price_tall = model.getPrice_tall().toString();
+
+                        OrderDetailsMenu.putExtra("beverage_name", beverage_name);
+                        OrderDetailsMenu.putExtra("beverage_description", beverage_description);
+                        OrderDetailsMenu.putExtra("beverage_image", beverage_image);
+                        OrderDetailsMenu.putExtra("beverage_category", beverage_category);
+                        OrderDetailsMenu.putExtra("price_small", price_small);
+                        OrderDetailsMenu.putExtra("price_medium", price_medium);
+                        OrderDetailsMenu.putExtra("price_tall", price_tall);
+
+                        startActivity(OrderDetailsMenu);
                     }
                 });
+
+
             }
 
             @Override
