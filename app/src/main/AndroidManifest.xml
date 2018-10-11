@@ -30,7 +30,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
 
-        <activity android:name=".OkoaCoffeeDetails">
+        <activity android:name=".Okoa.OkoaCoffeeDetails">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
