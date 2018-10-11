@@ -30,7 +30,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
 
-        <activity android:name=".MapsActivity">
+        <activity android:name=".OkoaCoffeeDetails">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,7 +62,8 @@
         <activity android:name=".Okoa.OkoaCategoryHot" />
         <activity android:name=".Okoa.OkoaCategoryCold" />
         <activity android:name=".Okoa.OkoaSize" />
-        <activity android:name=".Doubleshot.DoubleShotSize"></activity>
+        <activity android:name=".Doubleshot.DoubleShotSize" />
+        <activity android:name=".MapsActivity"></activity>
     </application>
 
 </manifest>
