@@ -66,8 +66,6 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
-    //Order-Related Variables
-    private String coffeeName;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     FirebaseDatabase database;
@@ -153,10 +151,20 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 Picasso.with(getBaseContext()).load(model.getBeverage_image())
                         .into(holder.food_image);
                 final Beverage beverage = model;
+                Log.d(TAG,model.getPrice_small().toString());
+                Log.d(TAG,model.getPrice_tall().toString());
                 holder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
                         Toast.makeText(OkoaCategoryHot.this, beverage.getBeverage_name(), Toast.LENGTH_SHORT).show();
+                        final Intent intent = new Intent(OkoaCategoryHot.this,OkoaCoffeeDetails.class);
+                        intent.putExtra("beverageName", beverage.getBeverage_name());
+                        intent.putExtra("beverageImage",beverage.getBeverage_image());
+                        intent.putExtra("beverageDescription",beverage.getBeverage_description());
+                        intent.putExtra("beveragePriceSmall",beverage.getPrice_small());
+                        intent.putExtra("beveragePriceLarge",beverage.getPrice_tall());
+
+                        startActivity(intent);
                     }
                 });
             }
