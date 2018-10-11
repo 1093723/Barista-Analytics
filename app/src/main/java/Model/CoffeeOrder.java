@@ -5,13 +5,15 @@ public class CoffeeOrder {
     private String order_Description;
     private String order_Store;
     private String order_CustomerUsername;
+    private int Order_Total;
 
     public CoffeeOrder() {
     }
 
     public CoffeeOrder(int orderID, String order_Description, String order_Store,
-                       String order_CustomerUsername) {
+                       String order_CustomerUsername, int Order_total) {
         this.orderID = orderID;
+        this.Order_Total = Order_total;
         this.order_Description = order_Description;
         this.order_Store = order_Store;
         this.order_CustomerUsername = order_CustomerUsername;
@@ -28,6 +30,8 @@ public class CoffeeOrder {
     public String getOrder_Description() {
         return order_Description;
     }
+
+    public int getOrder_Total() { return Order_Total; }
 
     public void setOrder_Description(String order_Description) {
         this.order_Description = order_Description;
