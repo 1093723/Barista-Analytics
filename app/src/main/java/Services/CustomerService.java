@@ -33,8 +33,8 @@ public class CustomerService {
                 flag = true;
             }
         }catch (NullPointerException e){
-            flag = true;
-        }
+        flag = true;
+    }
         return flag;
     }
 }
