@@ -11,13 +11,17 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import Services.OrderService;
 import mini.com.baristaanalytics.R;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class OkoaCoffeeDetails extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private DatabaseReference databaseRef;
     private String beverageName,beverageDescription,beveragePriceSmall,beveragePriceTall,beverageImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +34,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         // need this for getting a user to register or
         // check that the user is logged in so that we can process the order
         mAuth = FirebaseAuth.getInstance();
-
+        databaseRef = FirebaseDatabase.getInstance().getReference("ORDER");
         ImageView imageView = findViewById(R.id.app_bar_coffee_image);
         TextView beverage_name_small = findViewById(R.id.beverage_name_small);
         TextView beverage_name_tall = findViewById(R.id.beverage_name_tall);
@@ -52,7 +56,12 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
                 if(mAuth != null){
                     if(mAuth.getCurrentUser() != null) {
                     // Bruce stuff, that is, needs to confirm the order
+                        OrderService orderService = new OrderService();
+                        Long beveragePrice = Long.parseLong(beveragePriceTall);
+                        orderService.processOrder("Okoa",mAuth.getCurrentUser().getUid(),mAuth.getCurrentUser().getUid().toString(),"1",beverageName,beveragePrice,databaseRef);
 
+                        Intent orderConfirmed = new Intent(OkoaCoffeeDetails.this,OrderConfirmed.class);
+                        startActivity(orderConfirmed);
                     }else {
                         Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
                         registrationPage.putExtra("beverage_name", beverageName);

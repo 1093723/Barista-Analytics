@@ -21,14 +21,15 @@ public class OrderService {
         return Order_Total;
     }
 
-    public Boolean processOrder(String OrderStore, String userName, String quantity, String nameOfCoffee, int beverage_price, DatabaseReference databaseOrder){
+    public Boolean processOrder(String OrderStore, String userName,String Uid, String quantity, String nameOfCoffee, Long beverage_price, DatabaseReference databaseOrder){
         Boolean flag = false;
         try {
-            String id = databaseOrder.push().getKey();
-            int int_id = Integer.parseInt(id);
+            //String id = databaseOrder.push().getKey();
+            //int int_id = Integer.parseInt(id);
             this.OrderDescription = quantity + " x " + nameOfCoffee + " on " + OrderDate;
-            CoffeeOrder order = new CoffeeOrder(int_id, OrderDescription, OrderStore, userName, beverage_price);
-            if(databaseOrder.child("Order").child(id).setValue(order).isSuccessful()){
+            CoffeeOrder order = new CoffeeOrder(Uid, OrderDescription, OrderStore, userName, beverage_price);
+
+            if(databaseOrder.child(userName).setValue(order).isSuccessful()){
                 flag = true;
             }
         }catch (NullPointerException e){
