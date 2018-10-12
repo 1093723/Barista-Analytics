@@ -17,7 +17,7 @@ import mini.com.baristaanalytics.R;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class OkoaCoffeeDetails extends AppCompatActivity {
-
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,8 +28,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
 
         // need this for getting a user to register or
         // check that the user is logged in so that we can process the order
-        final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-
+        mAuth = FirebaseAuth.getInstance();
         String intent_beverage_name = intent.getStringExtra("beverage_name");
         String intent_beverage_description = intent.getStringExtra("beverage_description");
         String intent_beverage_image = intent.getStringExtra("beverage_image");
@@ -56,15 +55,20 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         buttonCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(firebaseAuth.getCurrentUser().getUid().isEmpty()) {
+                if(mAuth != null){
+                    if(mAuth.getCurrentUser() != null) {
+                    // Bruce stuff, that is, needs to confirm the order
+
+                    }else {
+                        Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
+                        startActivity(registrationPage);
+                    }
+                }
+                else {
                     Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
                     startActivity(registrationPage);
                 }
-                else {
-                    // Bruce stuff, that is, needs to confirm the order
                 }
-
-            }
         });
 
         // Load the stuff into the new activity
