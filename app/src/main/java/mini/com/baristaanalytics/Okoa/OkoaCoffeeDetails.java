@@ -18,6 +18,7 @@ import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
 public class OkoaCoffeeDetails extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private String beverageName,beverageDescription,beveragePriceSmall,beveragePriceTall,beverageImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,17 +26,10 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
 
         //Create new intent with details of coffee
         Intent intent = getIntent();
-
+        setValues(intent);
         // need this for getting a user to register or
         // check that the user is logged in so that we can process the order
         mAuth = FirebaseAuth.getInstance();
-        String intent_beverage_name = intent.getStringExtra("beverage_name");
-        String intent_beverage_description = intent.getStringExtra("beverage_description");
-        String intent_beverage_image = intent.getStringExtra("beverage_image");
-        // String intent_beverage_category = intent.getStringExtra("beverage_category");
-        String intent_price_small = intent.getStringExtra("price_small");
-        // String intent_price_medium = intent.getStringExtra("price_medium");
-        String intent_price_tall = intent.getStringExtra("price_tall");
 
         ImageView imageView = findViewById(R.id.app_bar_coffee_image);
         TextView beverage_name_small = findViewById(R.id.beverage_name_small);
@@ -61,6 +55,12 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
 
                     }else {
                         Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
+                        registrationPage.putExtra("beverage_name", beverageName);
+                        registrationPage.putExtra("beverage_description", beverageDescription);
+                        registrationPage.putExtra("beverage_image", beverageImage);
+                        registrationPage.putExtra("price_small", beveragePriceSmall);
+                        registrationPage.putExtra("price_tall", beveragePriceTall);
+                        registrationPage.putExtra("orderQuantity", 1);
                         startActivity(registrationPage);
                     }
                 }
@@ -72,15 +72,21 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         });
 
         // Load the stuff into the new activity
-        Picasso.with(getBaseContext()).load(Uri.parse(intent_beverage_image)).into(imageView);
-        beverage_name_tall.setText(intent_beverage_name + " - Tall");
-        beverage_name_small.setText(intent_beverage_name + " - Small");
-        beverage_price_small.setText(intent_price_small);
-        beverage_price_tall.setText(intent_price_tall);
-        beverage_description.setText(intent_beverage_description);
+        Picasso.with(getBaseContext()).load(Uri.parse(beverageImage)).into(imageView);
+        beverage_name_tall.setText(beverageName + " - Tall");
+        beverage_name_small.setText(beverageName + " - Small");
+        beverage_price_small.setText(beveragePriceSmall);
+        beverage_price_tall.setText(beveragePriceTall);
+        beverage_description.setText(beverageDescription);
+    }
 
-
-
-
+    private void setValues(Intent intent) {
+        beverageName = intent.getStringExtra("beverage_name");
+        beverageDescription = intent.getStringExtra("beverage_description");
+        beverageImage = intent.getStringExtra("beverage_image");
+        // String intent_beverage_category = intent.getStringExtra("beverage_category");
+        beveragePriceSmall = intent.getStringExtra("price_small");
+        // String intent_price_medium = intent.getStringExtra("price_medium");
+        beveragePriceTall = intent.getStringExtra("price_tall");
     }
 }

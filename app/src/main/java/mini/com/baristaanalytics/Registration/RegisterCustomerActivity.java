@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import Services.CustomerService;
 import Services.ActorsServiceHelper;
 import mini.com.baristaanalytics.LoginActivity;
+import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import mini.com.baristaanalytics.R;
 
 public class RegisterCustomerActivity extends AppCompatActivity {
@@ -32,11 +33,15 @@ public class RegisterCustomerActivity extends AppCompatActivity {
     DatabaseReference databaseCustomer;
     Activity  activity;
     ArrayList<EditText>registrationDetails;
+    private String beverageName,beverageDescription,beveragePriceSmall,beveragePriceTall,beverageImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_register);
         mAuth = FirebaseAuth.getInstance();
+        Intent intent = getIntent();
+        setValues(intent);
         this.ctx = this;
         this.activity  = this;
         databaseCustomer = FirebaseDatabase.getInstance().getReference("CUSTOMER");
@@ -106,8 +111,14 @@ public class RegisterCustomerActivity extends AppCompatActivity {
 
                             Toast.makeText(ctx, "Welcome. You're now registered",
                                     Toast.LENGTH_LONG).show();
-                            Intent sign_in = new Intent(ctx,LoginActivity.class);
-                            startActivity(sign_in);
+                            Intent goToOkoaCoffeeDetails = new Intent(ctx,OkoaCoffeeDetails.class);
+                            goToOkoaCoffeeDetails.putExtra("beverage_name", beverageName);
+                            goToOkoaCoffeeDetails.putExtra("beverage_description", beverageDescription);
+                            goToOkoaCoffeeDetails.putExtra("beverage_image", beverageImage);
+                            goToOkoaCoffeeDetails.putExtra("price_small", beveragePriceSmall);
+                            goToOkoaCoffeeDetails.putExtra("price_tall", beveragePriceTall);
+                            goToOkoaCoffeeDetails.putExtra("orderQuantity", 1);
+                            startActivity(goToOkoaCoffeeDetails);
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -126,5 +137,13 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         }
         return check;
     }
-
+    private void setValues(Intent intent) {
+        beverageName = intent.getStringExtra("beverage_name");
+        beverageDescription = intent.getStringExtra("beverage_description");
+        beverageImage = intent.getStringExtra("beverage_image");
+        // String intent_beverage_category = intent.getStringExtra("beverage_category");
+        beveragePriceSmall = intent.getStringExtra("price_small");
+        // String intent_price_medium = intent.getStringExtra("price_medium");
+        beveragePriceTall = intent.getStringExtra("price_tall");
+    }
 }
