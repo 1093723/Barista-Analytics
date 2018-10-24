@@ -69,11 +69,13 @@ import Services.MapsServices;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
+import utilities.SMS;
 import utilities.Upload;
 import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryCold;
 import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryHot;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryHot;
+import utilities.smsService;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
     private RecyclerView mRecyclerView;
