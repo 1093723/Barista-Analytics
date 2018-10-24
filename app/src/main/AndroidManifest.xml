@@ -30,13 +30,23 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
 
-        <activity android:name=".MapsActivity">
+
+        <receiver
+            android:name="utilities.ConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MapsActivity"/>
         <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
             android:name=".LoginActivity"
@@ -48,15 +58,6 @@
             android:name=".SpeechAPI"
             android:label="Maps Activity" />
         <activity android:name=".ProcessOrderActivity" />
-
-        <receiver
-            android:name="utilities.ConnectivityReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
         <activity android:name=".Okoa.OkoaCategoryHot" />

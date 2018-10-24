@@ -15,6 +15,14 @@
     android:text="Show me maps" />
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="63dp"
+        android:text="Go To Okoa Details"
+        android:onClick="goToOkoaDetails"/>
+    <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 
@@ -42,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void ViewImages(View view) {
         Intent x = new Intent(this,MapsActivity.class);
+        startActivity(x);
+    }
+
+    public void goToOkoaDetails(View view) {
+        Intent x  =new Intent(this, OkoaCoffeeDetails.class);
         startActivity(x);
     }
 }

@@ -12,7 +12,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="85">
+            android:layout_weight="80">
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="15">
+            android:layout_weight="10">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,6 +60,20 @@
                 android:layout_below="@+id/img_order_confirmed"
                 android:layout_marginTop="25dp"
                 />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="80">
+            <ImageButton
+                android:id="@+id/btnSpeak"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_mic"
+                android:onClick="promptSpeechInput" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
