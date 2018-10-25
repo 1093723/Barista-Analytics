@@ -8,4 +8,11 @@
     <color name="bg_gradient_end">#6b394c</color>
     <color name="transparent">#800000</color>
     <color name="grey">#c4bebe</color>
+
+
+    <color name="color5">#424549</color>
+    <color name="color2">#7e455e</color>
+    <color name="color3">#796e25</color>
+    <color name="color4">#59717c</color>
+
 </resources>

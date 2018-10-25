@@ -20,7 +20,7 @@ android {
         }
 
     }
-    lintOptions{
+    lintOptions {
         abortOnError false
     }
     testOptions {
@@ -31,7 +31,8 @@ android {
         }
     }
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'}
+        exclude 'META-INF/DEPENDENCIES'
+    }
     buildToolsVersion '27.0.3'
 }
 

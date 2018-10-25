@@ -158,7 +158,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                     public void onClick(View view, int position, boolean isLongClick) {
                         Toast.makeText(OkoaCategoryHot.this, beverage.getBeverage_name(), Toast.LENGTH_SHORT).show();
 
-                        Intent OrderDetailsMenu = new Intent(OkoaCategoryHot.this, OkoaCoffeeDetails.class);
+                        Intent OrderDetailsMenu = new Intent(OkoaCategoryHot.this,  OkoaCoffeeDetails.class);
 
                         String beverage_name = model.getBeverage_name();
                         String beverage_description = model.getBeverage_description();
