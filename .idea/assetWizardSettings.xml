@@ -13,13 +13,44 @@
                       <PersistentState>
                         <option name="children">
                           <map>
+                            <entry key="actionbar">
+                              <value>
+                                <PersistentState>
+                                  <option name="children">
+                                    <map>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="paddingPercent" value="10" />
+                                                <entry key="trimmed" value="true" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/speech-bubble.png" />
+                                      <entry key="outputName" value="ic_converation" />
+                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="themeColor" value="e50417" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
                             <entry key="launcher">
                               <value>
                                 <PersistentState>
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundLayerName" value="ic_launcher_background_large_coffe_cup" />
-                                      <entry key="foregroundImage" value="C:\Users\Jancy\Desktop\large_cup.png" />
+                                      <entry key="foregroundImage" value="$PROJECT_DIR$/../../instagram/C:\Users\Jancy\Desktop\large_cup.png" />
                                       <entry key="foregroundLayerName" value="launcher_foreground_large_cup_image" />
                                       <entry key="outputName" value="ic_large_cup_image" />
                                     </map>
@@ -33,12 +64,17 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\Jancy\Desktop\large_cup.png" />
+                                      <entry key="imageAsset" value="$PROJECT_DIR$/../../instagram/C:\Users\Jancy\Desktop\large_cup.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
                               </value>
                             </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

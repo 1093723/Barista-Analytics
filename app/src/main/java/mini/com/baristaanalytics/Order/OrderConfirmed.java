@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics.Okoa;
+package mini.com.baristaanalytics.Order;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.speech.RecognizerIntent;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +24,7 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
+import com.felipecsl.gifimageview.library.GifImageView;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,13 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
-import mini.com.baristaanalytics.R;
 
-public class OkoaSize extends AppCompatActivity {
-
-    private String TAG = "OKOA SIZE";
+public class OrderConfirmed extends AppCompatActivity {
+    private String TAG = "ORDER CONFIRMED";
     private Context ctx;
     // Speech to text
     // Array of input speech from user
@@ -54,8 +56,6 @@ public class OkoaSize extends AppCompatActivity {
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
-    // Order-related vars
-    private String coffeeName;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -80,6 +80,7 @@ public class OkoaSize extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG,"onActivityResult(): Result from speech to text");
         super.onActivityResult(requestCode, resultCode, data);
+
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
@@ -97,13 +98,33 @@ public class OkoaSize extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_okoa_size);
-
-
-
-
+        setContentView(R.layout.activity_order_confirmed);
+        Log.d(TAG,"onCreate:Activity Started");
+        ctx = OrderConfirmed.this;
+        initPollyClient();
+        setupViewPager();
     }
 
+
+    /**
+     * Responsible for adding 3 tabs to the viewpager
+     * -Current Orders
+     * -Previous Orders
+     * -Messages Fragment
+     */
+    private void setupViewPager(){
+        SectionsPagerAdapter adapter  = new SectionsPagerAdapter(getSupportFragmentManager());
+        adapter.addFragments(new CurrentOrdersFragment());
+        adapter.addFragments(new MessagesFragment());
+        adapter.addFragments(new History_Orders_Fragment());
+        ViewPager viewPager = (ViewPager)findViewById(R.id.container);
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_current_orders);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_converation);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_pervious_orders);
+    }
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();
         if(isConnected){
@@ -156,9 +177,14 @@ public class OkoaSize extends AppCompatActivity {
     }
 
     private void decodeUserInput(String s) {
-        // Check quantity of coffee being ordered
-        if(s.contains("one")){
-            // only one being ordered
+        // Check what the user gave as input
+        // It can be an americano
+        if(s.contains("history") || s.contains("previous")){
+            // Take to the previous orders activity
+            // Send a variable to notify the fragment loader on which fragment to display
+        }else if(s.contains("view my order") || s.contains("view order")) {
+            // Take to the current orders activity
+            // Send a variable to notify fragment holder to load the current-orders fragment
         }
     }
 

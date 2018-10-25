@@ -65,7 +65,7 @@
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
-        <activity android:name=".Okoa.OrderConfirmed"></activity>
+        <activity android:name=".Order.OrderConfirmed"></activity>
     </application>
 
 </manifest>

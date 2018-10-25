@@ -11,7 +11,6 @@ import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -29,7 +28,6 @@ import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -43,6 +41,7 @@ import java.util.Locale;
 import Adapter.FoodViewHolder;
 import Model.Beverage;
 import Services.OrderService;
+import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
@@ -52,7 +51,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseRef;
     private String beverageName,beverageDescription,beveragePriceSmall,beveragePriceTall,beverageImage;
-    private String TAG = "OKOA HOT";
+    private String TAG = "OKOA COFFEE DETAILS";
     private Context ctx;
     // Speech to text
     // Array of input speech from user
@@ -71,12 +70,6 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
-    //Order-Related Variables
-    private String coffeeName;
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    FirebaseDatabase database;
-    DatabaseReference coffeeList;
 
     FirebaseRecyclerAdapter<Beverage, FoodViewHolder> adapter;
     @Override
@@ -119,6 +112,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_coffee_details);
+        Log.d(TAG,"onCreate(): Activity started");
         this.ctx = this;
         initPollyClient();
         setupNewMediaPlayer();

@@ -3,77 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Okoa.OrderConfirmed">
-    <LinearLayout
+    tools:context=".Order.OrderConfirmed">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/relLayouttxtViewHolder"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+        <!-- Top Toolbar-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/relLayout1">
+            <include layout="@layout/layout_top_tabs"/>
+        </RelativeLayout>
+        <!-- Middle Section-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="80">
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Order Confirmed"
-                android:textColor="?attr/colorPrimaryDark"
-                android:textSize="30sp"
-                android:layout_centerHorizontal="true"/>
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Barista's on it"
-                android:textColor="?attr/colorPrimaryDark"
-                android:textSize="30sp"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/textView2"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16dp"
-                />
+            android:id="@+id/relLayout2"
+            android:layout_below="@id/relLayout1"
+            android:background="@color/white">
+            <include layout="@layout/layout_center_viewpager"/>
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="10">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/a256x256"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/img_order_confirmed"/>
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Success!"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="30sp"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@+id/img_order_confirmed"
-                android:layout_marginTop="25dp"
-                />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="80">
-            <ImageButton
-                android:id="@+id/btnSpeak"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/ic_mic"
-                android:onClick="promptSpeechInput" />
-        </RelativeLayout>
-    </LinearLayout>
+        <include layout="@layout/layout_bottom_bruce"
+            />
+    </RelativeLayout>
 </RelativeLayout>
