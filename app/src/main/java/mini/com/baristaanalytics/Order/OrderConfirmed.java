@@ -24,7 +24,6 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
-import com.felipecsl.gifimageview.library.GifImageView;
 
 import java.io.IOException;
 import java.net.URL;
@@ -116,7 +115,7 @@ public class OrderConfirmed extends AppCompatActivity {
         SectionsPagerAdapter adapter  = new SectionsPagerAdapter(getSupportFragmentManager());
         adapter.addFragments(new CurrentOrdersFragment());
         adapter.addFragments(new MessagesFragment());
-        adapter.addFragments(new History_Orders_Fragment());
+        adapter.addFragments(new OrderHistoryFragment());
         ViewPager viewPager = (ViewPager)findViewById(R.id.container);
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = findViewById(R.id.tabs);

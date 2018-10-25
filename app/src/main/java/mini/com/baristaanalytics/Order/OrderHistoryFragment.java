@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import mini.com.baristaanalytics.R;
 
-public class History_Orders_Fragment extends Fragment {
+public class OrderHistoryFragment extends Fragment {
     private static final String TAG = "ORDER_HISTORY_FRAGMENT";
 
     @Nullable

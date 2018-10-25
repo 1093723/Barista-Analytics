@@ -26,6 +26,7 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
+import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -72,6 +73,8 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
 
     FirebaseRecyclerAdapter<Beverage, FoodViewHolder> adapter;
+    ElegantNumberButton btnLarge;
+    ElegantNumberButton btnSmall;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -113,6 +116,9 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_coffee_details);
         Log.d(TAG,"onCreate(): Activity started");
+        btnLarge = (ElegantNumberButton) findViewById(R.id.number_button_large);
+        btnSmall = (ElegantNumberButton) findViewById(R.id.number_button_small);
+
         this.ctx = this;
         initPollyClient();
         setupNewMediaPlayer();
@@ -138,35 +144,6 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
             2. Confirm the order details in the OkoaDetailConfirmed activity (not created)
                 After that, send them to the OrderConfirmed page.
          */
-        buttonCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mAuth != null){
-                    if(mAuth.getCurrentUser() != null) {
-                    // Bruce stuff, that is, needs to confirm the order
-                        OrderService orderService = new OrderService();
-                        Long beveragePrice = Long.parseLong(beveragePriceTall);
-                        orderService.processOrder("Okoa",mAuth.getCurrentUser().getUid(),mAuth.getCurrentUser().getUid().toString(),"1",beverageName,beveragePrice,databaseRef);
-
-                        Intent orderConfirmed = new Intent(OkoaCoffeeDetails.this,OrderConfirmed.class);
-                        startActivity(orderConfirmed);
-                    }else {
-                        Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
-                        registrationPage.putExtra("beverage_name", beverageName);
-                        registrationPage.putExtra("beverage_description", beverageDescription);
-                        registrationPage.putExtra("beverage_image", beverageImage);
-                        registrationPage.putExtra("price_small", beveragePriceSmall);
-                        registrationPage.putExtra("price_tall", beveragePriceTall);
-                        registrationPage.putExtra("orderQuantity", 1);
-                        startActivity(registrationPage);
-                    }
-                }
-                else {
-                    Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
-                    startActivity(registrationPage);
-                }
-                }
-        });
 
         // Load the stuff into the new activity
         Picasso.with(getBaseContext()).load(Uri.parse(beverageImage)).into(imageView);
@@ -200,6 +177,49 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     }
 
     /**
+     * This method takes all the input from the user in order to process their order
+     * This is done by first confirming that they are still signed in
+     *
+     * @param view
+     */
+    public void processOrder(View view){
+        if(btnSmall.getNumber() != null && btnLarge.getNumber() != null){
+           // Ordered small and large
+        }else if(btnSmall != null){
+            // Only small
+        }
+        else if(btnLarge.getNumber() != null){
+            // Only Large
+        }else {
+            // Nothing ordered
+        }
+
+        if(mAuth != null){
+            if(mAuth.getCurrentUser() != null) {
+                // Bruce stuff, that is, needs to confirm the order
+                OrderService orderService = new OrderService();
+                Long beveragePrice = Long.parseLong(beveragePriceTall);
+                orderService.processOrder("Okoa",mAuth.getCurrentUser().getUid(),mAuth.getCurrentUser().getUid().toString(),"1",beverageName,beveragePrice,databaseRef);
+
+                Intent orderConfirmed = new Intent(OkoaCoffeeDetails.this,OrderConfirmed.class);
+                startActivity(orderConfirmed);
+            }else {
+                Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
+                registrationPage.putExtra("beverage_name", beverageName);
+                registrationPage.putExtra("beverage_description", beverageDescription);
+                registrationPage.putExtra("beverage_image", beverageImage);
+                registrationPage.putExtra("price_small", beveragePriceSmall);
+                registrationPage.putExtra("price_tall", beveragePriceTall);
+                registrationPage.putExtra("orderQuantity", 1);
+                startActivity(registrationPage);
+            }
+        }
+        else {
+            Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
+            startActivity(registrationPage);
+        }
+    }
+    /**
      * AWS Polly Media Player
      */
     void setupNewMediaPlayer() {
@@ -229,26 +249,10 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
 
     private void decodeUserInput(String s) {
         // Check what the user gave as input
-        // It can be an americano
-        Intent okoa = new Intent(this, OkoaSize.class);
-        String coffeeName = "coffeeName";
-        String almostThere;
-        if(s.contains("Americano")){
-            // Add the coffee name to the intent and retrieve it in the OkoaSize class
-            almostThere = "Americano coming up. Let's confirm the size";
-            setupPlayButton(almostThere);
-            okoa.putExtra(coffeeName,"Americano");
-            startActivity(okoa);
-            // User would like americano
-        }
-        else if(s.contains("Chai Latte")){
-            // User would like a Chai Latte
-            // Add the coffee name to the intent and retrieve it in the OkoaSize class
-            okoa.putExtra(coffeeName,"Chai Latte");
-            startActivity(okoa);
-        }else {
-            String coffeeNotRecognized = "Please repeat that.";
-            setupPlayButton(coffeeNotRecognized);
+        if(s.contains("yes") || s.contains("sure") || s.contains("right")
+                || s.contains("definitely")){
+            Intent confirmed = new Intent(this,OrderConfirmed.class);
+            startActivity(confirmed);
         }
     }
 
