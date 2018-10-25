@@ -5,7 +5,7 @@ public class OkoaColdMenuModel {
     private String desc;
     private String title;
 
-    public OkoaColdMenuModel(int image, String desc, String title) {
+    public OkoaColdMenuModel(int image, String title, String desc) {
         this.image = image;
         this.desc = desc;
         this.title = title;
