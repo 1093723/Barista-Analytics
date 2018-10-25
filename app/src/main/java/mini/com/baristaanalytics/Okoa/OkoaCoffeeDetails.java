@@ -83,7 +83,6 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setupVoicesList();
-
     }
     /**
      * Setup Polly Voices List
@@ -92,7 +91,6 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
     void setupVoicesList() {
         // Asynchronously get available Polly voices.
         new GetPollyVoices().execute();
-
     }
 
     /**
@@ -124,7 +122,6 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         this.ctx = this;
         initPollyClient();
         setupNewMediaPlayer();
-        /*
         //Create new intent with details of coffee
         Intent intent = getIntent();
         setValues(intent);
@@ -138,7 +135,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         TextView beverage_price_small = findViewById(R.id.beverage_price_small);
         TextView beverage_price_tall = findViewById(R.id.beverage_price_large);
         TextView beverage_description = findViewById(R.id.beverage_description);
-        */
+
         FloatingActionButton buttonCart = findViewById(R.id.btnCart);
         /*FloatingActionButton needs to either:
             1. Send the user to the reigster activity so that they can register.
@@ -178,12 +175,12 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         });
 
         // Load the stuff into the new activity
-        /*Picasso.with(getBaseContext()).load(Uri.parse(beverageImage)).into(imageView);
+        Picasso.with(getBaseContext()).load(Uri.parse(beverageImage)).into(imageView);
         beverage_name_tall.setText(beverageName + " - Tall");
         beverage_name_small.setText(beverageName + " - Small");
         beverage_price_small.setText(beveragePriceSmall);
         beverage_price_tall.setText(beveragePriceTall);
-        beverage_description.setText(beverageDescription);*/
+        beverage_description.setText(beverageDescription);
     }
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();

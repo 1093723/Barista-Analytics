@@ -39,14 +39,14 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapsActivity"/>
+        <activity android:name=".MainActivity"/>
         <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
             android:name=".LoginActivity"
