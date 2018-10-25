@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "114533826598",
+    "firebase_url": "https://barista-analytics.firebaseio.com",
+    "project_id": "barista-analytics",
+    "storage_bucket": "barista-analytics.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114533826598:android:74dfc3ee8ba870bb",
+        "android_client_info": {
+          "package_name": "mini.com.baristaanalytics"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114533826598-vdl3meiv4hftbrsrnamdm6kivr4dnnms.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mini.com.baristaanalytics",
+            "certificate_hash": "090b968c77c054dc43c02b571a7a80fb93c168e0"
+          }
+        },
+        {
+          "client_id": "114533826598-nvvlpntb5q83m6mc6dol6c16bt2vnbes.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mini.com.baristaanalytics",
+            "certificate_hash": "2bd294f50472cfc8ebfa7f08dc554c063f00cd7d"
+          }
+        },
+        {
+          "client_id": "114533826598-guf4tmrph1gi7tpg956lioi6gdp6i60m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mini.com.baristaanalytics",
+            "certificate_hash": "223f1660fd73bce8b875e7c68f2d0dd5399a6b96"
+          }
+        },
+        {
+          "client_id": "114533826598-j1o5tku3suvbgnh4tkndrcfftk9k5bbi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcK__sFNpQXEsX1IAo6JFbBWsh5Z3fJV4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114533826598-fv1ah22p3slg5ov2054pim87jrhdm1o1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

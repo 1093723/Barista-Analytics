@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="mini.com.baristaanalytics">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- To do with testing and adb permissions -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:name="utilities.MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
+
+        <receiver
+            android:name="utilities.ConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".OkoaCategoryCold2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".Registration.RegisterCustomerActivity" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login" />
+        <activity
+            android:name=".Registration.RegisterAdminActivity"
+            android:label="Admin Registration" />
+        <activity
+            android:name=".SpeechAPI"
+            android:label="Maps Activity" />
+        <activity android:name=".ProcessOrderActivity" />
+        <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
+        <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
+        <activity android:name=".Okoa.OkoaCategoryHot" />
+        <activity android:name=".Okoa.OkoaCategoryCold" />
+        <activity android:name=".Okoa.OkoaSize" />
+        <activity android:name=".Doubleshot.DoubleShotSize" />
+        <activity android:name=".Okoa.OkoaCoffeeDetails" />
+        <activity android:name=".Order.OrderConfirmed" />
+        <activity android:name=".MapsActivity"></activity>
+    </application>
+
+</manifest>
