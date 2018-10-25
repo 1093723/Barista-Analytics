@@ -64,7 +64,6 @@ public class OkoaCategoryCold2 extends AppCompatActivity {
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
-
                 Integer[] colors_temp = {
                         getResources().getColor(R.color.color5),
                         getResources().getColor(R.color.color2),
