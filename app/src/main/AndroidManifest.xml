@@ -30,7 +30,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
 
-
         <receiver
             android:name="utilities.ConnectivityReceiver"
             android:enabled="true">
@@ -46,7 +45,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapsActivity"/>
+        <activity android:name=".MapsActivity" />
         <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
             android:name=".LoginActivity"
@@ -65,7 +64,8 @@
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
-        <activity android:name=".Okoa.OrderConfirmed"></activity>
+        <activity android:name=".Okoa.OrderConfirmed" />
+        <activity android:name=".OkoaCategoryCold2"></activity>
     </application>
 
 </manifest>

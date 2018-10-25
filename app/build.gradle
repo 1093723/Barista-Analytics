@@ -28,8 +28,9 @@ android {
         }
     }
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'}
-    buildToolsVersion '27.0.3'
+        exclude 'META-INF/DEPENDENCIES'
+    }
+    buildToolsVersion '28.0.2'
 }
 
 dependencies {
