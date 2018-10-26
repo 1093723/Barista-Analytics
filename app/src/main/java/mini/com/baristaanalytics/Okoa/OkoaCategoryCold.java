@@ -141,14 +141,11 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    models.add(beverage);
-                    //Log.d(TAG, beverage.getBeverage_name());
+                    if(beverage.getBeverage_category().equals("cold")){
+                        models.add(beverage);
+                    }
                 }
-                /*models.add(new OkoaColdMenuModel(R.drawable.brochure, "Brochure", "This is a brochure"));
-                models.add(new OkoaColdMenuModel(R.drawable.sticker, "Sticker", "This is a sticker"));
-                models.add(new OkoaColdMenuModel(R.drawable.poster, "Poster", "This is a poster"));
-                models.add(new OkoaColdMenuModel(R.drawable.namecard, "Namecard", "This is a namecard"));
-                */
+
                 adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
 
                 viewPager = findViewById(R.id.viewPager);

@@ -1,5 +1,6 @@
 package mini.com.baristaanalytics.Okoa;
 
+import android.animation.ArgbEvaluator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,8 +31,11 @@ import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -40,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.FoodViewHolder;
+import Adapter.OkoaColdMenuAdapter;
 import Interface.ItemClickListener;
 import Model.Beverage;
 import utilities.ConnectivityReceiver;
@@ -48,8 +54,14 @@ import mini.com.baristaanalytics.R;
 
 public class OkoaCategoryHot extends AppCompatActivity {
     private String TAG = "OKOA HOT";
+    ViewPager viewPager;
     private Context ctx;
-    // Speech to text
+    OkoaColdMenuAdapter adapter;
+    List<Beverage> models;
+    Integer[] colors = null;
+    ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+    FirebaseDatabase database;
+    DatabaseReference coffeeList;    // Speech to text
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
@@ -68,12 +80,6 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     //Order-Related Variables
     private String coffeeName;
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    FirebaseDatabase database;
-    DatabaseReference coffeeList;
-
-    FirebaseRecyclerAdapter<Beverage, FoodViewHolder> adapter;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -117,84 +123,66 @@ public class OkoaCategoryHot extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_hot);
-        Log.d(TAG,"onCreate:Activity Started");
-        this.ctx = this;
-        // Firebase
+        ctx = OkoaCategoryHot.this;
+        models = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
         coffeeList = database.getReference("CoffeeMenuOkoa");
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewFoods);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        loadCoffeeList();
-
-        initPollyClient();
-        setupNewMediaPlayer();
-        String Greeting = "What beverage would you like?";
-        setupPlayButton(Greeting);
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        adapter.startListening();
-    }
-    private void loadCoffeeList() {
-        FirebaseRecyclerOptions<Beverage> options =
-                new FirebaseRecyclerOptions.Builder<Beverage>()
-                        .setQuery(coffeeList.orderByChild("beverage_category").equalTo("hot"), Beverage.class)
-                        .build();
-        Log.d(TAG,"getting model model ");
-        adapter = new FirebaseRecyclerAdapter<Beverage, FoodViewHolder>(options){
+        coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
-            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull final Beverage model) {
-                holder.food_txt_viewName.setText(model.getBeverage_name());
-                Picasso.with(getBaseContext()).load(model.getBeverage_image())
-                        .into(holder.food_image);
-                final Beverage beverage = model;
-                holder.setItemClickListener(new ItemClickListener() {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap :
+                        dataSnapshot.getChildren()) {
+                    Beverage beverage = snap.getValue(Beverage.class);
+                    if(beverage.getBeverage_category().equals("hot")){
+                        models.add(beverage);
+                    }
+                }
+
+                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryHot.this);
+
+                viewPager = findViewById(R.id.viewPager);
+                viewPager.setAdapter(adapter);
+                viewPager.setPadding(130,0,130,0);
+                Integer[] colors_temp = {
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color4)
+                };
+
+                colors = colors_temp;
+                viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(OkoaCategoryHot.this, beverage.getBeverage_name(), Toast.LENGTH_SHORT).show();
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
+                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                        }
+                        else {
+                            viewPager.setBackgroundColor(colors[colors.length - 1]);
+                        }
+                    }
 
-                        Intent OrderDetailsMenu = new Intent(OkoaCategoryHot.this, OkoaCoffeeDetails.class);
+                    @Override
+                    public void onPageSelected(int position) {
 
-                        String beverage_name = model.getBeverage_name();
-                        String beverage_description = model.getBeverage_description();
-                        String beverage_image = model.getBeverage_image();
-                        String beverage_category = model.getBeverage_category();
-                        String price_small = model.getPrice_small().toString();
-                        String price_medium = model.getPrice_medium();
-                        String price_tall = model.getPrice_tall().toString();
+                    }
 
-                        OrderDetailsMenu.putExtra("beverage_name", beverage_name);
-                        OrderDetailsMenu.putExtra("beverage_description", beverage_description);
-                        OrderDetailsMenu.putExtra("beverage_image", beverage_image);
-                        OrderDetailsMenu.putExtra("beverage_category", beverage_category);
-                        OrderDetailsMenu.putExtra("price_small", price_small);
-                        OrderDetailsMenu.putExtra("price_medium", price_medium);
-                        OrderDetailsMenu.putExtra("price_tall", price_tall);
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
 
-                        startActivity(OrderDetailsMenu);
                     }
                 });
-
-
             }
-
             @Override
-            public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.food_item, parent, false);
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                return new FoodViewHolder(view);
             }
-        };
-        // Set adapter
-        Log.d(TAG,"setting adapter");
-        recyclerView.setAdapter(adapter);
+        });
+
+
+
     }
+
 
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();
