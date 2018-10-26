@@ -7,17 +7,13 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,9 +27,6 @@ import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.gms.signin.SignIn;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,9 +34,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-
-import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.URL;
@@ -51,30 +41,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Adapter.FoodViewHolder;
 import Adapter.OkoaColdMenuAdapter;
-import Interface.ItemClickListener;
 import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
 import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
+import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
-import mini.com.baristaanalytics.R;
 
 public class OkoaCategoryHot extends AppCompatActivity {
     private String TAG = "OKOA HOT";
-    private Boolean final_Confirmation;
-    ViewPager viewPager;
-    private Context ctx;
-    OkoaColdMenuAdapter adapter;
-    List<Beverage> models;
-    Integer[] colors = null;
-    ArgbEvaluator argbEvaluator = new ArgbEvaluator();
-    FirebaseDatabase database;
-    private FirebaseAuth mAuth;
-    DatabaseReference coffeeList,coffee_Order;    // Speech to text
+    /**
+     * Bruce-related variables
+     */
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
@@ -83,21 +64,43 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private List<Voice> voices;
     // Amazon Polly permissions.
     private static final String COGNITO_POOL_ID = "CHANGEME";
-
     // Region of Amazon Polly.
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
-    private ImageButton btn;
-    // AWS Media Player
-    private MediaPlayer mediaPlayer;
-    //Order-Related Variables
-    private ElegantNumberButton btnSmall,btnLarge;
-    private Beverage beverage;
-    private TextView txtViewPriceSmall,txtViewPriceLarge;
+    /**
+     * Order-related variables
+     */
     private CoffeeOrder coffeeOrder;
     private String confirmation;
     String order_description;
+    private Boolean final_Confirmation;
+    private ElegantNumberButton btnSmall,btnLarge;
+
+    /**
+     * Layout-related variables
+     */
+    private Context ctx;
+    private Beverage beverage;
+    private ViewPager viewPager;
+    private OkoaColdMenuAdapter adapter;
+    private List<Beverage> models;
+    private Integer[] colors = null;
+    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+    private TextView txtViewPriceSmall,txtViewPriceLarge;
+
+    /**
+     * Firebase-related variables
+     */
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    DatabaseReference coffeeList,coffee_Order;    // Speech to text
+
+    /**
+     * Google speech to text
+     */
+    private MediaPlayer mediaPlayer;
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -141,20 +144,9 @@ public class OkoaCategoryHot extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_hot);
-        ctx = OkoaCategoryHot.this;
-        mAuth = FirebaseAuth.getInstance();
-        txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
-        txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
-        btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
-        btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
+        initVariables();
         initPollyClient();
         setupNewMediaPlayer();
-        models = new ArrayList<>();
-        coffeeOrder = new CoffeeOrder();
-        database = FirebaseDatabase.getInstance();
-        coffee_Order = database.getReference("OkoaCoffeeOrders");
-        coffeeList = database.getReference("CoffeeMenuOkoa");
-
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -210,31 +202,55 @@ public class OkoaCategoryHot extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Initialize variables to be used
+     */
+    private void initVariables() {
+        ctx = OkoaCategoryHot.this;
+        mAuth = FirebaseAuth.getInstance();
+        txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
+        txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
+        btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
+        btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
+        models = new ArrayList<>();
+        coffeeOrder = new CoffeeOrder();
+        database = FirebaseDatabase.getInstance();
+        coffee_Order = database.getReference("OkoaCoffeeOrders");
+        coffeeList = database.getReference("CoffeeMenuOkoa");
+    }
+
     @Override
     public void onResume(){
         super.onResume();
-
+        /**
+         * Resume from the sign-in activity
+         */
+        // Check if the user is signed-ins
         if(mAuth.getCurrentUser() != null && confirmation!=null){
-            if(final_Confirmation){
-                String userReq = "The total is " + coffeeOrder.getOrder_Total() +
-                        " rands. Is that in order?";
-                setupPlayButton(userReq);
-                final_Confirmation= false;
-            }
-            else {
-                btnSmall.setClickable(false);
-                btnLarge.setClickable(false);
-                OrderService orderService = new OrderService();
-                coffeeOrder.setUUID(mAuth.getUid());
-                String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
-                        "ready.";
-                setupPlayButton(complete);
-                orderService.process_order(coffeeOrder,coffee_Order);
-                Intent x = new Intent(this, OrderConfirmed.class);
-                startActivity(x);
-                finish();
+            if(final_Confirmation != null){
+                if(final_Confirmation){
+                    String userReq = "The total is " + coffeeOrder.getOrder_Total() +
+                            " rands. Is that in order?";
+                    setupPlayButton(userReq);
+                    final_Confirmation= false;
+                }
+                else {
+                    OrderService orderService = new OrderService();
+                    coffeeOrder.setUUID(mAuth.getUid());
+                    String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
+                            "ready.";
+                    setupPlayButton(complete);
+                    orderService.process_order(coffeeOrder,coffee_Order);
+                    Intent x = new Intent(this, OrderConfirmed.class);
+                    startActivity(x);
+                    finish();
+
+                }
+            }else {
 
             }
+
         }
     }
     @Override
@@ -346,7 +362,11 @@ public class OkoaCategoryHot extends AppCompatActivity {
                     String account = "Seems like you're registered.";
                     coffeeOrder.setUUID(mAuth.getUid());
                     coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
-
+                    OrderService orderService = new OrderService();
+                    orderService.process_order(coffeeOrder,coffee_Order);
+                    Intent x = new Intent(this, OrderConfirmed.class);
+                    startActivity(x);
+                    finish();
                     setupPlayButton(account);
                 }else {
                     String confirm_account = "Let's get you signed in before wrapping this up";

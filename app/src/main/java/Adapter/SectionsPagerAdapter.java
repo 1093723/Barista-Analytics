@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics.Order;
+package Adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

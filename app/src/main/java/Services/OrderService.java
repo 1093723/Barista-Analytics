@@ -24,8 +24,9 @@ public class OrderService {
     }
     public boolean process_order(CoffeeOrder order,DatabaseReference reference){
         Boolean flag = false;
+        String id = reference.push().getKey();
         order.setOrder_date(DateTime.now().toDateTime().toString());
-        if(reference.child(order.getUUID()).setValue(order).isComplete()){
+        if(reference.child(id).setValue(order).isComplete()){
             flag = true;
         }
         return flag;

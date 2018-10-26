@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import Adapter.SectionsPagerAdapter;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
