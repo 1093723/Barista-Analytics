@@ -2,6 +2,8 @@ package Services;
 
 import com.google.firebase.database.DatabaseReference;
 
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
 
 import Model.CoffeeOrder;
@@ -20,22 +22,13 @@ public class OrderService {
     public int getOrder_Total() {
         return Order_Total;
     }
-
-    public Boolean processOrder(String OrderStore, String userName,String Uid, String quantity, String nameOfCoffee, Long beverage_price, DatabaseReference databaseOrder){
+    public boolean process_order(CoffeeOrder order,DatabaseReference reference){
         Boolean flag = false;
-        try {
-            //String id = databaseOrder.push().getKey();
-            //int int_id = Integer.parseInt(id);
-            this.OrderDescription = quantity + " x " + nameOfCoffee + " on " + OrderDate;
-            CoffeeOrder order = new CoffeeOrder(Uid, OrderDescription, OrderStore, userName, beverage_price);
-
-            if(databaseOrder.child(userName).setValue(order).isSuccessful()){
-                flag = true;
-            }
-        }catch (NullPointerException e){
+        order.setOrder_date(DateTime.now().toDateTime().toString());
+        if(reference.child(order.getUUID()).setValue(order).isComplete()){
             flag = true;
         }
         return flag;
-
     }
+
 }

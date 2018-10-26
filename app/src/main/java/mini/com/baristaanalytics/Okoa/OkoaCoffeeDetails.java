@@ -199,7 +199,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
                 // Bruce stuff, that is, needs to confirm the order
                 OrderService orderService = new OrderService();
                 Long beveragePrice = Long.parseLong(beveragePriceTall);
-                orderService.processOrder("Okoa",mAuth.getCurrentUser().getUid(),mAuth.getCurrentUser().getUid().toString(),"1",beverageName,beveragePrice,databaseRef);
+                //orderService.processOrder("Okoa",mAuth.getCurrentUser().getUid(),mAuth.getCurrentUser().getUid().toString(),"1",beverageName,beveragePrice,databaseRef);
 
                 Intent orderConfirmed = new Intent(OkoaCoffeeDetails.this,OrderConfirmed.class);
                 startActivity(orderConfirmed);

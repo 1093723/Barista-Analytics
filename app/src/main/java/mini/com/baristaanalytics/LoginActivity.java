@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private FirebaseAuth mAuth;
 
     ConnectivityReceiver connectivityReceiver;
-
+    String from_order;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +92,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         ctx = this;
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
-
+        Intent intent = getIntent();
+        if(intent != null){
+            from_order = intent.getStringExtra("sign_in");
+        }
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -215,9 +218,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
                         showProgress(false);
+                        finish();
                         // User successfully logged in
-                        Intent x = new Intent(ctx,OkoaCoffeeDetails.class);
-                        startActivity(x);
+                        //Intent x = new Intent(ctx,OkoaCoffeeDetails.class);
+                        //startActivity(x);
                     }else {
                         Toast.makeText(ctx,task.getException().getMessage(),Toast.LENGTH_LONG).show();
                     }
