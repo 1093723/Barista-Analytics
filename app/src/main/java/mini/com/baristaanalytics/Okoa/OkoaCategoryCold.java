@@ -1,13 +1,19 @@
 package mini.com.baristaanalytics.Okoa;
 
+import android.animation.ArgbEvaluator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,17 +35,23 @@ import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import Adapter.FoodViewHolder;
+import Adapter.OkoaColdMenuAdapter;
 import Interface.ItemClickListener;
 import Model.Beverage;
 import utilities.ConnectivityReceiver;
@@ -47,8 +59,15 @@ import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 public class OkoaCategoryCold extends AppCompatActivity {
-    private String TAG = "OKOA COLD";
+    private final String TAG = "OKOA_COLD_CATEGORY";
+    ViewPager viewPager;
     private Context ctx;
+    OkoaColdMenuAdapter adapter;
+    List<Beverage> models;
+    Integer[] colors = null;
+    ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+    FirebaseDatabase database;
+    DatabaseReference coffeeList;
     // Speech to text
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
@@ -67,13 +86,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
     // AWS Media Player
     private MediaPlayer mediaPlayer;
     //Order-Related Variables
-    private String coffeeName;
-    RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
-    FirebaseDatabase database;
-    DatabaseReference coffeeList;
 
-    FirebaseRecyclerAdapter<Beverage, FoodViewHolder> adapter;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -112,88 +126,83 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
-        Log.d(TAG,"onCreate:Activity Started");
-        this.ctx = this;
-        // Firebase
+        ctx = OkoaCategoryCold.this;
+        models = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
         coffeeList = database.getReference("CoffeeMenuOkoa");
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewFoods);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        loadCoffeeList();
-
-        initPollyClient();
-        setupNewMediaPlayer();
-        String Greeting = "What beverage would you like?";
-        setupPlayButton(Greeting);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        adapter.startListening();
-    }
-    private void loadCoffeeList() {
-        FirebaseRecyclerOptions<Beverage> options =
-                new FirebaseRecyclerOptions.Builder<Beverage>()
-                        .setQuery(coffeeList.orderByChild("beverage_category").equalTo("cold"), Beverage.class)
-                        .build();
-        Log.d(TAG,"getting model model ");
-        adapter = new FirebaseRecyclerAdapter<Beverage, FoodViewHolder>(options){
+        coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
-            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull final Beverage model) {
-                holder.food_txt_viewName.setText(model.getBeverage_name());
-                Picasso.with(getBaseContext()).load(model.getBeverage_image())
-                        .into(holder.food_image);
-                final Beverage beverage = model;
-                holder.setItemClickListener(new ItemClickListener() {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap :
+                        dataSnapshot.getChildren()) {
+                    Beverage beverage = snap.getValue(Beverage.class);
+                    models.add(beverage);
+                    //Log.d(TAG, beverage.getBeverage_name());
+                }
+                /*models.add(new OkoaColdMenuModel(R.drawable.brochure, "Brochure", "This is a brochure"));
+                models.add(new OkoaColdMenuModel(R.drawable.sticker, "Sticker", "This is a sticker"));
+                models.add(new OkoaColdMenuModel(R.drawable.poster, "Poster", "This is a poster"));
+                models.add(new OkoaColdMenuModel(R.drawable.namecard, "Namecard", "This is a namecard"));
+                */
+                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
+
+                viewPager = findViewById(R.id.viewPager);
+                viewPager.setAdapter(adapter);
+                viewPager.setPadding(130,0,130,0);
+                Integer[] colors_temp = {
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color4)
+                };
+
+                colors = colors_temp;
+                viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(OkoaCategoryCold.this, beverage.getBeverage_name(), Toast.LENGTH_SHORT).show();
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
+                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                        }
+                        else {
+                            viewPager.setBackgroundColor(colors[colors.length - 1]);
+                        }
+                    }
 
-                        Intent OrderDetailsMenu = new Intent(OkoaCategoryCold.this, OkoaCoffeeDetails.class);
+                    @Override
+                    public void onPageSelected(int position) {
 
-                        String beverage_name = model.getBeverage_name();
-                        String beverage_description = model.getBeverage_description();
-                        String beverage_image = model.getBeverage_image();
-                        String beverage_category = model.getBeverage_category();
-                        String price_small = model.getPrice_small().toString();
-                        String price_medium = model.getPrice_medium();
-                        String price_tall = model.getPrice_tall().toString();
+                    }
 
-                        OrderDetailsMenu.putExtra("beverage_name", beverage_name);
-                        OrderDetailsMenu.putExtra("beverage_description", beverage_description);
-                        OrderDetailsMenu.putExtra("beverage_image", beverage_image);
-                        OrderDetailsMenu.putExtra("beverage_category", beverage_category);
-                        OrderDetailsMenu.putExtra("price_small", price_small);
-                        OrderDetailsMenu.putExtra("price_medium", price_medium);
-                        OrderDetailsMenu.putExtra("price_tall", price_tall);
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
 
-                        startActivity(OrderDetailsMenu);
                     }
                 });
-
-
             }
-
             @Override
-            public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.food_item, parent, false);
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                return new FoodViewHolder(view);
             }
-        };
-        // Set adapter
-        Log.d(TAG,"setting adapter");
-        recyclerView.setAdapter(adapter);
+        });
+
+
+
+    }
+
+    public static Drawable drawableFromUrl(String url) throws IOException {
+        Bitmap x;
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return new BitmapDrawable(x);
     }
 
     public void promptSpeechInput(View view) {
