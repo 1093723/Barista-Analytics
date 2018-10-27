@@ -94,7 +94,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
      */
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
-    DatabaseReference coffeeList,coffee_Order;    // Speech to text
+        DatabaseReference coffeeList,coffee_Order;    // Speech to text
 
     /**
      * Google speech to text

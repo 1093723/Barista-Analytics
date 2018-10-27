@@ -68,7 +68,7 @@
                                 android:src="@drawable/ic_attach_money_black_24dp" />
 
                             <TextView
-                                android:id="@+id/beverage_price_large"
+                                android:id="@+id/txtView_beverage_price_large"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="9"
@@ -126,7 +126,7 @@
                                 android:src="@drawable/ic_attach_money_black_24dp" />
 
                             <TextView
-                                android:id="@+id/beverage_price_small"
+                                android:id="@+id/txtView_beverage_price_small"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="9"
@@ -166,7 +166,8 @@
                     android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
                     android:background="@null"
-                    android:src="@drawable/ic_mic" />
+                    android:src="@drawable/ic_mic"
+                    android:onClick="promptSpeechInput"/>
             </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>
