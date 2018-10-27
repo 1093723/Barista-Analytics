@@ -53,40 +53,54 @@ import utilities.MessageItem;
 
 public class OkoaCategoryCold extends AppCompatActivity {
     private final String TAG = "OKOA_COLD_CATEGORY";
-    ViewPager viewPager;
-    private Context ctx;
-    private Boolean final_Confirmation;
-    OkoaColdMenuAdapter adapter;
-    List<Beverage> models;
-    private FirebaseAuth mAuth;
-    private Beverage beverage;
-    private TextView txtViewPriceSmall,txtViewPriceLarge;
-    private CoffeeOrder coffeeOrder;
-    private String confirmation;
-    String order_description;
-    Integer[] colors = null;
-    ArgbEvaluator argbEvaluator = new ArgbEvaluator();
-    FirebaseDatabase database;
-    DatabaseReference coffeeList,coffee_Order;
-    // Speech to text
-    // Array of input speech from user
-    private List<MessageItem> message_items = new ArrayList<>();
+    /**
+     * Bruce-related variables
+     */
     private final int REQ_CODE_SPEECH_INPUT = 100;
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
     private List<Voice> voices;
     // Amazon Polly permissions.
     private static final String COGNITO_POOL_ID = "CHANGEME";
-
     // Region of Amazon Polly.
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
-    private ImageButton btn;
-    // AWS Media Player
-    private MediaPlayer mediaPlayer;
-    //Order-Related Variables
+    /**
+     * Order-related variables
+     */
+    private CoffeeOrder coffeeOrder;
+    private String confirmation;
+    private String order_description;
+    private Boolean final_Confirmation;
     private ElegantNumberButton btnSmall,btnLarge;
+
+    /**
+     * Layout-related variables
+     */
+    ViewPager viewPager;
+    private Context ctx;
+    private Beverage beverage;
+    private TextView txtViewPriceSmall,txtViewPriceLarge;
+    private Integer[] colors = null;
+    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+    private OkoaColdMenuAdapter adapter;
+    private List<Beverage> models;
+
+    /**
+     * Firebase-related variables
+     */
+    private FirebaseAuth mAuth;
+    private FirebaseDatabase database;
+    private DatabaseReference coffeeList,coffee_Order;
+
+    /**
+     * Google speech to text
+     */
+    // Array of input speech from user
+    private List<MessageItem> message_items = new ArrayList<>();
+    // Media player
+    private MediaPlayer mediaPlayer;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -130,21 +144,11 @@ public class OkoaCategoryCold extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
-        btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
-        btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
-        mAuth = FirebaseAuth.getInstance();
-        txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
-        txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
+        initVariables();
         initPollyClient();
         setupNewMediaPlayer();
-        ctx = OkoaCategoryCold.this;
-        models = new ArrayList<>();
-        mAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
-        coffeeOrder = new CoffeeOrder();
 
-        coffee_Order = database.getReference("OkoaCoffeeOrders");
-        coffeeList = database.getReference("CoffeeMenuOkoa");
+
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -200,6 +204,24 @@ public class OkoaCategoryCold extends AppCompatActivity {
             }
         });
     }
+    /**
+     * Initialize global variables to be used
+     */
+    private void initVariables() {
+        database = FirebaseDatabase.getInstance();
+        coffee_Order = database.getReference("OkoaCoffeeOrders");
+        coffeeList = database.getReference("CoffeeMenuOkoa");
+        mAuth = FirebaseAuth.getInstance();
+
+        btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
+        btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
+        txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
+        txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
+
+        ctx = OkoaCategoryCold.this;
+        models = new ArrayList<>();
+        coffeeOrder = new CoffeeOrder();
+    }
 
     @Override
     public void onResume(){
@@ -209,14 +231,19 @@ public class OkoaCategoryCold extends AppCompatActivity {
          */
         // Check if the user is signed-ins
         if(mAuth.getCurrentUser() != null && confirmation!=null){
+            // User has logged in
             if(final_Confirmation != null){
                 if(final_Confirmation){
+                    // Get final confirmation from the user
                     String userReq = "The total is " + coffeeOrder.getOrder_Total() +
                             " rands. Is that in order?";
                     setupPlayButton(userReq);
                     final_Confirmation= false;
                 }
                 else {
+                    // User confirmed in previous call
+                    // 1. Register their order
+                    // 2. Take them to the order layout
                     OrderService orderService = new OrderService();
                     coffeeOrder.setUUID(mAuth.getUid());
                     String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
@@ -226,7 +253,6 @@ public class OkoaCategoryCold extends AppCompatActivity {
                     Intent x = new Intent(this, OrderConfirmed.class);
                     startActivity(x);
                     finish();
-
                 }
             }else {
 
@@ -291,8 +317,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
      * @param s is the input string from the user
      */
     private void decodeUserInput(String s) {
-        if(s.contains("ready") || s.contains("confirm") ||
-                s.contains("order") || s.contains("done")){
+        if((s.contains("ready") || s.contains("confirm") ||
+                s.contains("order") || s.contains("done")) && confirmation == null){
             // User is making an order
             // Get the screen they have slided to
             String qtyLarge = btnLarge.getNumber();
@@ -306,25 +332,52 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 Long price_small = beverage.getPrice_small();
                 Long price_lrg = beverage.getPrice_tall();
                 Long total = price_lrg+price_small;
-                order_description = large_Quantity + "x Tall" + beverage.getBeverage_name() + "\n"
+                order_description = large_Quantity + "x Tall" + beverage.getBeverage_name() + '\n'
                         + small_Quantity + "x Small " +
                         beverage.getBeverage_name();
-                userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " + small_Quantity + " small " +
+                userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
+                        small_Quantity + " small " +
                         beverage.getBeverage_name() + ". Is that correct?";
                 coffeeOrder.setOrder_Description(order_description);
                 coffeeOrder.setOrder_Total(total);
                 coffeeOrder.setOrder_Store("Okoa Coffee Co.");
             }else if(large_Quantity > 0){
                 // Give me a large
-                userRequest = "You've ordered " + large_Quantity + beverage.getBeverage_name() +"'s";
-                coffeeOrder.setOrder_Description(userRequest);
-                coffeeOrder.setOrder_Total(Long.valueOf(large_Quantity));
+                Long price_lrg = beverage.getPrice_tall();
+                Long lrg_Total = price_lrg*large_Quantity;
+                if(large_Quantity > 1){
+                    userRequest = "You've ordered " + large_Quantity + " Tall " + beverage.getBeverage_name() +"'s"
+                            +". Is that correct?";
+                    order_description = large_Quantity + "x Tall " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(lrg_Total);
+                }else {
+                    userRequest = "You've ordered one large " + beverage.getBeverage_name()
+                            +". Is that correct?";
+                    order_description = large_Quantity + " Tall " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(lrg_Total);
+                }
             }
             else if(small_Quantity > 0){
                 // Give me a small
-                userRequest = "You've ordered " + small_Quantity + beverage.getBeverage_name();
-                coffeeOrder.setOrder_Description(userRequest);
-                coffeeOrder.setOrder_Total(Long.valueOf(small_Quantity));
+                Long price_small = beverage.getPrice_small();
+                Long small_Total = price_small*small_Quantity;
+                if(small_Quantity > 1){
+                    userRequest = "You've ordered " + small_Quantity + " small "
+                            +beverage.getBeverage_name() + "'s"
+                            +". Is that correct?";
+                    order_description = small_Quantity + "x Small " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(small_Total);
+                }else {
+                    userRequest = "You've ordered one small "
+                            +beverage.getBeverage_name()
+                            +". Is that correct?";
+                    order_description = small_Quantity + " Small " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(small_Total);
+                }
             }
             else {
                 // I haven't decided on anything
@@ -333,28 +386,24 @@ public class OkoaCategoryCold extends AppCompatActivity {
             }
             setupPlayButton(userRequest);
         }else if(s.contains("yes")){
-            if(confirmation != null){
-
+            confirmation = "yes";
+            if(mAuth.getCurrentUser() != null){
+                String account = "Give me a second to send your order to the Barista";
+                coffeeOrder.setUUID(mAuth.getUid());
+                coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
+                OrderService orderService = new OrderService();
+                orderService.process_order(coffeeOrder,coffee_Order);
+                Intent x = new Intent(this, OrderConfirmed.class);
+                startActivity(x);
+                finish();
+                setupPlayButton(account);
             }else {
-                confirmation = "yes";
-                if(mAuth.getCurrentUser() != null){
-                    String account = "Seems like you're registered.";
-                    coffeeOrder.setUUID(mAuth.getUid());
-                    coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
-                    OrderService orderService = new OrderService();
-                    orderService.process_order(coffeeOrder,coffee_Order);
-                    Intent x = new Intent(this, OrderConfirmed.class);
-                    startActivity(x);
-                    finish();
-                    setupPlayButton(account);
-                }else {
-                    String confirm_account = "Let's get you signed in before wrapping this up";
-                    setupPlayButton(confirm_account);
-                    Intent sign_in = new Intent(this, LoginActivity.class);
-                    sign_in.putExtra("sign_in","sign_in");
-                    startActivity(sign_in);
-                    final_Confirmation = true;
-                }
+                String confirm_account = "Let's get you signed in before wrapping this up";
+                setupPlayButton(confirm_account);
+                Intent sign_in = new Intent(this, LoginActivity.class);
+                sign_in.putExtra("sign_in","sign_in");
+                startActivity(sign_in);
+                final_Confirmation = true;
             }
         }
     }

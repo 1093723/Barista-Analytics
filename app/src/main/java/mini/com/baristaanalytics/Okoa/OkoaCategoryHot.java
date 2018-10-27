@@ -56,8 +56,6 @@ public class OkoaCategoryHot extends AppCompatActivity {
     /**
      * Bruce-related variables
      */
-    // Array of input speech from user
-    private List<MessageItem> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
@@ -100,6 +98,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
      * Google speech to text
      */
     private MediaPlayer mediaPlayer;
+    // Array of input speech from user
+    private List<MessageItem> message_items = new ArrayList<>();
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -184,12 +184,10 @@ public class OkoaCategoryHot extends AppCompatActivity {
                             viewPager.setBackgroundColor(colors[colors.length - 1]);
                         }
                     }
-
                     @Override
                     public void onPageSelected(int position) {
 
                     }
-
                     @Override
                     public void onPageScrollStateChanged(int state) {
 
@@ -230,12 +228,16 @@ public class OkoaCategoryHot extends AppCompatActivity {
         if(mAuth.getCurrentUser() != null && confirmation!=null){
             if(final_Confirmation != null){
                 if(final_Confirmation){
+                    // Get final confirmation from the user
                     String userReq = "The total is " + coffeeOrder.getOrder_Total() +
                             " rands. Is that in order?";
                     setupPlayButton(userReq);
                     final_Confirmation= false;
                 }
                 else {
+                    // User confirmed in previous call
+                    // 1. Register their order
+                    // 2. Take them to the order layout
                     OrderService orderService = new OrderService();
                     coffeeOrder.setUUID(mAuth.getUid());
                     String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
@@ -312,8 +314,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
     }
 
     private void decodeUserInput(String s) {
-        if(s.contains("ready") || s.contains("confirm") ||
-                s.contains("order") || s.contains("done")){
+        if((s.contains("ready") || s.contains("confirm") ||
+                s.contains("order") || s.contains("done")) && confirmation == null){
             // User is making an order
             // Get the screen they have slided to
             String qtyLarge = btnLarge.getNumber();
@@ -327,25 +329,52 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 Long price_small = beverage.getPrice_small();
                 Long price_lrg = beverage.getPrice_tall();
                 Long total = price_lrg+price_small;
-                order_description = large_Quantity + "x Tall" + beverage.getBeverage_name() + "\n"
+                order_description = large_Quantity + "x Tall" + beverage.getBeverage_name() + '\n'
                         + small_Quantity + "x Small " +
                         beverage.getBeverage_name();
-                userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " + small_Quantity + " small " +
-                        beverage.getBeverage_name() + ". Is that correct?";
+                userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
+                        small_Quantity + " small " +
+                        beverage.getBeverage_name()+"'s" + ". Is that correct?";
                 coffeeOrder.setOrder_Description(order_description);
                 coffeeOrder.setOrder_Total(total);
                 coffeeOrder.setOrder_Store("Okoa Coffee Co.");
             }else if(large_Quantity > 0){
                 // Give me a large
-                userRequest = "You've ordered " + large_Quantity + beverage.getBeverage_name() +"'s";
-                coffeeOrder.setOrder_Description(userRequest);
-                coffeeOrder.setOrder_Total(Long.valueOf(large_Quantity));
+                Long price_lrg = beverage.getPrice_tall();
+                Long lrg_Total = price_lrg*large_Quantity;
+                if(large_Quantity > 1){
+                    userRequest = "You've ordered " + large_Quantity + " large " + beverage.getBeverage_name() +"'s"
+                            +". Is that correct?";
+                    order_description = large_Quantity + "x Tall" + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(lrg_Total);
+                }else {
+                    userRequest = "You've ordered one large " + beverage.getBeverage_name()
+                            +". Is that correct?";
+                    order_description = large_Quantity + " Tall" + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(lrg_Total);
+                }
             }
             else if(small_Quantity > 0){
                 // Give me a small
-                userRequest = "You've ordered " + small_Quantity + beverage.getBeverage_name();
-                coffeeOrder.setOrder_Description(userRequest);
-                coffeeOrder.setOrder_Total(Long.valueOf(small_Quantity));
+                Long price_small = beverage.getPrice_small();
+                Long small_Total = price_small*small_Quantity;
+                if(small_Quantity > 1){
+                    userRequest = "You've ordered " + small_Quantity + " small "
+                            +beverage.getBeverage_name() + "'s"
+                            +". Is that correct?";
+                    order_description = small_Quantity + "x Small" + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(small_Total);
+                }else {
+                    userRequest = "You've ordered one small "
+                            +beverage.getBeverage_name()
+                            +". Is that correct?";
+                    order_description = small_Quantity + " Small" + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(small_Total);
+                }
             }
             else {
                 // I haven't decided on anything
@@ -354,28 +383,24 @@ public class OkoaCategoryHot extends AppCompatActivity {
             }
             setupPlayButton(userRequest);
         }else if(s.contains("yes")){
-            if(confirmation != null){
-
+            confirmation = "yes";
+            if(mAuth.getCurrentUser() != null){
+                String account = "Give me a second to send your order to the Barista";
+                coffeeOrder.setUUID(mAuth.getUid());
+                coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
+                OrderService orderService = new OrderService();
+                orderService.process_order(coffeeOrder,coffee_Order);
+                Intent x = new Intent(this, OrderConfirmed.class);
+                startActivity(x);
+                finish();
+                setupPlayButton(account);
             }else {
-                confirmation = "yes";
-                if(mAuth.getCurrentUser() != null){
-                    String account = "Seems like you're registered.";
-                    coffeeOrder.setUUID(mAuth.getUid());
-                    coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
-                    OrderService orderService = new OrderService();
-                    orderService.process_order(coffeeOrder,coffee_Order);
-                    Intent x = new Intent(this, OrderConfirmed.class);
-                    startActivity(x);
-                    finish();
-                    setupPlayButton(account);
-                }else {
-                    String confirm_account = "Let's get you signed in before wrapping this up";
-                    setupPlayButton(confirm_account);
-                    Intent sign_in = new Intent(this, LoginActivity.class);
-                    sign_in.putExtra("sign_in","sign_in");
-                    startActivity(sign_in);
-                    final_Confirmation = true;
-                }
+                String confirm_account = "Let's get you signed in before wrapping this up";
+                setupPlayButton(confirm_account);
+                Intent sign_in = new Intent(this, LoginActivity.class);
+                sign_in.putExtra("sign_in","sign_in");
+                startActivity(sign_in);
+                final_Confirmation = true;
             }
         }
     }
