@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class CoffeeOrder {
@@ -25,7 +26,8 @@ public class CoffeeOrder {
     }
 
     public CoffeeOrder() {
-        this.order_State = "Confirmed";
+        this.order_State = "Requested";
+        this.order_date =java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
     }
 
     public String getOrder_date() {
