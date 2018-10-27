@@ -34,15 +34,20 @@ public class RegisterCustomerActivity extends AppCompatActivity {
     Activity  activity;
     ArrayList<EditText>registrationDetails;
     private String beverageName,beverageDescription,beveragePriceSmall,beveragePriceTall,beverageImage;
-
+    String from_order;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_register);
+        this.ctx = this;
+
         mAuth = FirebaseAuth.getInstance();
         Intent intent = getIntent();
+        if(intent != null){
+            from_order = intent.getStringExtra("sign_in");
+            Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
+        }
         setValues(intent);
-        this.ctx = this;
         this.activity  = this;
         databaseCustomer = FirebaseDatabase.getInstance().getReference("CUSTOMER");
         registrationDetails = new ArrayList<>();
@@ -94,6 +99,8 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                     }else {
                         Toast.makeText(ctx, "Please Check Your Connection And Try Again", Toast.LENGTH_LONG).show();
                     }
+                }else {
+                    textPhone.setError("Invalid phone number");
                 }
             }
         }
@@ -108,18 +115,22 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
+                            if(from_order != null){
+                                Toast.makeText(ctx, "Welcome. You're now registered",
+                                        Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                            else{
+                                Intent goToOkoaCoffeeDetails = new Intent(ctx,OkoaCoffeeDetails.class);
+                                goToOkoaCoffeeDetails.putExtra("beverage_name", beverageName);
+                                goToOkoaCoffeeDetails.putExtra("beverage_description", beverageDescription);
+                                goToOkoaCoffeeDetails.putExtra("beverage_image", beverageImage);
+                                goToOkoaCoffeeDetails.putExtra("price_small", beveragePriceSmall);
+                                goToOkoaCoffeeDetails.putExtra("price_tall", beveragePriceTall);
+                                goToOkoaCoffeeDetails.putExtra("orderQuantity", 1);
+                                startActivity(goToOkoaCoffeeDetails);
 
-                            Toast.makeText(ctx, "Welcome. You're now registered",
-                                    Toast.LENGTH_LONG).show();
-                            Intent goToOkoaCoffeeDetails = new Intent(ctx,OkoaCoffeeDetails.class);
-                            goToOkoaCoffeeDetails.putExtra("beverage_name", beverageName);
-                            goToOkoaCoffeeDetails.putExtra("beverage_description", beverageDescription);
-                            goToOkoaCoffeeDetails.putExtra("beverage_image", beverageImage);
-                            goToOkoaCoffeeDetails.putExtra("price_small", beveragePriceSmall);
-                            goToOkoaCoffeeDetails.putExtra("price_tall", beveragePriceTall);
-                            goToOkoaCoffeeDetails.putExtra("orderQuantity", 1);
-                            startActivity(goToOkoaCoffeeDetails);
-
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             if(task.getException() instanceof FirebaseAuthUserCollisionException){

@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
+import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
 import utilities.MyApplication;
 
@@ -83,19 +84,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     ConnectivityReceiver connectivityReceiver;
     String from_order;
+    TextView account;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mAuth = FirebaseAuth.getInstance();
+        Intent intent = getIntent();
+        account = (TextView)findViewById(R.id.txtViewCreate);
         ctx = this;
+        if(intent != null){
+            account.setVisibility(View.GONE);
+            from_order = intent.getStringExtra("sign_in");
+            Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
+        }
+        mAuth = FirebaseAuth.getInstance();
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
-        Intent intent = getIntent();
-        if(intent != null){
-            from_order = intent.getStringExtra("sign_in");
-        }
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -218,7 +223,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
                         showProgress(false);
-                        finish();
+                        if(from_order != null){
+                            finish();
+                        }
                         // User successfully logged in
                         //Intent x = new Intent(ctx,OkoaCoffeeDetails.class);
                         //startActivity(x);
@@ -379,6 +386,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onPause(){
         super.onPause();
         unregisterReceiver(connectivityReceiver);
+    }
+
+    public void createAccount(View view) {
+        Intent register = new Intent(this, RegisterCustomerActivity.class);
+        if(from_order != null){
+            register.putExtra("sign_in",from_order);
+
+        }
+        startActivity(register);
+        finish();
     }
 
 

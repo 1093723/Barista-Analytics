@@ -72,20 +72,15 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in_short"
                 android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/buttonFBSignIn"
+            <TextView
+                android:id="@+id/txtViewCreate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#4267b2"
-                android:text="Sign in with Facebook"
-                android:textColor="#ffffff" />
-
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/sign_in_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:textSize="24dp"
+                android:textColor="@color/black"
+                android:textAlignment="center"
+                android:text="Dont Have An Account? Sign Up"
+                android:onClick="createAccount"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

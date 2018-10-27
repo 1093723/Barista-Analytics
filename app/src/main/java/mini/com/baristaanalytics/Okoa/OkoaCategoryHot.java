@@ -48,6 +48,7 @@ import Services.OrderService;
 import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
+import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 
@@ -247,10 +248,9 @@ public class OkoaCategoryHot extends AppCompatActivity {
                     Intent x = new Intent(this, OrderConfirmed.class);
                     startActivity(x);
                     finish();
-
                 }
             }else {
-
+                Toast.makeText(ctx, "Final confirmation null", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -381,6 +381,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 userRequest = "Seems like you've forgotten to specify how many " + beverage.getBeverage_name() +
                         " you would like.";
             }
+            userRequest = "One more step. Do you already have an account?";
             setupPlayButton(userRequest);
         }else if(s.contains("yes")){
             confirmation = "yes";
@@ -395,13 +396,26 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 finish();
                 setupPlayButton(account);
             }else {
-                String confirm_account = "Let's get you signed in before wrapping this up";
+                String confirm_account = "Let's get you signed in so that I know who's ordering the "
+                        + beverage.getBeverage_name();
                 setupPlayButton(confirm_account);
                 Intent sign_in = new Intent(this, LoginActivity.class);
                 sign_in.putExtra("sign_in","sign_in");
                 startActivity(sign_in);
                 final_Confirmation = true;
             }
+        }else if(s.contains("no")){
+            confirmation = "yes";
+            String create_account = "Let's create a basic profile just so I know who's " +
+                    "collecting the coffee";
+            setupPlayButton(create_account);
+            Intent sign_in = new Intent(this, RegisterCustomerActivity.class);
+            sign_in.putExtra("sign_in","sign_in");
+            startActivity(sign_in);
+            final_Confirmation = true;
+        }else {
+            String please_confirm = "I didn't get that. Do you have a Barista account";
+            setupPlayButton(please_confirm);
         }
     }
 
