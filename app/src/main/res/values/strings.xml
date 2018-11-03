@@ -30,9 +30,9 @@
 
     <!-- Order-Related arrays and attributes -->
     <string-array name="promptOrder">
-        <item>I'd like to make an order</item>
         <item>I would like to make an order</item>
-        <item>I'd like some coffee</item>
+        <item>I would like to make an order</item>
+        <item>I would like some coffee</item>
         <item>I would like some coffee</item>
     </string-array>
     <string-array name="beverageName">

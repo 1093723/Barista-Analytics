@@ -144,7 +144,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_okoa_category_hot);
+        setContentView(R.layout.item);
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
