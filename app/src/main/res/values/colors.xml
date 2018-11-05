@@ -10,9 +10,40 @@
     <color name="grey">#c4bebe</color>
 
 
-    <color name="color5">#424549</color>
+   <color name="color5">#424549</color>
     <color name="color2">#7e455e</color>
     <color name="color3">#796e25</color>
-    <color name="color4">#59717c</color>
+    <color name="color4">#6f7c59</color>
+    <color name="color6">#781e7b</color>
+    <color name="color7">#60916f</color>
+    <color name="color8">#7c595b</color>
+    <color name="color9">#7c7759</color>
+    <color name="color10">#debe24</color>
+    <color name="color11">#595b7c</color>
+    <color name="color13">#59787c</color>
+    <color name="color14">#597c64</color>
+    <color name="color15">#7c6959</color>
+    <color name="color16">#7c7459</color>
+    <color name="color17">#63597c</color>
+    <color name="color18">#76597c</color>
+    <color name="color19">#7c5976</color>
+    <color name="color20">#7c5967</color>
+    <color name="color21">#707c59</color>
+    <color name="color22">#597c62</color>
+    <color name="color23">#7c6559</color>
+    <color name="color24">#65597c</color>
+    <color name="color25">#7c6459</color>
+    <color name="color26">#7c5976</color>
+    <color name="color27">#7c597a</color>
+    <color name="color28">#747c59</color>
+    <color name="color29">#a3a721</color>
+    <color name="color30">#3535d6</color>
     <color name="black">#000000</color>
+
+    <!-- <color name="color5">#ffffff</color>
+    <color name="color2">#ffffff</color>
+    <color name="color3">#ffffff</color>
+    <color name="color4">#ffffff</color>
+    <color name="black">#000000</color> -->
+
 </resources>

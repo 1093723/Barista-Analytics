@@ -85,7 +85,7 @@ public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver
         message = findViewById(R.id.message);
         checkConnection();
         initPollyClient();
-        //Snackbar snack = (Snackbar) findViewById(R.id.fab);
+        //Snackbar snack = (Snackbar) findViewById(r.id.fab);
         setupNewMediaPlayer();
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
@@ -356,7 +356,7 @@ public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(r.menu.main, menu);
         return true;
     }
     private void initRecyclerView(){
