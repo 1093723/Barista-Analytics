@@ -59,10 +59,10 @@
                     <TextView
                         android:id="@+id/rands"
                         android:layout_width="0dp"
-                        android:layout_gravity="center_horizontal"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:text="R"
+                        android:translationX="67dp"
                         android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -74,7 +74,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:text="1,000"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -109,10 +109,10 @@
                     <TextView
                         android:id="@+id/rands2"
                         android:layout_width="0dp"
-                        android:layout_gravity="center_horizontal"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:text="R"
+                        android:translationX="75dp"
                         android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -124,7 +124,7 @@
                         android:layout_weight="9"
                         android:text="1,000"
                         android:layout_gravity="center_horizontal"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
