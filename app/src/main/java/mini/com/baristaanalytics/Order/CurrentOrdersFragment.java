@@ -19,7 +19,7 @@ public class CurrentOrdersFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_order_current,container,false);
+        View view = inflater.inflate(R.layout.fragment_admin_current_order,container,false);
         database = FirebaseDatabase.getInstance();
         current_orders = database.getReference("CoffeeMenuOkoa");
         return view;
