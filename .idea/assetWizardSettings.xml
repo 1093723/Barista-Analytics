@@ -35,10 +35,10 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/speech-bubble.png" />
-                                      <entry key="outputName" value="ic_converation" />
+                                      <entry key="imageAsset" value="$PROJECT_DIR$/../../IMG_7805.PNG" />
+                                      <entry key="outputName" value="ic_cup_small" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="e50417" />
+                                      <entry key="themeColor" value="010106" />
                                     </map>
                                   </option>
                                 </PersistentState>
