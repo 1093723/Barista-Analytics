@@ -165,10 +165,18 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
                 Integer[] colors_temp = {
-                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
                         getResources().getColor(R.color.color2),
                         getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color4)
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
                 };
 
                 colors = colors_temp;

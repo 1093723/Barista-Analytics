@@ -30,7 +30,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0" />
 
-
         <receiver
             android:name="utilities.ConnectivityReceiver"
             android:enabled="true">
@@ -39,14 +38,14 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".Order.OrderConfirmed">
+        <activity android:name=".Okoa.OkoaCategoryCold">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".MainActivity" />
         <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
             android:name=".LoginActivity"
@@ -61,11 +60,12 @@
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
         <activity android:name=".MapsActivity" />
-        <activity android:name=".Okoa.OkoaCategoryCold" />
+        <activity android:name=".Okoa.OkoaCategoryHot" />
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
-        <activity android:name=".Okoa.OkoaCategoryHot"></activity>
+        <activity android:name=".Order.CustomerOrders" />
+        <activity android:name=".Order.OrderConfirmed" />
     </application>
 
 </manifest>

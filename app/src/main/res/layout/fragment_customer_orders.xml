@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/current_orders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Your Orders"
+        android:textSize="24dp" />
+
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="20dp"
+        android:layout_margin="8dp"
+        android:layout_below="@id/current_orders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="164dp">
+
+
+            <TextView
+                android:id="@+id/desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="3dp"
+                android:drawablePadding="10dp"
+                android:ellipsize="end"
+                android:maxLines="20"
+                android:text="Order Description:"
+                android:textColor="#262626" />
+
+            <TextView
+                android:id="@+id/description_hard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/desc"
+                android:layout_marginTop="32dp"
+                android:drawablePadding="10dp"
+                android:ellipsize="end"
+                android:text="Description"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/order_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/description_hard"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="3dp"
+                android:drawablePadding="10dp"
+                android:ellipsize="end"
+                android:maxLines="20"
+                android:text="Order Date:"
+                android:textColor="#262626" />
+
+            <TextView
+                android:id="@+id/date_ordered"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignTop="@+id/order_date"
+                android:layout_marginStart="103dp"
+                android:drawablePadding="10dp"
+                android:ellipsize="end"
+                android:maxLines="20"
+                android:text="Order Date" />
+
+
+            <TextView
+                android:id="@+id/order_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/desc"
+                android:layout_below="@+id/order_date"
+                android:drawablePadding="10dp"
+                android:ellipsize="end"
+                android:text="Order Total:"
+                android:textColor="#262626"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/order_sum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/order_date"
+                android:layout_marginStart="111dp"
+                android:drawablePadding="10dp"
+                android:ellipsize="end"
+                android:text="Money Total"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="11dp"
+                android:text="Order Status" />
+
+            <RatingBar
+                android:id="@+id/rating_coffee_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignStart="@+id/desc"
+                android:isIndicator="false"
+                android:rating="4" />
+
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+
+</RelativeLayout>
