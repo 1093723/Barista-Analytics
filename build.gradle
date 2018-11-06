@@ -12,6 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
+
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
 
 

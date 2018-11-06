@@ -41,6 +41,7 @@ public class RegistrationUnitTests {
         String uname = "soy",pword = "1234",confirm = "1234",mail="validemail@mail.com",old = "21",phone_no="0814754016",
                 fname="mosaic",lname="mosaic";
 
+
         AdminService adminService = new AdminService();
         final EditText username = Mockito.mock(EditText.class);
         Mockito.when(username.getText()).thenReturn(new MockEditable(uname));

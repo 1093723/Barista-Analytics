@@ -168,6 +168,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                         coffeeNames.add(beverage.getBeverage_name());                    }
                 }
 
+
                 adapter = new OkoaColdMenuAdapter(models, OkoaCategoryHot.this);
 
                 viewPager = findViewById(R.id.viewPager);

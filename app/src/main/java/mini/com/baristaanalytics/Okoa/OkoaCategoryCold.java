@@ -178,7 +178,6 @@ public class OkoaCategoryCold extends AppCompatActivity {
                         getResources().getColor(R.color.color2),
                         getResources().getColor(R.color.color3),
                         getResources().getColor(R.color.color5),
-
                 };
 
                 colors = colors_temp;
@@ -210,6 +209,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                
             }
         });
     }
