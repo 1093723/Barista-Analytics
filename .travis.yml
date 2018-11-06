@@ -6,15 +6,12 @@ env:
 
 android:
   components:
-    - tools
     - build-tools-28.0.3
-    - android-22
     - android-26
     - sys-img-armeabi-v7a-android-22
     - extra-android-m2repository
 
-    sudo: enabled
-
+  sudo: enabled
 
   before_script:
       - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
