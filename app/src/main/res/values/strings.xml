@@ -53,7 +53,47 @@
         <item>Drinking for two?</item>
         <item>How many of those will you like?</item>
     </string-array>
+    <!-- Request which coffee places are supported -->
+    <string-array name="isSupportedCoffeePlaces">
+        <item>available</item>
+        <item>show</item>
+        <item>like coffee</item>
+        <item>have coffee</item>
+        <item>cup</item>
+        <item>order</item>
+        <item>places</item>
+    </string-array>
 
+    <!-- Ask Bruce to recommend the best coffee place recommendation -->
+    <string-array name="isRecommended">
+        <item>best available</item>
+        <item>recommend</item>
+        <item>what coffee</item>
+        <item>which coffee</item>
+        <item>unsure</item>
+    </string-array>
+    <!-- Request to order from Okoa -->
+    <string-array name="isOkoaRequested">
+        <item>okoa</item>
+        <item>koa</item>
+        <item>core</item>
+        <item>aqua</item>
+        <item>over</item>
+        <item>ok</item>
+        <item>makeover</item>
+        <item>a call</item>
+        <item>a car</item>
+    </string-array>
+    <!-- Coffee Sizes -->
+    <string-array name="isCoffeeSize">
+        <item>small</item>
+        <item>tall</item>
+        <item>medium</item>
+    </string-array><!-- Coffee Sizes -->
+
+
+=======
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+>>>>>>> 4c906e2479e230f87f8c8be2ca1c2d8af345a6c0
 </resources>

@@ -524,66 +524,66 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void decodeUserInput(String s) {
 
-        if(s.contains("show") || s.contains("available")){
-            if (!mapsServices.getLocations().isEmpty()) {
-                String toSpeak = "I currently support these locations on the map. I hope they are " +
-                        "near your address";
-                Log.d(TAG,mapsServices.getLocations().get(0).getAddressLine());
-                Log.d(TAG,mapsServices.getLocations().get(1).getAddressLine());
-                setupPlayButton(toSpeak);
-                geoLocate(mapsServices.getLocations());
-            }else {
-                String toSpeak = "Coffee places near you seem to be closed. Check again at " +
-                        "a later time and you just might be lucky.";
-                setupPlayButton(toSpeak);
-            }
-
-        }
-        else if(place != null){
-            Resources res = getResources();
-            String[] prompt_Order = res.getStringArray(R.array.promptOrder);
-            int size = prompt_Order.length;
-            // Assume user is not ready to order
-            // Check if assumption is true in the promptOrder array in strings.xml
-            for(int i = 0;i < size;i++){
-                if(prompt_Order[i].contains(s)){
-                    // Trigger Bruce to ask hot/cold
-                    String Hot = "Would you like a hot or cold beverage?";
-                    setupPlayButton(Hot);
-                    break;
-                }
-            }
-            if(s.contains("yes") || s.contains("hot")){
-                if(place.contains("Okoa")){
-                    setupPlayButton("Let's get you a hot one from Okoa!");
-                    Intent okoa_hot = new Intent(MapsActivity.this, OkoaCategoryHot.class);
-                    startActivity(okoa_hot);
-                }else {
-                    setupPlayButton("Let's get you something warm from Doubleshot!");
-                    Intent dblshot_hot = new Intent(MapsActivity.this,
-                            DoubleshotCategoryHot.class);
-                    startActivity(dblshot_hot);
-                }
-
-            }else if(s.contains("no") || s.contains("cold")){
-                if(place.contains("Okoa")){
-                    setupPlayButton("Cold beverages from Okoa coming up!");
-                    Intent okoa_cold = new Intent(MapsActivity.this, OkoaCategoryCold.class);
-                    startActivity(okoa_cold);
-                }else {
-                    setupPlayButton("Time to cool down with a cold beverage from Doubleshot!");
-                    Intent dblshot_cold = new Intent(MapsActivity.this,
-                            DoubleshotCategoryCold.class);
-                    startActivity(dblshot_cold);
-                }
-            }
-        }
-        else {
-            // We are here if place is null. i.e if user did not select a coffee place
-            String chooseRestaurant = "Please choose a restaurant before beginning the ordering" +
-                    "process.";
-            setupPlayButton(chooseRestaurant);
-        }
+//        if(s.contains("show") || s.contains("available")){
+//            if (!mapsServices.getLocations().isEmpty()) {
+//                String toSpeak = "I currently support these locations on the map. I hope they are " +
+//                        "near your address";
+//                Log.d(TAG,mapsServices.getLocations().get(0).getAddressLine());
+//                Log.d(TAG,mapsServices.getLocations().get(1).getAddressLine());
+//                setupPlayButton(toSpeak);
+//                geoLocate(mapsServices.getLocations());
+//            }else {
+//                String toSpeak = "Coffee places near you seem to be closed. Check again at " +
+//                        "a later time and you just might be lucky.";
+//                setupPlayButton(toSpeak);
+//            }
+//
+//        }
+//        else if(place != null){
+//            Resources res = getResources();
+//            String[] prompt_Order = res.getStringArray(R.array.promptOrder);
+//            int size = prompt_Order.length;
+//            // Assume user is not ready to order
+//            // Check if assumption is true in the promptOrder array in strings.xml
+//            for(int i = 0;i < size;i++){
+//                if(prompt_Order[i].contains(s)){
+//                    // Trigger Bruce to ask hot/cold
+//                    String Hot = "Would you like a hot or cold beverage?";
+//                    setupPlayButton(Hot);
+//                    break;
+//                }
+//            }
+//            if(s.contains("yes") || s.contains("hot")){
+//                if(place.contains("Okoa")){
+//                    setupPlayButton("Let's get you a hot one from Okoa!");
+//                    Intent okoa_hot = new Intent(MapsActivity.this, OkoaCategoryHot.class);
+//                    startActivity(okoa_hot);
+//                }else {
+//                    setupPlayButton("Let's get you something warm from Doubleshot!");
+//                    Intent dblshot_hot = new Intent(MapsActivity.this,
+//                            DoubleshotCategoryHot.class);
+//                    startActivity(dblshot_hot);
+//                }
+//
+//            }else if(s.contains("no") || s.contains("cold")){
+//                if(place.contains("Okoa")){
+//                    setupPlayButton("Cold beverages from Okoa coming up!");
+//                    Intent okoa_cold = new Intent(MapsActivity.this, OkoaCategoryCold.class);
+//                    startActivity(okoa_cold);
+//                }else {
+//                    setupPlayButton("Time to cool down with a cold beverage from Doubleshot!");
+//                    Intent dblshot_cold = new Intent(MapsActivity.this,
+//                            DoubleshotCategoryCold.class);
+//                    startActivity(dblshot_cold);
+//                }
+//            }
+//        }
+//        else {
+//            // We are here if place is null. i.e if user did not select a coffee place
+//            String chooseRestaurant = "Please choose a restaurant before beginning the ordering" +
+//                    "process.";
+//            setupPlayButton(chooseRestaurant);
+//        }
     }
 
     @Override
