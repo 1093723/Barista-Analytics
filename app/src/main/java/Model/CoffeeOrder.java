@@ -5,7 +5,6 @@ import java.util.Calendar;
 public class CoffeeOrder {
     private String uuid;
     private String order_Description;
-    private String order_Store;
     private String order_CustomerUsername;
     private Long order_Total;
     private String order_date;
@@ -13,11 +12,10 @@ public class CoffeeOrder {
 
 
 
-    public CoffeeOrder(String UUID, String order_Description, String order_Store,
+    public CoffeeOrder(String UUID, String order_Description,
                        String order_CustomerUsername, Long order_Total, String order_date) {
         this.uuid = UUID;
         this.order_Description = order_Description;
-        this.order_Store = order_Store;
         this.order_CustomerUsername = order_CustomerUsername;
         this.order_Total = order_Total;
         this.order_date = order_date;
@@ -67,13 +65,6 @@ public class CoffeeOrder {
         this.order_Description = order_Description;
     }
 
-    public String getOrder_Store() {
-        return order_Store;
-    }
-
-    public void setOrder_Store(String order_Store) {
-        this.order_Store = order_Store;
-    }
 
     public String getOrder_CustomerUsername() {
         return order_CustomerUsername;

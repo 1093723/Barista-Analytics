@@ -85,6 +85,8 @@ public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver
         message = findViewById(R.id.message);
         checkConnection();
         initPollyClient();
+        initRecyclerView();
+
         //Snackbar snack = (Snackbar) findViewById(r.id.fab);
         setupNewMediaPlayer();
         btnSpeak.setOnClickListener(new View.OnClickListener() {

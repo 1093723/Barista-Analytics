@@ -1,5 +1,6 @@
 package mini.com.baristaanalytics.Order;
 
+import android.animation.ArgbEvaluator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -7,10 +8,13 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.speech.RecognizerIntent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -24,6 +28,12 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,7 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import Adapter.OkoaOrdersRecyclerviewAdapter;
+import Adapter.RecyclerViewAdapter;
 import Adapter.SectionsPagerAdapter;
+import Model.CoffeeOrder;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
@@ -43,16 +56,28 @@ public class OrderConfirmed extends AppCompatActivity {
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private ViewPager viewPager;
+
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
     private List<Voice> voices;
+    private CoffeeOrder order;
+    private Integer[] colors = null;
+
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private CoffeeOrder coffeeOrder;
+    private DatabaseReference coffeeList,coffee_Order;    // Speech to text
+    private ArrayList<CoffeeOrder> coffeeOrderArrayList;
     // Amazon Polly permissions.
     private static final String COGNITO_POOL_ID = "CHANGEME";
 
     // Region of Amazon Polly.
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
-
+    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
@@ -101,10 +126,38 @@ public class OrderConfirmed extends AppCompatActivity {
         setContentView(R.layout.activity_order_confirmed);
         Log.d(TAG,"onCreate:Activity Started");
         ctx = OrderConfirmed.this;
-        initPollyClient();
-        setupViewPager();
-    }
+        coffeeOrderArrayList = new ArrayList<>();
+        //initPollyClient();
+        database = FirebaseDatabase.getInstance();
+        coffee_Order = database.getReference("OkoaCoffeeOrders");
 
+        coffee_Order.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap :
+                        dataSnapshot.getChildren()) {
+                    CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
+                    Log.d(TAG,coffeeOrder.getOrder_Description());
+                        coffeeOrderArrayList.add(coffeeOrder);
+                    Toast.makeText(ctx, coffeeOrder.getOrder_Description().toString(), Toast.LENGTH_SHORT).show();
+                }
+                initRecyclerView();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+        //setupViewPager();
+    }
+    private void initRecyclerView(){
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewConfirmed);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new OkoaOrdersRecyclerviewAdapter(coffeeOrderArrayList,this);
+        recyclerView.setAdapter(adapter);
+    }
 
     /**
      * Responsible for adding 3 tabs to the viewpager
@@ -115,14 +168,14 @@ public class OrderConfirmed extends AppCompatActivity {
     private void setupViewPager(){
         SectionsPagerAdapter adapter  = new SectionsPagerAdapter(getSupportFragmentManager());
         adapter.addFragments(new CurrentOrdersFragment());
-        adapter.addFragments(new MessagesFragment());
+        //adapter.addFragments(new MessagesFragment());
         adapter.addFragments(new OrderHistoryFragment());
         ViewPager viewPager = (ViewPager)findViewById(R.id.container);
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_current_orders);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_converation);
+        //tabLayout.getTabAt(1).setIcon(R.drawable.ic_converation);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_pervious_orders);
     }
     public void promptSpeechInput(View view) {

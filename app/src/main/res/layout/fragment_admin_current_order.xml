@@ -10,136 +10,140 @@
         android:textSize="24dp"
         android:text="Current Orders"
         android:layout_centerHorizontal="true"/>
-
-    <android.support.v7.widget.CardView
-        app:cardCornerRadius="20dp"
-        android:layout_margin="8dp"
-        android:layout_below="@id/current_orders"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RelativeLayout
+        android:layout_height="match_parent">
+        <android.support.v7.widget.CardView
+            app:cardCornerRadius="20dp"
+            android:layout_margin="8dp"
+            android:layout_below="@id/current_orders"
             android:layout_width="match_parent"
-            android:layout_height="138dp">
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="138dp">
 
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/image"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="10dp"
-                android:text="Name:"
-                android:textColor="#262626"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/image"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Name:"
+                    android:textColor="#262626"
+                    android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/name_surname_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/title"
-                android:text="Name Surname"
-                android:textSize="16sp" />
-
-
-            <TextView
-                android:id="@+id/desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/title"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="3dp"
-                android:drawablePadding="10dp"
-                android:ellipsize="end"
-                android:maxLines="20"
-                android:text="Order Description:" />
-
-            <TextView
-                android:id="@+id/description_hard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/title"
-                android:layout_centerVertical="true"
-                android:drawablePadding="10dp"
-                android:ellipsize="end"
-                android:text="Description"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/order_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/description_hard"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="3dp"
-                android:drawablePadding="10dp"
-                android:ellipsize="end"
-                android:maxLines="20"
-                android:text="Order Date:"
-                android:textColor="#262626" />
-
-            <TextView
-                android:id="@+id/date_ordered"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignTop="@+id/order_date"
-                android:layout_marginStart="103dp"
-                android:drawablePadding="10dp"
-                android:ellipsize="end"
-                android:maxLines="20"
-                android:text="Order Date" />
+                <TextView
+                    android:id="@+id/name_surname_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_toRightOf="@+id/title"
+                    android:text="Name Surname"
+                    android:textSize="16sp" />
 
 
-            <TextView
-                android:id="@+id/order_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/title"
-                android:layout_below="@+id/order_date"
-                android:drawablePadding="10dp"
-                android:ellipsize="end"
-                android:text="Order Total:"
-                android:textColor="#262626"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/title"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="3dp"
+                    android:drawablePadding="10dp"
+                    android:ellipsize="end"
+                    android:maxLines="20"
+                    android:text="Order Description:" />
 
-            <TextView
-                android:id="@+id/order_sum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/order_date"
-                android:layout_marginStart="111dp"
-                android:drawablePadding="10dp"
-                android:ellipsize="end"
-                android:text="Money Total"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/description_hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/title"
+                    android:layout_centerVertical="true"
+                    android:drawablePadding="10dp"
+                    android:ellipsize="end"
+                    android:text="Description"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/order_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/description_hard"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="3dp"
+                    android:drawablePadding="10dp"
+                    android:ellipsize="end"
+                    android:maxLines="20"
+                    android:text="Order Date:"
+                    android:textColor="#262626" />
+
+                <TextView
+                    android:id="@+id/date_ordered"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignTop="@+id/order_date"
+                    android:layout_marginStart="103dp"
+                    android:drawablePadding="10dp"
+                    android:ellipsize="end"
+                    android:maxLines="20"
+                    android:text="Order Date" />
 
 
-            <Button
-                android:id="@+id/confirm_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignTop="@+id/title"
-                android:layout_marginEnd="15dp"
-                android:text="Confirm" />
+                <TextView
+                    android:id="@+id/order_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/title"
+                    android:layout_below="@+id/order_date"
+                    android:drawablePadding="10dp"
+                    android:ellipsize="end"
+                    android:text="Order Total:"
+                    android:textColor="#262626"
+                    android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/reject_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/order_total"
-                android:layout_alignStart="@+id/confirm_button"
-                android:text="Reject" />
+                <TextView
+                    android:id="@+id/order_sum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/order_date"
+                    android:layout_marginStart="111dp"
+                    android:drawablePadding="10dp"
+                    android:ellipsize="end"
+                    android:text="Money Total"
+                    android:textSize="16sp" />
 
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+
+                <Button
+                    android:id="@+id/confirm_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@+id/title"
+                    android:layout_marginEnd="15dp"
+                    android:text="Confirm" />
+
+                <Button
+                    android:id="@+id/reject_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/order_total"
+                    android:layout_alignStart="@+id/confirm_button"
+                    android:text="Reject" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+    </android.support.v4.widget.NestedScrollView>
 
 
 </RelativeLayout>

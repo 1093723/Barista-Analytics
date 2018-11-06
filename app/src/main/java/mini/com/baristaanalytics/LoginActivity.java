@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
+import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
 import utilities.MyApplication;
@@ -222,6 +223,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
+                        String email = mAuth.getCurrentUser().getEmail();
+                        String hardCodedAdmin = "sonti96@live.co.uk";
+                        if(email.equals(hardCodedAdmin)){
+                            // Administrator
+                            Intent x = new Intent(ctx, OrderConfirmed.class);
+                            startActivity(x);
+                            finish();
+                        }
                         showProgress(false);
                         if(from_order != null){
                             finish();
@@ -392,7 +401,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Intent register = new Intent(this, RegisterCustomerActivity.class);
         if(from_order != null){
             register.putExtra("sign_in",from_order);
-
         }
         startActivity(register);
         finish();

@@ -545,10 +545,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
         }
-        else if(isOkoa){
+        else if(place.contains("Okoa")){
+            if( s.contains("cold")){
+                setupPlayButton("Cold beverages from Okoa coming up!");
+                Intent okoa_cold = new Intent(MapsActivity.this, OkoaCategoryCold.class);
+                startActivity(okoa_cold);
+            }else if(s.contains("hot")){
+                setupPlayButton("Let's get you a hot one from Okoa!");
+                Intent okoa_hot = new Intent(MapsActivity.this, OkoaCategoryHot.class);
+                startActivity(okoa_hot);
+            }else {
+                String Hot = "Would you like a hot or cold beverage?";
+                setupPlayButton(Hot);
+            }
             proceed = true;
-            String Hot = "Would you like a hot or cold beverage?";
-            setupPlayButton(Hot);
         }
         else {
             // Trigger Bruce to ask hot/cold
