@@ -66,6 +66,7 @@ import java.util.Locale;
 import Model.Barista;
 import Adapter.ImageAdapter;
 import Services.MapsServices;
+import Services.SpeechProcessorService;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
@@ -80,6 +81,8 @@ import utilities.smsService;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
+    private SpeechProcessorService speechProcessorService;
+    private Boolean proceed;
 
     private List<Upload> mUploads;
     //Order Specific
@@ -229,6 +232,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mUploads = new ArrayList<>();
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
+        proceed = false;
 
         checkConnection();
 
@@ -523,7 +527,47 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void decodeUserInput(String s) {
+        speechProcessorService = new SpeechProcessorService(s,ctx);
+        Boolean isOkoa = speechProcessorService.isOkoaRequested();
+        Boolean isSupportedCoffeePlaces = speechProcessorService.isSupportedCoffeePlace();
+        if(isSupportedCoffeePlaces){
+            if (!mapsServices.getLocations().isEmpty()) {
+                String toSpeak = "I currently support these locations on the map. I hope they are " +
+                        "near your address";
+                Log.d(TAG,mapsServices.getLocations().get(0).getAddressLine());
+                Log.d(TAG,mapsServices.getLocations().get(1).getAddressLine());
+                setupPlayButton(toSpeak);
+                geoLocate(mapsServices.getLocations());
+            }else {
+                String toSpeak = "Coffee places near you seem to be closed. Check again at " +
+                        "a later time and you just might be lucky.";
+                setupPlayButton(toSpeak);
+            }
 
+        }
+        else if(isOkoa){
+            proceed = true;
+            String Hot = "Would you like a hot or cold beverage?";
+            setupPlayButton(Hot);
+        }
+        else {
+            // Trigger Bruce to ask hot/cold
+            if(proceed){
+                if(s.contains("yes") || s.contains("hot")){
+                    setupPlayButton("Let's get you a hot one from Okoa!");
+                    Intent okoa_hot = new Intent(MapsActivity.this, OkoaCategoryHot.class);
+                    startActivity(okoa_hot);
+                }else if(s.contains("no") || s.contains("cold")){
+                    setupPlayButton("Cold beverages from Okoa coming up!");
+                    Intent okoa_cold = new Intent(MapsActivity.this, OkoaCategoryCold.class);
+                    startActivity(okoa_cold);
+                }
+            }
+            // We are here if place is null. i.e if user did not select a coffee place
+            //String chooseRestaurant = "Please choose a restaurant before beginning the ordering" +
+            //        "process.";
+            //setupPlayButton(chooseRestaurant);
+        }
 //        if(s.contains("show") || s.contains("available")){
 //            if (!mapsServices.getLocations().isEmpty()) {
 //                String toSpeak = "I currently support these locations on the map. I hope they are " +
