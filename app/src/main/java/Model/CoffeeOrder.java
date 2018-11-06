@@ -1,10 +1,9 @@
 package Model;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class CoffeeOrder {
-    private String UUID;
+    private String uuid;
     private String order_Description;
     private String order_Store;
     private String order_CustomerUsername;
@@ -16,7 +15,7 @@ public class CoffeeOrder {
 
     public CoffeeOrder(String UUID, String order_Description, String order_Store,
                        String order_CustomerUsername, Long order_Total, String order_date) {
-        this.UUID = UUID;
+        this.uuid = UUID;
         this.order_Description = order_Description;
         this.order_Store = order_Store;
         this.order_CustomerUsername = order_CustomerUsername;
@@ -51,11 +50,11 @@ public class CoffeeOrder {
 
 
     public String getUUID() {
-        return UUID;
+        return uuid;
     }
 
     public void setUUID(String UUID) {
-        this.UUID = UUID;
+        this.uuid = UUID;
     }
 
     public String getOrder_Description() {
