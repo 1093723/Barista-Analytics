@@ -80,7 +80,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private CoffeeOrder coffeeOrder;
     private String confirmation;
     String order_description;
-    private Boolean final_Confirmation;
+    private Boolean final_Confirmation, checkAccount;
     private ElegantNumberButton btnSmall,btnLarge;
 
     /**
@@ -95,6 +95,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private TextView txtViewPriceSmall,txtViewPriceLarge;
 
+    private Boolean accountExists;
+    private Boolean isAnswered;
     /**
      * Firebase-related variables
      */
@@ -155,6 +157,9 @@ public class OkoaCategoryHot extends AppCompatActivity {
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
+        accountExists = false;
+        checkAccount = false;
+        isAnswered = false;
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -251,7 +256,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                     // Get final confirmation from the user
                     String userReq = "The total is " + coffeeOrder.getOrder_Total() +
                             " rands. Is that in order?";
-                    setupPlayButton(userReq);
+                    //setupPlayButton(userReq);
                     final_Confirmation= false;
                 }
                 else {
@@ -355,13 +360,31 @@ public class OkoaCategoryHot extends AppCompatActivity {
             finish();
         }
         else if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
-            // Placed their coffee order
-            String instruct = "Let's get you signed-in so I can put a face to the coffee";
-            setupPlayButton(instruct);
             final_Confirmation = true;
-            Intent register = new Intent(this, RegisterCustomerActivity.class);
-            register.putExtra("sign_in","sign_in");
-            startActivity(register);
+
+            if(isAnswered){
+                String askSignIn = "Do you already have an account?";
+                checkAccount = true;
+                isAnswered = false;
+                setupPlayButton(askSignIn);
+            }else {
+                if(checkAccount){
+                    Intent x = new Intent(this,LoginActivity.class);
+                    x.putExtra("sign_in","sign_in");
+                    startActivity(x);
+                    String instruct = "Let's get you signed-in so I can put a face to the coffee";
+                    setupPlayButton(instruct);
+
+                }else{
+                    String instruct = "Let's get you signed-up so I can put a face to the coffee";
+                    setupPlayButton(instruct);
+                    Intent x = new Intent(this, RegisterCustomerActivity.class);
+                    x.putExtra("sign_in","sign_in");
+                    startActivity(x);
+                }
+            }
+
+
         }else {
             if(orders.length > 1){
                 int orderCount = orders.length;
@@ -413,7 +436,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 coffeeOrder.setOrder_date(DateTime.now().toLocalDate().toString());
                 coffeeOrder.setOrder_State("requested");
                 // Ordered just one item
-
+                isAnswered = true;
                 String confirmation = orderDescription + ". Is that correct?";
                 setupPlayButton(confirmation);
             }
@@ -434,13 +457,9 @@ public class OkoaCategoryHot extends AppCompatActivity {
     }
 
     private String getCoffeeName(String order) {
-        String[] splittedOrder = order.split(" ");
-        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
-
-        for (int i = 0; i < tempOrder.size(); i++) {
-            String temp = tempOrder.get(i).toLowerCase();
-            if(coffeeNames.contains(temp)){
-                return temp;
+        for (int i = 0; i < coffeeNames.size(); i++) {
+            if(order.contains(coffeeNames.get(i))){
+                return coffeeNames.get(i);
             }
         }
         return "-1";
