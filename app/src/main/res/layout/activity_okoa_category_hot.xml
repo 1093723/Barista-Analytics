@@ -5,6 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Okoa.OkoaCategoryHot">
+    <ImageView
+        android:background="@drawable/coffee_beans2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <RelativeLayout
             android:layout_width="match_parent"

@@ -256,7 +256,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                     // Get final confirmation from the user
                     String userReq = "The total is " + coffeeOrder.getOrder_Total() +
                             " rands. Is that in order?";
-                    //setupPlayButton(userReq);
+                    setupPlayButton(userReq);
                     final_Confirmation= false;
                 }
                 else {

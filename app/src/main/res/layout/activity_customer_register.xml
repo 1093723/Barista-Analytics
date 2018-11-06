@@ -1,16 +1,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#e3e3e3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Registration.RegisterCustomerActivity"
     android:orientation="vertical">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="9dp"
         android:layout_weight="0.5"
         android:orientation="vertical">
+
 
         <TextView
             android:layout_width="match_parent"
@@ -41,7 +42,9 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="First Name"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textColor="@color/white"
+                android:textColorHint="@android:color/white" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -55,7 +58,8 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Last Name"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textColor="@color/white" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
