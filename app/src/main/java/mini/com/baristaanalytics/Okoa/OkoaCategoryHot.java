@@ -356,6 +356,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
         }
         else if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
             // Placed their coffee order
+            String instruct = "Let's get you signed-in so I can put a face to the coffee";
+            setupPlayButton(instruct);
             final_Confirmation = true;
             Intent register = new Intent(this, RegisterCustomerActivity.class);
             register.putExtra("sign_in","sign_in");
