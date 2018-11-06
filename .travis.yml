@@ -12,8 +12,8 @@ android:
     - android-26
     - sys-img-armeabi-v7a-android-22
     - extra-android-m2repository
-    
-    sudo: false
+
+    sudo: enabled
 
   before_script:
       - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
