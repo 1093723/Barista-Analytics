@@ -55,7 +55,7 @@
             android:label="Admin Registration" />
         <activity
             android:name=".SpeechAPI"
-            android:label="Maps Activity"/>
+            android:label="Maps Activity" />
         <activity android:name=".ProcessOrderActivity" />
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
@@ -66,6 +66,7 @@
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
         <activity android:name=".Order.CustomerOrders" />
         <activity android:name=".Order.OrderConfirmed" />
+        <activity android:name=".help_tutorial"></activity>
     </application>
 
 </manifest>
