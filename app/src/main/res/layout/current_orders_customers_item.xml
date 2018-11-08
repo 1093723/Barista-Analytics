@@ -5,10 +5,6 @@
 
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:background="@drawable/coffee_beans2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
     <android.support.v7.widget.CardView
         app:cardCornerRadius="20dp"
@@ -18,6 +14,7 @@
         android:layout_height="wrap_content">
 
         <RelativeLayout
+            android:background="@drawable/wood_3"
             android:layout_width="match_parent"
             android:layout_height="164dp">
 
@@ -33,7 +30,8 @@
                 android:ellipsize="end"
                 android:maxLines="20"
                 android:text="Order Description:"
-                android:textColor="#262626" />
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/description_hard"
@@ -45,7 +43,9 @@
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:text="Description"
-                android:textSize="16sp" />
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/order_date"
@@ -59,7 +59,8 @@
                 android:ellipsize="end"
                 android:maxLines="20"
                 android:text="Order Date:"
-                android:textColor="#262626" />
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/date_ordered"
@@ -71,7 +72,9 @@
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:maxLines="20"
-                android:text="Order Date" />
+                android:text="Order Date"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
 
             <TextView
@@ -83,8 +86,9 @@
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:text="Order Total:"
-                android:textColor="#262626"
-                android:textSize="16sp" />
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/order_sum"
@@ -96,7 +100,9 @@
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:text="Money Total"
-                android:textSize="16sp" />
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/button_status"

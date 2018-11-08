@@ -6,9 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".Order.CustomerOrders">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
 
         <TextView
             android:id="@+id/current_orders"
@@ -23,6 +25,10 @@
             android:id="@+id/relLayout2"
             android:layout_below="@id/current_orders"
             android:background="@color/white">
+            <ImageView
+                android:background="@drawable/coffee_beans_light"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerViewCustomerConfirmed"
                 android:layout_width="match_parent"

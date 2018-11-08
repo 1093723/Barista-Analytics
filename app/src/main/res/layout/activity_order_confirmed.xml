@@ -28,7 +28,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/color22"/>
+                android:background="@drawable/coffee_beans_light"/>
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerViewConfirmed"
                 android:layout_width="match_parent"
