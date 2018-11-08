@@ -10,6 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.List;
 
 import Model.CoffeeOrder;
@@ -33,7 +39,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.name.setText(coffeeOrders.get(position).getOrder_CustomerUsername());
         holder.description.setText(coffeeOrders.get(position).getOrder_Description());
         holder.date_ordered.setText(coffeeOrders.get(position).getOrder_date());
@@ -43,7 +49,65 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
                 coffeeOrders.get(position).getOrder_State().equals("Confirmed")){
             holder.confirmed.setClickable(false);
             holder.rejected.setClickable(false);
+            holder.order_status.setClickable(false);
         }
+        if(coffeeOrders.get(position).getOrder_State().equals("Confirmed")){
+            holder.order_status.setVisibility(View.VISIBLE);
+            holder.order_status.setText("Confirmed");
+            holder.confirmed.setVisibility(View.GONE);
+            holder.rejected.setVisibility(View.GONE);
+        }
+        else if(coffeeOrders.get(position).getOrder_State().equals("Rejected")){
+            holder.order_status.setVisibility(View.VISIBLE);
+            holder.order_status.setText("Rejected");
+            holder.rejected.setVisibility(View.GONE);
+            holder.confirmed.setVisibility(View.GONE);
+        }
+
+        holder.confirmed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmOrder(coffeeOrders.get(position));
+            }
+        });
+        holder.rejected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rejectOrder(coffeeOrders.get(position));
+            }
+        });
+    }
+
+    private void confirmOrder(final CoffeeOrder coffeeOrder) {
+        coffeeOrder.setOrder_State("Confirmed");
+        UpdateDatabase(coffeeOrder);
+    }
+
+    private void rejectOrder(final CoffeeOrder coffeeOrder) {
+        coffeeOrder.setOrder_State("Rejected");
+        UpdateDatabase(coffeeOrder);
+    }
+
+    private void UpdateDatabase(final CoffeeOrder coffeeOrder){
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("OkoaCoffeeOrders");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snap : dataSnapshot.getChildren()){
+                    CoffeeOrder coffeeOrder1 = snap.getValue(CoffeeOrder.class);
+                    if(coffeeOrder.getUUID().equals(coffeeOrder1.getUUID()) &&
+                            coffeeOrder.getOrder_date().equals(coffeeOrder1.getOrder_date())){
+                        String key = snap.getKey().toString();
+                        databaseReference.child(key).setValue(coffeeOrder);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -53,7 +117,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView message;
-        public Button confirmed,rejected;
+        public Button confirmed,rejected, order_status;
         public TextView date_ordered, description,name,orderSummary;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -61,6 +125,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
 
             confirmed = itemView.findViewById(R.id.confirm_button);
             rejected = itemView.findViewById(R.id.reject_button);
+            order_status = itemView.findViewById(R.id.order_status);
 
             name = itemView.findViewById(R.id.name_surname_user);
             description = itemView.findViewById(R.id.description_hard);
