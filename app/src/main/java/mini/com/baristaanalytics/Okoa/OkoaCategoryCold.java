@@ -156,22 +156,43 @@ public class OkoaCategoryCold extends AppCompatActivity {
         initPollyClient();
         setupNewMediaPlayer();
 
-
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beverage.getBeverage_category().equals("cold")){
-                        String coffeeName = beverage.getBeverage_name().toLowerCase();
-                        beverage.setBeverage_name(coffeeName);
-                        coffeeNames.add(beverage.getBeverage_name());
-                        models.add(beverage)    ;
+                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
+                    if(models.size() > 0){
+                        Boolean exists = false;
+                        for (int i = 0; i < models.size(); i++) {
+                            if(models.get(i).getBeverage_name()
+                                    .equals(tempCoffeeName)){
+                                exists = true;
+                            }
+                        }
+                        if(!exists){
+                            if(beverage.getBeverage_category().equals("cold")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                models.add(beverage);
+                            }
+                        }
+                    }else {
+                        if(beverage.getBeverage_category().equals("cold")){
+                            String coffeeName = beverage.getBeverage_name().toLowerCase();
+                            beverage.setBeverage_name(coffeeName);
+                            coffeeNames.add(beverage.getBeverage_name());
+                            models.add(beverage);
+                        }
                     }
-                }
 
+                    //count+=1;
+                }
                 adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
+
+
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
@@ -389,13 +410,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
                 }
                 coffeeOrder.setOrder_Total(orderTotal);
-                coffeeOrder.setOrder_Description(order_description);
-                //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
-
-//            userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
-//                    small_Quantity + " small " +
-//                    beverage.getBeverage_name()+"'s" + ". Is that correct?";
-
+                coffeeOrder.setOrder_Description(orderDescription);
             }else {
                 // Get the coffee name of the order
                 String coffeeName = getCoffeeName(s);
