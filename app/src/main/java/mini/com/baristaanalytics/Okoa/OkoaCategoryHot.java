@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTime;
 
@@ -178,33 +181,51 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
-                Integer[] colors_temp = {
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
+                final ImageView background_image_view = findViewById(R.id.background_image);
+                final Drawable swapImages[] = {
+                        getDrawable(R.drawable.coffee_background),
+                        getDrawable(R.drawable.coffee_background2),
+                        getDrawable(R.drawable.coffee_background3),
+                        getDrawable(R.drawable.coffee_background4),
+                        getDrawable(R.drawable.coffee_background5),
+                        getDrawable(R.drawable.coffee_background6),
+                        getDrawable(R.drawable.coffee_background7),
+                        getDrawable(R.drawable.coffee_background8),
+                        getDrawable(R.drawable.coffee_background9),
+                        getDrawable(R.drawable.coffee_background10),
+                        getDrawable(R.drawable.coffee_background11)
                 };
+                /*Integer[] colors_temp = {
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                }; */
 
-                colors = colors_temp;
+                // colors = colors_temp;
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
+                        if(position < (adapter.getCount() - 1) && position < (swapImages.length - 1)){
                             beverage = models.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                            // viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                            // background_image_view.setImageDrawable(swapImages[position]);
+                            // background_image_view.setScaleType(ImageView.ScaleType.CENTER);
                         }
                         else {
-                            viewPager.setBackgroundColor(colors[colors.length - 1]);
+                            // viewPager.setBackgroundColor(colors[colors.length - 1]);
+                            // background_image_view.setImageDrawable(swapImages[swapImages.length - 1]);
+                            // background_image_view.setScaleType(ImageView.ScaleType.CENTER);
                         }
                     }
                     @Override
