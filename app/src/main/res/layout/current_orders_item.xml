@@ -15,7 +15,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@drawable/coffee_background21">
+            android:background="@drawable/wood_3">
 
             <TextView
                 android:id="@+id/title"
@@ -26,7 +26,8 @@
                 android:layout_marginTop="10dp"
                 android:text="Name:"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/name_surname_user"
@@ -37,7 +38,8 @@
                 android:layout_toRightOf="@+id/title"
                 android:text="Name Surname"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
 
             <TextView
@@ -52,7 +54,8 @@
                 android:ellipsize="end"
                 android:maxLines="20"
                 android:text="Order Description:"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/description_hard"
@@ -64,7 +67,8 @@
                 android:ellipsize="end"
                 android:text="Description"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/order_date"
@@ -78,7 +82,8 @@
                 android:ellipsize="end"
                 android:maxLines="20"
                 android:text="Order Date:"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/date_ordered"
@@ -91,7 +96,8 @@
                 android:ellipsize="end"
                 android:maxLines="20"
                 android:text="Order Date"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
 
             <TextView
@@ -104,7 +110,8 @@
                 android:ellipsize="end"
                 android:text="Order Total:"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/order_sum"
@@ -117,7 +124,8 @@
                 android:ellipsize="end"
                 android:text="Money Total"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
 
             <Button
@@ -142,6 +150,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/date_ordered"
+                android:visibility="gone"
                 android:layout_below="@+id/order_total"
                 android:text="Reject/Confirm" />
 
