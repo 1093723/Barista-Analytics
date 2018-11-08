@@ -5,8 +5,9 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    android:background="@drawable/coffee_background9"
     tools:context=".LoginActivity"
-    android:background="@mipmap/ic_coffee_background">
+    >
 
     <!-- Login progress -->
     <ProgressBar
