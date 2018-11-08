@@ -7,7 +7,10 @@
     tools:context=".Okoa.OkoaCategoryCold">
 
     <ImageView
-        android:background="@drawable/coffee_beans2"
+        android:adjustViewBounds="true"
+        android:id="@+id/background_image"
+        android:src="@drawable/coffee_background7"
+        android:scaleType="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -49,6 +52,7 @@
                 android:translationY="-65dp">
 
                 <ImageView
+                    android:id="@+id/small_size_image"
                     android:layout_width="wrap_content"
                     android:layout_height="202dp"
                     android:layout_gravity="center_horizontal"
@@ -96,7 +100,7 @@
                 android:translationY="-65dp">
 
                 <ImageView
-                    android:id="@+id/small_size_image"
+                    android:id="@+id/large_size_image"
                     android:layout_width="182dp"
                     android:layout_height="wrap_content"
                     android:cropToPadding="false"
