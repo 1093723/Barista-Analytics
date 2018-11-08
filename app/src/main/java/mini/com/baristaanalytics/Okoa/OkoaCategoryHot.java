@@ -169,11 +169,32 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beverage.getBeverage_category().equals("hot")){
-                        String coffeeName = beverage.getBeverage_name().toLowerCase();
-                        beverage.setBeverage_name(coffeeName);
-                        models.add(beverage);
-                        coffeeNames.add(beverage.getBeverage_name());                    }
+                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
+                    if(models.size() > 0){
+                        Boolean exists = false;
+                        for (int i = 0; i < models.size(); i++) {
+                            if(models.get(i).getBeverage_name()
+                                    .equals(tempCoffeeName)){
+                                exists = true;
+                            }
+                        }
+                        if(!exists){
+                            if(beverage.getBeverage_category().equals("hot")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                models.add(beverage);
+                            }
+                        }
+                    }else {
+                        if(beverage.getBeverage_category().equals("hot")){
+                            String coffeeName = beverage.getBeverage_name().toLowerCase();
+                            beverage.setBeverage_name(coffeeName);
+                            coffeeNames.add(beverage.getBeverage_name());
+                            models.add(beverage);
+                        }
+                    }
+
                 }
 
                 adapter = new OkoaColdMenuAdapter(models, OkoaCategoryHot.this);
@@ -432,7 +453,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
 
                 }
                 coffeeOrder.setOrder_Total(orderTotal);
-                coffeeOrder.setOrder_Description(order_description);
+                coffeeOrder.setOrder_Description(orderDescription);
                 //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
 
 //            userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +

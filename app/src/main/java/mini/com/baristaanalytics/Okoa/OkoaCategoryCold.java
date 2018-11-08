@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -17,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -148,14 +146,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
         }
     }
-    public int getImage(String imageName) {
 
-        int drawableResourceId = this.getResources().getIdentifier(imageName, "drawable", this.getPackageName());
-
-        return drawableResourceId;
-    }
-
-        @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
@@ -164,84 +156,75 @@ public class OkoaCategoryCold extends AppCompatActivity {
         initPollyClient();
         setupNewMediaPlayer();
 
-
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beverage.getBeverage_category().equals("cold")){
-                        String coffeeName = beverage.getBeverage_name().toLowerCase();
-                        beverage.setBeverage_name(coffeeName);
-
-                        if(beverage.getPrice_small().equals(0)){
-                            findViewById(R.id.small_size_image).setVisibility(View.GONE);
+                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
+                    if(models.size() > 0){
+                        Boolean exists = false;
+                        for (int i = 0; i < models.size(); i++) {
+                            if(models.get(i).getBeverage_name()
+                                    .equals(tempCoffeeName)){
+                                exists = true;
+                            }
                         }
-                        if(beverage.getPrice_tall().equals(0)){
-                            findViewById(R.id.large_size_image).setVisibility(View.GONE);
+                        if(!exists){
+                            if(beverage.getBeverage_category().equals("cold")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                models.add(beverage);
+                            }
                         }
-                        coffeeNames.add(beverage.getBeverage_name());
-                        models.add(beverage);
+                    }else {
+                        if(beverage.getBeverage_category().equals("cold")){
+                            String coffeeName = beverage.getBeverage_name().toLowerCase();
+                            beverage.setBeverage_name(coffeeName);
+                            coffeeNames.add(beverage.getBeverage_name());
+                            models.add(beverage);
+                        }
                     }
-                }
 
+                    //count+=1;
+                }
                 adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
+
+
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
-                final ImageView background_image_view = findViewById(R.id.background_image);
-                final Drawable swapImages[] = {
-                        getDrawable(R.drawable.coffee_background),
-                        getDrawable(R.drawable.coffee_background2),
-                        getDrawable(R.drawable.coffee_background3),
-                        getDrawable(R.drawable.coffee_background4),
-                        getDrawable(R.drawable.coffee_background5),
-                        getDrawable(R.drawable.coffee_background6),
-                        getDrawable(R.drawable.coffee_background7),
-                        getDrawable(R.drawable.coffee_background8),
-                        getDrawable(R.drawable.coffee_background9),
-                        getDrawable(R.drawable.coffee_background10),
-                        getDrawable(R.drawable.coffee_background11)
+                Integer[] colors_temp = {
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+
                 };
 
-                /* Integer[] colors_temp = {
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-
-                }; */
-
-                // colors = colors_temp;
+                colors = colors_temp;
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                        if(position < (adapter.getCount() - 1) && position < (swapImages.length - 1)){
+                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
                             beverage = models.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            // viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
-                            // viewPager.setBackground(swapImages[position]);
-                            // background_image_view.setImageDrawable(swapImages[position]);
-                            // background_image_view.setScaleType(ImageView.ScaleType.CENTER);
-
+                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
                         }
                         else {
-                            // viewPager.setBackground(swapImages[swapImages.length - 1]);
-                            // background_image_view.setImageDrawable(swapImages[swapImages.length - 1]);
-                            // background_image_view.setScaleType(ImageView.ScaleType.CENTER);
-
-
+                            viewPager.setBackgroundColor(colors[colors.length - 1]);
                         }
                     }
 
@@ -427,13 +410,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
                 }
                 coffeeOrder.setOrder_Total(orderTotal);
-                coffeeOrder.setOrder_Description(order_description);
-                //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
-
-//            userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
-//                    small_Quantity + " small " +
-//                    beverage.getBeverage_name()+"'s" + ". Is that correct?";
-
+                coffeeOrder.setOrder_Description(orderDescription);
             }else {
                 // Get the coffee name of the order
                 String coffeeName = getCoffeeName(s);
