@@ -272,7 +272,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                             "ready.";
                     setupPlayButton(complete);
                     orderService.process_order(coffeeOrder,coffee_Order);
-                    Intent x = new Intent(this, OrderConfirmed.class);
+                    Intent x = new Intent(this, CustomerOrders.class);
                     startActivity(x);
                     finish();
                 }
@@ -431,7 +431,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 orderDescription = orderDescription + quantity + "x " + size + " " + coffeeName +
                         ". The total is " + price + " rands";
                 coffeeOrder.setOrder_Total(price);
-                coffeeOrder.setOrder_Description(order_description);
+                coffeeOrder.setOrder_Description(orderDescription);
                 //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
                 coffeeOrder.setOrder_date(DateTime.now().toLocalDate().toString());
                 coffeeOrder.setOrder_State("requested");

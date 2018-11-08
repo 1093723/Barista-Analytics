@@ -409,7 +409,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 orderDescription = orderDescription + quantity + "x " + size + " " + coffeeName +
                         ". The total is " + price + " rands";
                 coffeeOrder.setOrder_Total(price);
-                coffeeOrder.setOrder_Description(order_description);
+                coffeeOrder.setOrder_Description(orderDescription);
                 //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
                 coffeeOrder.setOrder_date(DateTime.now().toLocalDate().toString());
                 coffeeOrder.setOrder_State("requested");

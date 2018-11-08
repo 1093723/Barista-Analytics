@@ -137,9 +137,7 @@ public class OrderConfirmed extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
-                    Log.d(TAG,coffeeOrder.getOrder_Description());
                         coffeeOrderArrayList.add(coffeeOrder);
-                    Toast.makeText(ctx, coffeeOrder.getOrder_Description().toString(), Toast.LENGTH_SHORT).show();
                 }
                 initRecyclerView();
             }

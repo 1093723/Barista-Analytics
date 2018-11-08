@@ -38,7 +38,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -48,7 +48,7 @@
         <activity android:name=".MapsActivity" />
         <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".MainActivity"
             android:label="@string/title_activity_login" />
         <activity
             android:name=".Registration.RegisterAdminActivity"
