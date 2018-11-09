@@ -8,6 +8,6 @@ public class help_tutorial extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_help_tutorial);
+        setContentView(R.layout.activity_help_tutorial_maps);
     }
 }

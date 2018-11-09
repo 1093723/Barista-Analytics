@@ -38,7 +38,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Order.OrderConfirmed">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,8 +64,8 @@
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
+        <activity android:name=".LoginActivity" />
         <activity android:name=".Order.CustomerOrders" />
-        <activity android:name=".Order.OrderConfirmed" />
         <activity android:name=".help_tutorial"></activity>
     </application>
 

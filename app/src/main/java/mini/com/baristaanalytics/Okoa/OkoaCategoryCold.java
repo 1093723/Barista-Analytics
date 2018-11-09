@@ -1,6 +1,7 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +13,8 @@ import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +48,6 @@ import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
 import Services.SpeechProcessorService;
-import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
@@ -94,6 +92,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private List<Beverage> models;
     private List<String> coffeeNames;
 
+    Dialog helpDialog;
     /**
      * Firebase-related variables
      */
@@ -147,6 +146,19 @@ public class OkoaCategoryCold extends AppCompatActivity {
         }
     }
 
+    public void help_tutorial_cold(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.help_tutorial_cold);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,6 +167,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
+        helpDialog = new Dialog(this);
 
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override

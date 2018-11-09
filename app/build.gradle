@@ -39,6 +39,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.daasuu:BubbleLayout:1.2.0'
     implementation 'com.cepheuen.elegant-number-button:lib:1.0.2'
     implementation 'com.felipecsl:gifimageview:2.2.0'
     implementation 'com.android.support:appcompat-v7:26.+' // appcompat library
