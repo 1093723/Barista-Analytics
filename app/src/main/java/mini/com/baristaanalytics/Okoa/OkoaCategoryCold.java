@@ -12,10 +12,8 @@ import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,9 +45,9 @@ import java.util.Locale;
 import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
 import Model.CoffeeOrder;
+import Services.CategoryHelper;
 import Services.OrderService;
 import Services.SpeechProcessorService;
-import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
@@ -91,7 +89,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private OkoaColdMenuAdapter adapter;
-    private List<Beverage> models;
+    private List<Beverage> beveragesList;
     private List<String> coffeeNames;
 
     /**
@@ -162,70 +160,51 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
-                    if(models.size() > 0){
-                        Boolean exists = false;
-                        for (int i = 0; i < models.size(); i++) {
-                            if(models.get(i).getBeverage_name()
-                                    .equals(tempCoffeeName)){
-                                exists = true;
-                            }
-                        }
+                    if(beveragesList.size() > 0){
+                        /**
+                         * Flag for determining if there are coffee descriptions(from firebase)
+                         * the same as the ones we have already retrieved on the layout
+                         **/
+                        Boolean exists = CategoryHelper.beverageExists(coffeeNames,beverage);
                         if(!exists){
+                            // Add to array as the beverage does not exist
                             if(beverage.getBeverage_category().equals("cold")){
                                 String coffeeName = beverage.getBeverage_name().toLowerCase();
                                 beverage.setBeverage_name(coffeeName);
                                 coffeeNames.add(beverage.getBeverage_name());
-                                models.add(beverage);
+                                beveragesList.add(beverage);
                             }
+                        }
+                        else {
+                            // Bevarage exists so replace the beverage at that index
+                                CategoryHelper.replaceBeverage(beverage,beveragesList);
+                                Log.d(TAG, "Replacing");
                         }
                     }else {
                         if(beverage.getBeverage_category().equals("cold")){
                             String coffeeName = beverage.getBeverage_name().toLowerCase();
                             beverage.setBeverage_name(coffeeName);
                             coffeeNames.add(beverage.getBeverage_name());
-                            models.add(beverage);
+                            beveragesList.add(beverage);
                         }
                     }
-
-                    //count+=1;
                 }
-                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
+                adapter = new OkoaColdMenuAdapter(beveragesList, OkoaCategoryCold.this);
 
 
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
-                Integer[] colors_temp = {
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
 
-                };
-
-                colors = colors_temp;
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
-                            beverage = models.get(position);
+                            beverage = beveragesList.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
-                        }
-                        else {
-                            viewPager.setBackgroundColor(colors[colors.length - 1]);
-                        }
+                            //viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+
                     }
 
                     @Override
@@ -245,6 +224,9 @@ public class OkoaCategoryCold extends AppCompatActivity {
             }
         });
     }
+
+
+
     /**
      * Initialize global variables to be used
      */
@@ -260,7 +242,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
 
         ctx = OkoaCategoryCold.this;
-        models = new ArrayList<>();
+        beveragesList = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
     }
 
@@ -436,13 +418,13 @@ public class OkoaCategoryCold extends AppCompatActivity {
         }
     }
     private Long getCoffeePrice(String coffeeName, String size) {
-        for (int i = 0; i < models.size(); i++) {
-            String beverage = models.get(i).getBeverage_name().toLowerCase();
+        for (int i = 0; i < beveragesList.size(); i++) {
+            String beverage = beveragesList.get(i).getBeverage_name().toLowerCase();
             if(beverage.contains(coffeeName)){
                 if(size.equals("small")){
-                    return models.get(i).getPrice_small();
+                    return beveragesList.get(i).getPrice_small();
                 }else {
-                    return models.get(i).getPrice_tall();
+                    return beveragesList.get(i).getPrice_tall();
                 }
             }
         }

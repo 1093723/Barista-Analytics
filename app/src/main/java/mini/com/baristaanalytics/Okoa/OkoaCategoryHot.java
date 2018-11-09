@@ -50,6 +50,7 @@ import java.util.Locale;
 import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
 import Model.CoffeeOrder;
+import Services.CategoryHelper;
 import Services.OrderService;
 import Services.SpeechProcessorService;
 import mini.com.baristaanalytics.LoginActivity;
@@ -97,6 +98,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private TextView txtViewPriceSmall,txtViewPriceLarge;
+    private List<Beverage> beveragesList;
 
     private Boolean accountExists;
     private Boolean isAnswered;
@@ -169,53 +171,41 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
-                    if(models.size() > 0){
-                        Boolean exists = false;
-                        for (int i = 0; i < models.size(); i++) {
-                            if(models.get(i).getBeverage_name()
-                                    .equals(tempCoffeeName)){
-                                exists = true;
-                            }
-                        }
+                    if(beveragesList.size() > 0){
+                        /**
+                         * Flag for determining if there are coffee descriptions(from firebase)
+                         * the same as the ones we have already retrieved on the layout
+                         **/
+                        Boolean exists = CategoryHelper.beverageExists(coffeeNames,beverage);
                         if(!exists){
+                            // Add to array as the beverage does not exist
                             if(beverage.getBeverage_category().equals("hot")){
                                 String coffeeName = beverage.getBeverage_name().toLowerCase();
                                 beverage.setBeverage_name(coffeeName);
                                 coffeeNames.add(beverage.getBeverage_name());
-                                models.add(beverage);
+                                beveragesList.add(beverage);
                             }
+                        }
+                        else {
+                            // Bevarage exists so replace the beverage at that index
+                            CategoryHelper.replaceBeverage(beverage,beveragesList);
                         }
                     }else {
                         if(beverage.getBeverage_category().equals("hot")){
                             String coffeeName = beverage.getBeverage_name().toLowerCase();
                             beverage.setBeverage_name(coffeeName);
                             coffeeNames.add(beverage.getBeverage_name());
-                            models.add(beverage);
+                            beveragesList.add(beverage);
                         }
                     }
-
                 }
 
-                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryHot.this);
+                adapter = new OkoaColdMenuAdapter(beveragesList, OkoaCategoryHot.this);
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
                 final ImageView background_image_view = findViewById(R.id.background_image);
-                final Drawable swapImages[] = {
-                        getDrawable(R.drawable.coffee_background),
-                        getDrawable(R.drawable.coffee_background2),
-                        getDrawable(R.drawable.coffee_background3),
-                        getDrawable(R.drawable.coffee_background4),
-                        getDrawable(R.drawable.coffee_background5),
-                        getDrawable(R.drawable.coffee_background6),
-                        getDrawable(R.drawable.coffee_background7),
-                        getDrawable(R.drawable.coffee_background8),
-                        getDrawable(R.drawable.coffee_background9),
-                        getDrawable(R.drawable.coffee_background10),
-                        getDrawable(R.drawable.coffee_background11)
-                };
                 /*Integer[] colors_temp = {
                         getResources().getColor(R.color.color30),
                         getResources().getColor(R.color.color2),
@@ -235,19 +225,10 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                        if(position < (adapter.getCount() - 1) && position < (swapImages.length - 1)){
-                            beverage = models.get(position);
+                            beverage = beveragesList.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            // viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
-                            // background_image_view.setImageDrawable(swapImages[position]);
-                            // background_image_view.setScaleType(ImageView.ScaleType.CENTER);
-                        }
-                        else {
-                            // viewPager.setBackgroundColor(colors[colors.length - 1]);
-                            // background_image_view.setImageDrawable(swapImages[swapImages.length - 1]);
-                            // background_image_view.setScaleType(ImageView.ScaleType.CENTER);
-                        }
+
                     }
                     @Override
                     public void onPageSelected(int position) {
@@ -271,14 +252,13 @@ public class OkoaCategoryHot extends AppCompatActivity {
      */
     private void initVariables() {
         coffeeNames = new ArrayList<>();
-
+        beveragesList = new ArrayList<>();
         ctx = OkoaCategoryHot.this;
         mAuth = FirebaseAuth.getInstance();
         txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
         btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
         btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
-        models = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
         database = FirebaseDatabase.getInstance();
         coffee_Order = database.getReference("OkoaCoffeeOrders");

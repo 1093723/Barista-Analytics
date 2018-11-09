@@ -38,17 +38,18 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".Okoa.OkoaCategoryCold">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapsActivity" />
+        <activity android:name=".Okoa.OkoaCategoryHot" />
         <activity android:name=".Registration.RegisterCustomerActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".MapsActivity"
+
             android:label="@string/title_activity_login" />
         <activity
             android:name=".Registration.RegisterAdminActivity"
@@ -60,7 +61,7 @@
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".Okoa.OkoaCategoryHot" />
+        <activity android:name=".Okoa.OkoaCategoryCold" />
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
