@@ -1,11 +1,9 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -16,7 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,17 +40,18 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
 import Model.CoffeeOrder;
-import Services.CategoryHelper;
 import Services.OrderService;
 import Services.SpeechProcessorService;
 import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.CustomerOrders;
+import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
@@ -81,7 +80,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private CoffeeOrder coffeeOrder;
     private String confirmation;
     String order_description;
-    private Boolean final_Confirmation, checkAccount;
+    private Boolean final_Confirmation;
     private ElegantNumberButton btnSmall,btnLarge;
 
     /**
@@ -95,12 +94,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private TextView txtViewPriceSmall,txtViewPriceLarge;
-    private List<Beverage> beveragesList;
 
-    private Boolean accountExists;
-    private Boolean isAnswered;
-
-    Dialog helpDialog;
     /**
      * Firebase-related variables
      */
@@ -154,19 +148,6 @@ public class OkoaCategoryHot extends AppCompatActivity {
         }
     }
 
-    public void help_tutorial_hot(View v){
-        TextView textclose;
-        helpDialog.setContentView(R.layout.help_tutorial_hot);
-        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
-        textclose.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                helpDialog.dismiss();
-            }
-        });
-        helpDialog.show();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,52 +155,25 @@ public class OkoaCategoryHot extends AppCompatActivity {
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
-        helpDialog = new Dialog(this);
-        accountExists = false;
-        checkAccount = false;
-        isAnswered = false;
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beveragesList.size() > 0){
-                        /**
-                         * Flag for determining if there are coffee descriptions(from firebase)
-                         * the same as the ones we have already retrieved on the layout
-                         **/
-                        Boolean exists = CategoryHelper.beverageExists(coffeeNames,beverage);
-                        if(!exists){
-                            // Add to array as the beverage does not exist
-                            if(beverage.getBeverage_category().equals("hot")){
-                                String coffeeName = beverage.getBeverage_name().toLowerCase();
-                                beverage.setBeverage_name(coffeeName);
-                                coffeeNames.add(beverage.getBeverage_name());
-                                beveragesList.add(beverage);
-                            }
-                        }
-                        else {
-                            // Bevarage exists so replace the beverage at that index
-                            CategoryHelper.replaceBeverage(beverage,beveragesList);
-                        }
-                    }else {
-                        if(beverage.getBeverage_category().equals("hot")){
-                            String coffeeName = beverage.getBeverage_name().toLowerCase();
-                            beverage.setBeverage_name(coffeeName);
-                            coffeeNames.add(beverage.getBeverage_name());
-                            beveragesList.add(beverage);
-                        }
-                    }
+                    if(beverage.getBeverage_category().equals("hot")){
+                        String coffeeName = beverage.getBeverage_name().toLowerCase();
+                        beverage.setBeverage_name(coffeeName);
+                        models.add(beverage);
+                        coffeeNames.add(beverage.getBeverage_name());                    }
                 }
 
-                adapter = new OkoaColdMenuAdapter(beveragesList, OkoaCategoryHot.this);
+                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryHot.this);
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
-                final ImageView background_image_view = findViewById(R.id.background_image);
-                /*Integer[] colors_temp = {
+                Integer[] colors_temp = {
                         getResources().getColor(R.color.color30),
                         getResources().getColor(R.color.color2),
                         getResources().getColor(R.color.color3),
@@ -232,16 +186,21 @@ public class OkoaCategoryHot extends AppCompatActivity {
                         getResources().getColor(R.color.color2),
                         getResources().getColor(R.color.color3),
                         getResources().getColor(R.color.color5),
-                }; */
+                };
 
-                // colors = colors_temp;
+                colors = colors_temp;
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                            beverage = beveragesList.get(position);
+                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
+                            beverage = models.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-
+                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                        }
+                        else {
+                            viewPager.setBackgroundColor(colors[colors.length - 1]);
+                        }
                     }
                     @Override
                     public void onPageSelected(int position) {
@@ -265,13 +224,14 @@ public class OkoaCategoryHot extends AppCompatActivity {
      */
     private void initVariables() {
         coffeeNames = new ArrayList<>();
-        beveragesList = new ArrayList<>();
+
         ctx = OkoaCategoryHot.this;
         mAuth = FirebaseAuth.getInstance();
         txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
         btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
         btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
+        models = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
         database = FirebaseDatabase.getInstance();
         coffee_Order = database.getReference("OkoaCoffeeOrders");
@@ -307,7 +267,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                             "ready.";
                     setupPlayButton(complete);
                     orderService.process_order(coffeeOrder,coffee_Order);
-                    Intent x = new Intent(this, CustomerOrders.class);
+                    Intent x = new Intent(this, OrderConfirmed.class);
                     startActivity(x);
                     finish();
                 }
@@ -395,31 +355,13 @@ public class OkoaCategoryHot extends AppCompatActivity {
             finish();
         }
         else if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+            // Placed their coffee order
+            String instruct = "Let's get you signed-in so I can put a face to the coffee";
+            setupPlayButton(instruct);
             final_Confirmation = true;
-
-            if(isAnswered){
-                String askSignIn = "Do you already have an account?";
-                checkAccount = true;
-                isAnswered = false;
-                setupPlayButton(askSignIn);
-            }else {
-                if(checkAccount){
-                    Intent x = new Intent(this,LoginActivity.class);
-                    x.putExtra("sign_in","sign_in");
-                    startActivity(x);
-                    String instruct = "Let's get you signed-in so I can put a face to the coffee";
-                    setupPlayButton(instruct);
-
-                }else{
-                    String instruct = "Let's get you signed-up so I can put a face to the coffee";
-                    setupPlayButton(instruct);
-                    Intent x = new Intent(this, RegisterCustomerActivity.class);
-                    x.putExtra("sign_in","sign_in");
-                    startActivity(x);
-                }
-            }
-
-
+            Intent register = new Intent(this, RegisterCustomerActivity.class);
+            register.putExtra("sign_in","sign_in");
+            startActivity(register);
         }else {
             if(orders.length > 1){
                 int orderCount = orders.length;
@@ -446,7 +388,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
 
                 }
                 coffeeOrder.setOrder_Total(orderTotal);
-                coffeeOrder.setOrder_Description(orderDescription);
+                coffeeOrder.setOrder_Description(order_description);
                 //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
 
 //            userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
@@ -466,12 +408,12 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 orderDescription = orderDescription + quantity + "x " + size + " " + coffeeName +
                         ". The total is " + price + " rands";
                 coffeeOrder.setOrder_Total(price);
-                coffeeOrder.setOrder_Description(orderDescription);
+                coffeeOrder.setOrder_Description(order_description);
                 //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
                 coffeeOrder.setOrder_date(DateTime.now().toLocalDate().toString());
                 coffeeOrder.setOrder_State("requested");
                 // Ordered just one item
-                isAnswered = true;
+
                 String confirmation = orderDescription + ". Is that correct?";
                 setupPlayButton(confirmation);
             }
@@ -492,9 +434,13 @@ public class OkoaCategoryHot extends AppCompatActivity {
     }
 
     private String getCoffeeName(String order) {
-        for (int i = 0; i < coffeeNames.size(); i++) {
-            if(order.contains(coffeeNames.get(i))){
-                return coffeeNames.get(i);
+        String[] splittedOrder = order.split(" ");
+        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
+
+        for (int i = 0; i < tempOrder.size(); i++) {
+            String temp = tempOrder.get(i).toLowerCase();
+            if(coffeeNames.contains(temp)){
+                return temp;
             }
         }
         return "-1";

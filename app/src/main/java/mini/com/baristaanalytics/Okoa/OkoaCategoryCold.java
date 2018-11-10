@@ -1,7 +1,6 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +12,10 @@ import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,25 +35,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.joda.time.DateTime;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
 import Model.CoffeeOrder;
-import Services.CategoryHelper;
 import Services.OrderService;
-import Services.SpeechProcessorService;
-import mini.com.baristaanalytics.Order.CustomerOrders;
+import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 
@@ -90,10 +85,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private OkoaColdMenuAdapter adapter;
-    private List<Beverage> beveragesList;
-    private List<String> coffeeNames;
+    private List<Beverage> models;
 
-    Dialog helpDialog;
     /**
      * Firebase-related variables
      */
@@ -147,28 +140,14 @@ public class OkoaCategoryCold extends AppCompatActivity {
         }
     }
 
-    public void help_tutorial_cold(View v){
-        TextView textclose;
-        helpDialog.setContentView(R.layout.help_tutorial_cold);
-        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
-        textclose.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                helpDialog.dismiss();
-            }
-        });
-        helpDialog.show();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
-        coffeeNames = new ArrayList<>();
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
-        helpDialog = new Dialog(this);
+
 
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
@@ -176,51 +155,45 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beveragesList.size() > 0){
-                        /**
-                         * Flag for determining if there are coffee descriptions(from firebase)
-                         * the same as the ones we have already retrieved on the layout
-                         **/
-                        Boolean exists = CategoryHelper.beverageExists(coffeeNames,beverage);
-                        if(!exists){
-                            // Add to array as the beverage does not exist
-                            if(beverage.getBeverage_category().equals("cold")){
-                                String coffeeName = beverage.getBeverage_name().toLowerCase();
-                                beverage.setBeverage_name(coffeeName);
-                                coffeeNames.add(beverage.getBeverage_name());
-                                beveragesList.add(beverage);
-                            }
-                        }
-                        else {
-                            // Bevarage exists so replace the beverage at that index
-                                CategoryHelper.replaceBeverage(beverage,beveragesList);
-                                Log.d(TAG, "Replacing");
-                        }
-                    }else {
-                        if(beverage.getBeverage_category().equals("cold")){
-                            String coffeeName = beverage.getBeverage_name().toLowerCase();
-                            beverage.setBeverage_name(coffeeName);
-                            coffeeNames.add(beverage.getBeverage_name());
-                            beveragesList.add(beverage);
-                        }
+                    if(beverage.getBeverage_category().equals("cold")){
+                        models.add(beverage);
                     }
                 }
-                adapter = new OkoaColdMenuAdapter(beveragesList, OkoaCategoryCold.this);
 
-
+                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
+                Integer[] colors_temp = {
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
+                        getResources().getColor(R.color.color30),
+                        getResources().getColor(R.color.color2),
+                        getResources().getColor(R.color.color3),
+                        getResources().getColor(R.color.color5),
 
+                };
+
+                colors = colors_temp;
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                            beverage = beveragesList.get(position);
+                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
+                            beverage = models.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            //viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
-
+                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                        }
+                        else {
+                            viewPager.setBackgroundColor(colors[colors.length - 1]);
+                        }
                     }
 
                     @Override
@@ -240,9 +213,6 @@ public class OkoaCategoryCold extends AppCompatActivity {
             }
         });
     }
-
-
-
     /**
      * Initialize global variables to be used
      */
@@ -258,7 +228,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
 
         ctx = OkoaCategoryCold.this;
-        beveragesList = new ArrayList<>();
+        models = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
     }
 
@@ -356,109 +326,97 @@ public class OkoaCategoryCold extends AppCompatActivity {
      * @param s is the input string from the user
      */
     private void decodeUserInput(String s) {
-        SpeechProcessorService speechProcessor= new SpeechProcessorService(s,ctx);
-        String[] orders = s.split("and");
-        String orderDescription = "";
-        Long orderTotal = Long.valueOf(0);
-        if(mAuth.getCurrentUser() != null &&(final_Confirmation != null) && s.contains("yes")){
-            OrderService orderService = new OrderService();
-            coffeeOrder.setUUID(mAuth.getUid());
-            String[] splitted = mAuth.getCurrentUser().getEmail().split("@");
+        if((s.contains("ready") || s.contains("confirm") ||
+                s.contains("order") || s.contains("done")) && confirmation == null){
+            // User is making an order
+            // Get the screen they have slided to
+            String qtyLarge = btnLarge.getNumber();
+            String qtySmall = btnSmall.getNumber();
+            Integer large_Quantity = Integer.parseInt(qtyLarge);
+            Integer small_Quantity = Integer.parseInt(qtySmall);
+            String userRequest = "";
 
-            coffeeOrder.setOrder_CustomerUsername(splitted[0]);
-            String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
-                    "ready.";
-            setupPlayButton(complete);
-            orderService.process_order(coffeeOrder,coffee_Order);
-            Intent x = new Intent(this, CustomerOrders.class);
-            startActivity(x);
-            finish();
-        }
-        else if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
-            // Placed their coffee order
-            String instruct = "Let's get you signed-in so I can put a face to the coffee";
-            setupPlayButton(instruct);
-            final_Confirmation = true;
-            Intent register = new Intent(this, RegisterCustomerActivity.class);
-            register.putExtra("sign_in","sign_in");
-            startActivity(register);
-        }else {
-            if(orders.length > 1){
-                int orderCount = orders.length;
-                for (int i = 0; i < orderCount; i++) {
-                    // Get the coffee name of the order
-                    String coffeeName = getCoffeeName(orders[i]);
-
-                    // Get quantity of coffee
-                    Integer quantity = speechProcessor.getCoffeeQuantity(s);
-                    // Get the size of the coffee order
-                    String size = speechProcessor.getCoffeeSize("prod",s);
-                    // Get the price of the order
-                    Long price = getCoffeePrice(coffeeName, size);
-                    if(price == null){
-                        price = Long.valueOf(0);
-                    }
-                    // Set the order description
-                    orderDescription = order_description + quantity + "x " + size + " " + coffeeName;
-                    if(i+1 != orderCount){
-                        order_description += ",";
-                    }
-                    // Increment the total
-                    orderTotal+=price;
-
-                }
-                coffeeOrder.setOrder_Total(orderTotal);
-                coffeeOrder.setOrder_Description(orderDescription);
-            }else {
-                // Get the coffee name of the order
-                String coffeeName = getCoffeeName(s);
-                // Get quantity of coffee
-                Integer quantity = speechProcessor.getCoffeeQuantity(s);
-                // Get the size of the coffee order
-                String size = speechProcessor.getCoffeeSize("prod",s);
-                // Get the price of the order
-                Long price = getCoffeePrice(coffeeName, size);
-
-                orderDescription = orderDescription + quantity + "x " + size + " " + coffeeName +
-                        ". The total is " + price + " rands";
-                coffeeOrder.setOrder_Total(price);
-                coffeeOrder.setOrder_Description(orderDescription);
-                //coffeeOrder.setOrder_Store("Okoa Coffee Co.");
-                coffeeOrder.setOrder_date(DateTime.now().toLocalDate().toString());
-                coffeeOrder.setOrder_State("requested");
-                // Ordered just one item
-
-                String confirmation = orderDescription + ". Is that correct?";
-                setupPlayButton(confirmation);
-            }
-        }
-    }
-    private Long getCoffeePrice(String coffeeName, String size) {
-        for (int i = 0; i < beveragesList.size(); i++) {
-            String beverage = beveragesList.get(i).getBeverage_name().toLowerCase();
-            if(beverage.contains(coffeeName)){
-                if(size.equals("small")){
-                    return beveragesList.get(i).getPrice_small();
+            if(large_Quantity >0 && small_Quantity > 0){
+                // Give me both large and small
+                Long price_small = beverage.getPrice_small();
+                Long price_lrg = beverage.getPrice_tall();
+                Long total = price_lrg+price_small;
+                order_description = large_Quantity + "x Tall" + beverage.getBeverage_name() + '\n'
+                        + small_Quantity + "x Small " +
+                        beverage.getBeverage_name();
+                userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
+                        small_Quantity + " small " +
+                        beverage.getBeverage_name() + ". Is that correct?";
+                coffeeOrder.setOrder_Description(order_description);
+                coffeeOrder.setOrder_Total(total);
+                coffeeOrder.setOrder_Store("Okoa Coffee Co.");
+            }else if(large_Quantity > 0){
+                // Give me a large
+                Long price_lrg = beverage.getPrice_tall();
+                Long lrg_Total = price_lrg*large_Quantity;
+                if(large_Quantity > 1){
+                    userRequest = "You've ordered " + large_Quantity + " Tall " + beverage.getBeverage_name() +"'s"
+                            +". Is that correct?";
+                    order_description = large_Quantity + "x Tall " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(lrg_Total);
                 }else {
-                    return beveragesList.get(i).getPrice_tall();
+                    userRequest = "You've ordered one large " + beverage.getBeverage_name()
+                            +". Is that correct?";
+                    order_description = large_Quantity + " Tall " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(lrg_Total);
                 }
             }
-        }
-        return null;
-    }
-
-    private String getCoffeeName(String order) {
-        String[] splittedOrder = order.split(" ");
-        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
-
-        for (int i = 0; i < tempOrder.size(); i++) {
-            String temp = tempOrder.get(i).toLowerCase();
-            if(coffeeNames.contains(temp)){
-                return temp;
+            else if(small_Quantity > 0){
+                // Give me a small
+                Long price_small = beverage.getPrice_small();
+                Long small_Total = price_small*small_Quantity;
+                if(small_Quantity > 1){
+                    userRequest = "You've ordered " + small_Quantity + " small "
+                            +beverage.getBeverage_name() + "'s"
+                            +". Is that correct?";
+                    order_description = small_Quantity + "x Small " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(small_Total);
+                }else {
+                    userRequest = "You've ordered one small "
+                            +beverage.getBeverage_name()
+                            +". Is that correct?";
+                    order_description = small_Quantity + " Small " + beverage.getBeverage_name();
+                    coffeeOrder.setOrder_Description(order_description);
+                    coffeeOrder.setOrder_Total(small_Total);
+                }
+            }
+            else {
+                // I haven't decided on anything
+                userRequest = "Seems like you've forgotten to specify how many " + beverage.getBeverage_name() +
+                        " you would like.";
+            }
+            setupPlayButton(userRequest);
+        }else if(s.contains("yes")){
+            confirmation = "yes";
+            if(mAuth.getCurrentUser() != null){
+                String account = "Give me a second to send your order to the Barista";
+                coffeeOrder.setUUID(mAuth.getUid());
+                coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
+                OrderService orderService = new OrderService();
+                orderService.process_order(coffeeOrder,coffee_Order);
+                Intent x = new Intent(this, OrderConfirmed.class);
+                startActivity(x);
+                finish();
+                setupPlayButton(account);
+            }else {
+                String confirm_account = "Let's get you signed in before wrapping this up";
+                setupPlayButton(confirm_account);
+                Intent sign_in = new Intent(this, LoginActivity.class);
+                sign_in.putExtra("sign_in","sign_in");
+                startActivity(sign_in);
+                final_Confirmation = true;
             }
         }
-        return "-1";
     }
+
     /**
      * Initialize amazon polly
      */

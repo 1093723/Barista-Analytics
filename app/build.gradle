@@ -75,7 +75,18 @@ dependencies {
 
 }
 
+
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.github.kt3k.coveralls'
+
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'connectedAndroidTest'
+    onlyIf { System.env.'CI' }
+}
 
 configurations.all {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
