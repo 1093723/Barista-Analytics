@@ -1,11 +1,11 @@
 package mini.com.baristaanalytics;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
@@ -70,13 +70,9 @@ import Services.SpeechProcessorService;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
-import utilities.SMS;
 import utilities.Upload;
-import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryCold;
-import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryHot;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryHot;
-import utilities.smsService;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
     private RecyclerView mRecyclerView;
@@ -129,6 +125,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //AWS Lex tools
     private String response_to_q;
     private ConnectivityReceiver connectivityReceiver;
+    Dialog helpDialog;
 
     // Order-related vars
     private String[] ready_to_order;
@@ -136,6 +133,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setupVoicesList();
+    }
+    public void help_tutorial(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.activity_help_tutorial_maps);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+
     }
 
     @Override
@@ -233,6 +243,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
         proceed = false;
+
+        helpDialog = new Dialog(this);
 
         checkConnection();
 

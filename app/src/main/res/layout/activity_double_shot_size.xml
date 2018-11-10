@@ -36,6 +36,7 @@
                 android:layout_centerHorizontal="true"
                 android:src="@drawable/ic_mic"
                 android:onClick="promptSpeechInput" />
+
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

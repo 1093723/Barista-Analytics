@@ -1,5 +1,6 @@
 package mini.com.baristaanalytics.Doubleshot;
 
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -49,6 +51,8 @@ public class DoubleshotCategoryHot extends AppCompatActivity {
     // Region of Amazon Polly.
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
+
+    Dialog helpDialog;
 
     private ImageButton btn;
     // AWS Media Player
@@ -92,11 +96,25 @@ public class DoubleshotCategoryHot extends AppCompatActivity {
         }
     }
 
+    public void help_tutorial_hot(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.help_tutorial_hot);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doubleshot_category_hot);
         Log.d(TAG,"onCreate:Activity Started");
+        helpDialog = new Dialog(this);
         this.ctx = this;
 
         initPollyClient();

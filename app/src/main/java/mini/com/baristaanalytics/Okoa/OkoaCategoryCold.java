@@ -1,6 +1,7 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -92,6 +93,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private List<Beverage> beveragesList;
     private List<String> coffeeNames;
 
+    Dialog helpDialog;
     /**
      * Firebase-related variables
      */
@@ -145,6 +147,19 @@ public class OkoaCategoryCold extends AppCompatActivity {
         }
     }
 
+    public void help_tutorial_cold(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.help_tutorial_cold);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,6 +168,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
+        helpDialog = new Dialog(this);
 
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override

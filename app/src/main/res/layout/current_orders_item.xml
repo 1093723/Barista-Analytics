@@ -14,14 +14,16 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="250dp"
             android:background="@drawable/wood_3">
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/image"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="10dp"
                 android:text="Name:"
@@ -33,6 +35,7 @@
                 android:id="@+id/name_surname_user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/title"
@@ -47,9 +50,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/title"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_marginTop="3dp"
+                android:layout_marginRight="16dp"
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:maxLines="20"
@@ -61,8 +66,13 @@
                 android:id="@+id/description_hard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/title"
-                android:layout_below="@+id/confirm_button"
+                android:layout_below="@+id/desc"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="134dp"
+                android:layout_weight="1"
+                android:autoSizeStepGranularity="2sp"
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:text="Description"
@@ -149,10 +159,11 @@
                 android:id="@+id/order_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/date_ordered"
-                android:visibility="gone"
                 android:layout_below="@+id/order_total"
-                android:text="Reject/Confirm" />
+                android:layout_alignStart="@+id/date_ordered"
+                android:gravity="center_horizontal"
+                android:text="Reject/Confirm"
+                android:visibility="gone" />
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

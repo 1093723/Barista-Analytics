@@ -1,6 +1,7 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,14 +36,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,7 +53,6 @@ import Services.OrderService;
 import Services.SpeechProcessorService;
 import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.CustomerOrders;
-import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
@@ -102,6 +99,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
 
     private Boolean accountExists;
     private Boolean isAnswered;
+
+    Dialog helpDialog;
     /**
      * Firebase-related variables
      */
@@ -155,6 +154,19 @@ public class OkoaCategoryHot extends AppCompatActivity {
         }
     }
 
+    public void help_tutorial_hot(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.help_tutorial_hot);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,6 +174,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
+        helpDialog = new Dialog(this);
         accountExists = false;
         checkAccount = false;
         isAnswered = false;
