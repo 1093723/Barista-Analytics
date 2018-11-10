@@ -1,6 +1,7 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +13,8 @@ import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +52,8 @@ import utilities.MessageItem;
 
 public class OkoaCategoryCold extends AppCompatActivity {
     private final String TAG = "OKOA_COLD_CATEGORY";
+    private Dialog helpDialog;
+
     /**
      * Bruce-related variables
      */
@@ -85,7 +86,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private OkoaColdMenuAdapter adapter;
-    private List<Beverage> models;
+    private List<Beverage> beverageList;
 
     /**
      * Firebase-related variables
@@ -101,6 +102,9 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private List<MessageItem> message_items = new ArrayList<>();
     // Media player
     private MediaPlayer mediaPlayer;
+
+    private List<String> coffeeNames;
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -144,6 +148,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
+        helpDialog = new Dialog(this);
+
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
@@ -155,12 +161,28 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beverage.getBeverage_category().equals("cold")){
-                        models.add(beverage);
+                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
+                    beverage.setBeverage_name(tempCoffeeName);
+                    if(beverageList.size() > 0){
+                        if(!beverageExists(beverage)){
+                            if(beverage.getBeverage_category().equals("cold")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                beverageList.add(beverage);
+                            }
+                        }
+                    }else {
+                        if(beverage.getBeverage_category().equals("cold")){
+                            String coffeeName = beverage.getBeverage_name().toLowerCase();
+                            beverage.setBeverage_name(coffeeName);
+                            coffeeNames.add(beverage.getBeverage_name());
+                            beverageList.add(beverage);
+                        }
                     }
                 }
 
-                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryCold.this);
+                adapter = new OkoaColdMenuAdapter(beverageList, OkoaCategoryCold.this);
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
@@ -168,10 +190,9 @@ public class OkoaCategoryCold extends AppCompatActivity {
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                            beverage = models.get(position);
-                            txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
-                            txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
+                        beverage = beverageList.get(position);
+                        txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
+                        txtViewPriceSmall.setText(beverage.getPrice_small().toString());
                     }
 
                     @Override
@@ -191,6 +212,29 @@ public class OkoaCategoryCold extends AppCompatActivity {
             }
         });
     }
+    private Boolean beverageExists(Beverage beverage){
+        for (int i = 0; i < beverageList.size(); i++) {
+            if(beverageList.get(i).getBeverage_name().equals(beverage.getBeverage_name())){
+                beverage.setBeverage_name(beverage.getBeverage_name());
+                // Update the array
+                beverageList.set(i,beverage);
+                return true;
+            }
+        }
+        return false;
+    }
+    public void help_tutorial_hot(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.help_tutorial_hot);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+    }
     /**
      * Initialize global variables to be used
      */
@@ -199,6 +243,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
         coffee_Order = database.getReference("OkoaCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuOkoa");
         mAuth = FirebaseAuth.getInstance();
+        coffeeNames = new ArrayList<>();
 
         btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
         btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
@@ -206,7 +251,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
 
         ctx = OkoaCategoryCold.this;
-        models = new ArrayList<>();
+        beverageList = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
     }
 

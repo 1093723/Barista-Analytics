@@ -1,6 +1,7 @@
 package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +15,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +49,6 @@ import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
 import Services.SpeechProcessorService;
-import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
@@ -59,6 +58,7 @@ import utilities.MessageItem;
 
 public class OkoaCategoryHot extends AppCompatActivity {
     private String TAG = "OKOA HOT";
+    private Dialog helpDialog;
     /**
      * Bruce-related variables
      */
@@ -90,7 +90,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private Beverage beverage;
     private ViewPager viewPager;
     private OkoaColdMenuAdapter adapter;
-    private List<Beverage> models;
+    private List<Beverage> beverageList;
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private TextView txtViewPriceSmall,txtViewPriceLarge;
@@ -155,52 +155,46 @@ public class OkoaCategoryHot extends AppCompatActivity {
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
+        helpDialog = new Dialog(this);
+
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
-                    if(beverage.getBeverage_category().equals("hot")){
-                        String coffeeName = beverage.getBeverage_name().toLowerCase();
-                        beverage.setBeverage_name(coffeeName);
-                        models.add(beverage);
-                        coffeeNames.add(beverage.getBeverage_name());                    }
+                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
+                    beverage.setBeverage_name(tempCoffeeName);
+                    if(beverageList.size() > 0){
+                        if(!beverageExists(beverage)){
+                            if(beverage.getBeverage_category().equals("hot")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                beverageList.add(beverage);
+                            }
+                        }
+                    }else {
+                        if(beverage.getBeverage_category().equals("hot")){
+                            String coffeeName = beverage.getBeverage_name().toLowerCase();
+                            beverage.setBeverage_name(coffeeName);
+                            coffeeNames.add(beverage.getBeverage_name());
+                            beverageList.add(beverage);
+                        }
+                    }
                 }
 
-                adapter = new OkoaColdMenuAdapter(models, OkoaCategoryHot.this);
+                adapter = new OkoaColdMenuAdapter(beverageList, OkoaCategoryHot.this);
 
                 viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
-                Integer[] colors_temp = {
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                        getResources().getColor(R.color.color30),
-                        getResources().getColor(R.color.color2),
-                        getResources().getColor(R.color.color3),
-                        getResources().getColor(R.color.color5),
-                };
-
-                colors = colors_temp;
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                        if(position < (adapter.getCount() - 1) && position < (colors.length - 1)){
-                            beverage = models.get(position);
+                            beverage = beverageList.get(position);
                             txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
-                            viewPager.setBackgroundColor((Integer) argbEvaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
-                        }
-                        else {
-                            viewPager.setBackgroundColor(colors[colors.length - 1]);
-                        }
                     }
                     @Override
                     public void onPageSelected(int position) {
@@ -218,7 +212,31 @@ public class OkoaCategoryHot extends AppCompatActivity {
             }
         });
     }
+    private Boolean beverageExists(Beverage beverage){
+        for (int i = 0; i < beverageList.size(); i++) {
+            if(beverageList.get(i).getBeverage_name().equals(beverage.getBeverage_name())){
+                beverage.setBeverage_name(beverage.getBeverage_name());
+                // Update the array
+                beverageList.set(i,beverage);
+                return true;
+            }
+        }
+        return false;
+    }
 
+
+    public void help_tutorial_hot(View v){
+        TextView textclose;
+        helpDialog.setContentView(R.layout.help_tutorial_hot);
+        textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
+        textclose.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                helpDialog.dismiss();
+            }
+        });
+        helpDialog.show();
+    }
     /**
      * Initialize variables to be used
      */
@@ -231,7 +249,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
         btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
         btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
-        models = new ArrayList<>();
+        beverageList = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
         database = FirebaseDatabase.getInstance();
         coffee_Order = database.getReference("OkoaCoffeeOrders");
@@ -420,13 +438,13 @@ public class OkoaCategoryHot extends AppCompatActivity {
         }
     }
     private Long getCoffeePrice(String coffeeName, String size) {
-        for (int i = 0; i < models.size(); i++) {
-            String beverage = models.get(i).getBeverage_name().toLowerCase();
+        for (int i = 0; i < beverageList.size(); i++) {
+            String beverage = beverageList.get(i).getBeverage_name().toLowerCase();
             if(beverage.contains(coffeeName)){
                 if(size.equals("small")){
-                    return models.get(i).getPrice_small();
+                    return beverageList.get(i).getPrice_small();
                 }else {
-                    return models.get(i).getPrice_tall();
+                    return beverageList.get(i).getPrice_tall();
                 }
             }
         }
