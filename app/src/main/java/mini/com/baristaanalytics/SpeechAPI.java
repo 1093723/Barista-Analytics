@@ -312,42 +312,6 @@ public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver
                     message_items.add(message_item);
                     Log.d(TAG, "The array size is: " + message_items.size());
                     initRecyclerView();
-                    SpeechProcessorService speechProcessorService = new SpeechProcessorService(result.get(0),ctx);
-
-                    if(speechProcessorService.isOkoaRequested()){
-                        setupPlayButton("You'd like Okoa wouldn't you?");
-                    }else if(speechProcessorService.isSupportedCoffeePlace()){
-                        setupPlayButton("Now showing supported coffee places");
-                    }else {
-                        setupPlayButton("I didn't quite get that.");
-                    }
-                    // Say anything related to 'like' or 'coffee' to trigger the maps
-//                    if(result.get(0).contains("like") && result.get(0).contains("coffee")){
-//                        Intent x = new Intent(this, MapsActivity.class);
-//                        String toSpeak = "Proceeding to user registration";
-//                        MessageItem message = new MessageItem(toSpeak);
-//                        message_items.add(message);
-//                        //Trigger AWS Polly
-//                        setupPlayButton("We're Almost There");
-//                        startActivity(x);
-//                        finish();
-//                    }
-//                    else if((result.get(0).contains("registration") ||
-//                            result.get(0).contains("register")) &&
-//                            (result.get(0).contains("user") || result.get(0).contains("customer"))){
-//                        Intent x = new Intent(this, RegisterCustomerActivity.class);
-//                        String toSpeak = "Let's get you signed in so you can order coffee";
-//                        setupPlayButton(toSpeak);
-//                        startActivity(x);
-//                    }else if((result.get(0).contains("registration") ||
-//                            result.get(0).contains("register")) &&
-//                            (result.get(0).contains("admin") || result.get(0).contains("administrator"))){
-//                        Intent x = new Intent(this, RegisterAdminActivity.class);
-//                        String toSpeak = "Proceeding to administrator registration";
-//                        setupPlayButton(toSpeak);
-//                        startActivity(x);
-//                    }
-                    //message.setText(message_items.size());
                 }
                 break;
             }

@@ -330,6 +330,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
      */
     void setupNewMediaPlayer() {
         mediaPlayer = new MediaPlayer();
+
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -354,7 +355,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
     }
 
     private void decodeUserInput(String s) {
-        SpeechProcessorService speechProcessor= new SpeechProcessorService(s,ctx);
+        /*SpeechProcessorService speechProcessor= new SpeechProcessorService(s,ctx);
         String[] orders = s.split("and");
         String orderDescription = "";
         Long orderTotal = Long.valueOf(0);
@@ -461,7 +462,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
                 return temp;
             }
         }
-        return "-1";
+        return "-1";*/
     }
     /**
      * Initialize amazon polly

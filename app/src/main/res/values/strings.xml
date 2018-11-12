@@ -28,67 +28,46 @@
 
     <string name="google_maps_API_key" templateMergeStrategy="preserve" translatable="false">AIzaSyA2SICyg9ZYnWhTMO0leH4YJvwEvDgp_U0</string>
 
-    <!-- Order-Related arrays and attributes -->
-    <string-array name="promptOrder">
-        <item>I would like to make an order</item>
-        <item>I would like to make an order</item>
-        <item>I would like some coffee</item>
-        <item>I would like some coffee</item>
-    </string-array>
-    <string-array name="beverageName">
-        <item>What beverage would you like?</item>
-        <item>What do you feel like?</item>
-        <item>Which beverage would you prefer?</item>
-    </string-array>
-    <string-array name="beverageSize">
-        <item>Which size would you like?</item>
-        <item>Which size would you prefer?</item>
-    </string-array>
-    <string-array name="beverageType">
-        <item>Cold drink for the scorching heat?</item>
-        <item>What do you think about having a warm beverage as your first cup for the day?</item>
-        <item>I suggest something cold to cool you down. Do you agree?</item>
-    </string-array>
-    <string-array name="beverageQuantity">
-        <item>Drinking for two?</item>
-        <item>How many of those will you like?</item>
-    </string-array>
-    <!-- Request which coffee places are supported -->
-    <string-array name="isSupportedCoffeePlaces">
-        <item>available</item>
-        <item>show</item>
-        <item>like coffee</item>
-        <item>have coffee</item>
-        <item>cup</item>
-        <item>places</item>
+    <string-array name="userGreetings">
+        <item>Hey</item>
+        <item>Hi</item>
+        <item>Hello</item>
+        <item>Bruce</item>
     </string-array>
 
-    <!-- Ask Bruce to recommend the best coffee place recommendation -->
-    <string-array name="isRecommended">
-        <item>best available</item>
-        <item>recommend</item>
-        <item>what coffee</item>
-        <item>which coffee</item>
-        <item>unsure</item>
+    <string-array name="helpHotwordList">
+        <item>help</item>
+        <item>useless</item>
+        <item>frustrated</item>
+        <item>frustrating</item>
+        <item>what can</item>
+        <item>never using</item>
+        <item>what to do</item>
+        <item>useless</item>
+        <item>lost</item>
+        <item>confused</item>
+        <item>confusing</item>
     </string-array>
-    <!-- Request to order from Okoa -->
-    <string-array name="isOkoaRequested">
+
+    <string-array name="requestOkoaHotwordList">
+        <item>agora</item>
         <item>okoa</item>
-        <item>koa</item>
-        <item>core</item>
         <item>aqua</item>
-        <item>over</item>
         <item>ok</item>
-        <item>makeover</item>
-        <item>a call</item>
-        <item>a car</item>
+        <item>cocoa</item>
+        <item>coco</item>
+        <item>car</item>
+        <item>cooler</item>
+        <item>iziko</item>
+        <item>moco</item>
+        <item>call</item>
+        <item>ago</item>
+        <item>cause</item>
     </string-array>
-    <!-- Coffee Sizes -->
-    <string-array name="isCoffeeSize">
-        <item>small</item>
-        <item>tall</item>
-        <item>medium</item>
-    </string-array><!-- Coffee Sizes -->
+
+
+
+
 
 
     =======
