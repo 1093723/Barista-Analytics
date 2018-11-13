@@ -1,5 +1,7 @@
 package Model;
 
+import android.util.Log;
+
 public class Barista {
     private String name;
     private String AddressLine;
@@ -10,6 +12,16 @@ public class Barista {
     private String open_Hours_Saturday;
     private String close_hours_Saturday;
     private String is_Open_Sunday;
+    private Long Rating;
+
+    public Long getRating() {
+        return Rating;
+    }
+
+    public void setRating(Long rating) {
+        Rating = rating;
+    }
+
 
     public String getName() {
         return name;

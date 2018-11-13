@@ -30,6 +30,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -187,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public View getInfoContents(Marker marker) {
                     View v = getLayoutInflater().inflate(R.layout.activity_view_place, null);
                     TextView placeName = v.findViewById(R.id.place_name);
-
+                    RatingBar ratingBar = v.findViewById(R.id.ratingBar);
                     place = marker.getTitle();
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                     StrictMode.setThreadPolicy(policy);
@@ -199,6 +200,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String address = "https://b.zmtcdn.com/data/pictures/6/18276956/313e117fe15fdcc7d54248298062f7b9_featured_v2.jpg";
                         final TextView txtView  = v.findViewById(R.id.place_address);
                         txtView.setText(okoa_coffee_place);
+                        ratingBar.setRating(mapsServices.getLocations().get(0).getRating());
                         try {
 
                             URL url = new URL(address);
@@ -211,7 +213,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String double_coffee_place = "15 Melle Street, Corner, Juta St, Braamfontein";
                         final TextView txtView  = v.findViewById(R.id.place_address);
                         txtView.setText(double_coffee_place);
-
+                        ratingBar.setRating(mapsServices.getLocations().get(1).getRating());
                         try {
 
                             URL url = new URL(address);

@@ -44,21 +44,10 @@ public class MapsServices {
     public void process_locations(DataSnapshot dataSnapshot) {
         Integer id = 1;
         for(DataSnapshot ds: dataSnapshot.getChildren()){
-            //String value = ds.getValue(String.class);
-            Log.d(TAG, "Value is: " + ds.toString());
             if(ds.getKey().equals(id.toString())){
                 Barista barista = ds.getValue(Barista.class);
-                Log.d(TAG, "Value is: " + barista.toString());
-                /*barista.setName(ds.getValue(id.toString()).getValue(Barista.class).getName());
-                barista.setAddressLine(ds.child(id.toString()).getValue(Barista.class).getAddressLine());
-                barista.setContactNumber(ds.child(id.toString()).getValue(Barista.class).getContactNumber());
-                barista.setOpen_Hours_Midweek(ds.child(id.toString()).getValue(Barista.class).getOpen_Hours_Midweek());
-                barista.setClose_Hours_midweek(ds.child(id.toString()).getValue(Barista.class).getClose_Hours_midweek());
-                barista.setIs_Open_Saturday(ds.child(id.toString()).getValue(Barista.class).getIs_Open_Saturday());
-                barista.setClose_hours_Saturday(ds.child(id.toString()).getValue(Barista.class).getOpen_Hours_Saturday());
-                barista.setClose_Hours_midweek(ds.child(id.toString()).getValue(Barista.class).getClose_hours_Saturday());
-                *///barista.setIs_Open_Sunday(ds.child(id.toString()).getValue(Barista.class).getIs_Open_Sunday());
                 this.locations.add(barista);
+                Log.i(TAG,barista.getRating().toString());
             }
             id+=1;
         }
