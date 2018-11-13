@@ -134,6 +134,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Boolean isHotOrColdQuestionOkoa;
     // Variables related to interacting with Bruce
     private SpeechProcessorService speechProcessorService;
+    private Intent toOkoaHotCategory,toOkoaColdCategory,toDoubleshotHotCategory,
+                    toDoubleshotColdCategory;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -339,6 +341,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      *This is for searching for available coffee places
      */
     private void init(){
+        toOkoaColdCategory = new Intent(this,OkoaCategoryCold.class);
+        toOkoaHotCategory = new Intent(this,OkoaCategoryHot.class);
+        toDoubleshotHotCategory = new Intent(this,DoubleshotCategoryHot.class);
+        toDoubleshotColdCategory = new Intent(this,DoubleshotCategoryCold.class);
         isHotOrColdQuestionDoubleshot = false;
         isHotOrColdQuestionOkoa = false;
         speechProcessorService = new SpeechProcessorService();        ctx = this;
@@ -565,39 +571,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void decodeUserInput(String userInput) {
         String norm_input = userInput.toLowerCase();
+
         String okoa_or_doubleshot = "Would you like to place an order from Okoa Or Doubleshot";
+
         if(isOkoaOrDoubleshotHotDrink){
             // User responded to the Okoa/Doubleshot question
             Log.d(TAG,norm_input);
             if(speechProcessorService.isOkoaRequested(norm_input)){
-                setupPlayButton("Hot drinks from Okoa coming up");
-                Intent intent = new Intent(this, OkoaCategoryHot.class);
-                // Reset boolean checker
+                setupPlayButton("Hot drinks from Okoa coming up");// Reset boolean checker
                 isOkoaOrDoubleshotHotDrink = false;
-                startActivity(intent);
+                startActivity(toOkoaHotCategory);
             }else if(speechProcessorService.isDoubleshotRequested(norm_input)){
                 setupPlayButton("Doubleshot coming in hot. Get it? Cause you chose hot beverages " +
-                        "and I said coming in 'HOT'?");
-                Intent intent = new Intent(this, DoubleshotCategoryHot.class);
+                        "and I said coming in 'HOT' but the drinks are actually cold?");
                 // Reset boolean checker
                 isOkoaOrDoubleshotHotDrink = false;
-                startActivity(intent);
+                startActivity(toDoubleshotHotCategory);
             }else {
                 setupPlayButton("I didn't quite get that");
             }
         }else if(isOkoaOrDoubleshotColdDrink){
             // User responded to the Okoa/Doubleshot question
-            if(speechProcessorService.isHotBeverageRequired(norm_input)){
-                setupPlayButton("Hehe Okoa coming up");
-                Intent intent = new Intent(this, OkoaCategoryCold.class);
+            if(speechProcessorService.isOkoaRequested(norm_input)){
+                setupPlayButton("Cool drinks from Okoa coming up");
                 // Reset boolean checker
                 isOkoaOrDoubleshotColdDrink = false;
-                startActivity(intent);
+                startActivity(toOkoaColdCategory);
 
-            }else if(speechProcessorService.isColdBeverageRequired(norm_input)){
+            }else if(speechProcessorService.isDoubleshotRequested(norm_input)){
                 setupPlayButton("Doubleshot coming in hot. Get it?");
-                Intent intent = new Intent(this, DoubleshotCategoryCold.class);
-                startActivity(intent);
+                startActivity(toDoubleshotColdCategory);
                 // Reset boolean checker
                 isOkoaOrDoubleshotColdDrink = false;
             }else {
@@ -609,16 +612,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             // And take them to the respective menus
             if(speechProcessorService.isHotBeverageRequired(norm_input)){
                 // Take to Hot beverage menu Doubleshot
-                Intent doubleShotHot = new Intent(this,
-                        DoubleshotCategoryHot.class);
                 isHotOrColdQuestionDoubleshot = false;
-                startActivity(doubleShotHot);
+                startActivity(toDoubleshotHotCategory);
             }else if(speechProcessorService.isColdBeverageRequired(norm_input)){
                 // Take to cold doubleshot beverages
-                Intent doubleShotCold = new Intent(this,
-                        DoubleshotCategoryCold.class);
                 isHotOrColdQuestionDoubleshot = false;
-                startActivity(doubleShotCold);
+                startActivity(toDoubleshotColdCategory);
             }else {
                 // Check with user ro specify something hot or cold
                 // from doubleshot
@@ -627,24 +626,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 setupPlayButton(question);
             }
         }else if(isHotOrColdQuestionOkoa){
-            // User requested something from okoa
+            // User requested something from Okoa
             // Now we need to check if they ordered something hot or cold
             // And take them to the respective menus
             if(speechProcessorService.isHotBeverageRequired(norm_input)){
-                // Take to Hot beverage menu okoa
-                Intent okoaHot = new Intent(this,
-                        OkoaCategoryHot.class);
-                startActivity(okoaHot);
+                // Take to Hot beverage menu Okoa
+                isHotOrColdQuestionOkoa = false;
+                startActivity(toOkoaHotCategory);
             }else if(speechProcessorService.isColdBeverageRequired(norm_input)){
-                // Take to Cold beverage menu Doubleshot
-                Intent okoaCold = new Intent(this,
-                        OkoaCategoryCold.class);
-                startActivity(okoaCold);
+                // Take to Cold beverage menu Okoa
+                isHotOrColdQuestionOkoa = false;
+                startActivity(toOkoaColdCategory);
             }else {
                 // Check with user ro specify something hot or cold
                 // from okoa
                 String question = "Would you like something warm or cold" +
                         "from Okoa?";
+                Log.i(TAG, speechProcessorService.getRequestHotBeverages().get(1));
+                isHotOrColdQuestionOkoa = true;
                 setupPlayButton(question);
             }
         }else {
@@ -653,6 +652,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }else if(speechProcessorService.isHelpRequired(norm_input)){
                     setupPlayButton("I'll help you in a second");
                     help_tutorial(mRecyclerView);
+                }else if(speechProcessorService.isOkoaHot(norm_input)){
+                    // Handle smart order of Hot beverages from Okoa
+                    startActivity(toOkoaHotCategory);
+
+                }else if(speechProcessorService.isOkoaCold(norm_input)){
+                    // Handle smart order of Cold beverages from Okoa
+                    startActivity(toOkoaColdCategory);
+                }else if(speechProcessorService.isDoubleshotHot(norm_input)){
+                    // Handle smart order of hot beverages from Doubleshot
+                    startActivity(toDoubleshotHotCategory);
+                }else if(speechProcessorService.isDoubleshotCold(norm_input)){
+                    // Handle smart order of cold beverages from Doubleshot
+                    startActivity(toDoubleshotColdCategory);
                 }else if(speechProcessorService.isHotBeverageRequired(norm_input)){
                     setupPlayButton(okoa_or_doubleshot);
                     isOkoaOrDoubleshotHotDrink = true;
@@ -665,6 +677,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }else if(speechProcessorService.isOkoaRequested(norm_input)){
                     setupPlayButton("Would you like a hot or cold beverage from Okoa?");
                     isHotOrColdQuestionOkoa = true;
+                }else if(speechProcessorService.isAvailablePlaces(norm_input)){
+                    String supported = "I currently support these locations on the map." +
+                            "I hope they're near your address";
+                    setupPlayButton(supported);
+                    geoLocate(mapsServices.getLocations());
+                }else {
+                    Log.i(TAG,norm_input);
+                    setupPlayButton("I didn't quite get that");
                 }
         }
 
@@ -718,7 +738,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 // Set text to synthesize.
                                 .withText(welcome_message)
                                 // Set voice selected by the user.
-                                .withVoiceId(voices.get(33).getId())
+                                .withVoiceId(voices.get(36).getId())
                                 // Set format to MP3.
                                 .withOutputFormat(OutputFormat.Mp3);
 
@@ -751,7 +771,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 // Set text to synthesize.
                                 .withText(words)
                                 // Set voice selected by the user.
-                                .withVoiceId(voices.get(33).getId())
+                                .withVoiceId(voices.get(36).getId())
                                 // Set format to MP3.
                                 .withOutputFormat(OutputFormat.Mp3);
 
@@ -802,7 +822,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.reset();
+                mp.release();
+                setupNewMediaPlayer();
                 //setupNewMediaPlayer();
             }
         });

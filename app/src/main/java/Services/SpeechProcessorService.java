@@ -21,6 +21,7 @@ public class SpeechProcessorService {
     private List<String>requestHelp;
     private List<String>requestHotBeverages;
     private List<String>requestColdBeverages;
+    private List<String> requestAvailableCoffeePlaces;
 
     public List<String> getOkoaRequest() {
         return okoaRequest;
@@ -49,6 +50,12 @@ public class SpeechProcessorService {
     private String userInput;
     public SpeechProcessorService(){
         okoaRequest = new ArrayList<>();
+        requestHelp = new ArrayList<>();
+        requestColdBeverages = new ArrayList<>();
+        requestHotBeverages = new ArrayList<>();
+        requestAvailableCoffeePlaces = new ArrayList<>();
+        Greetings = new ArrayList<>();
+        doubleshotRequest = new ArrayList<>();
     }
 
     public void initializeAcceptedCommands(DataSnapshot dataSnapshot){
@@ -77,6 +84,9 @@ public class SpeechProcessorService {
             else if(command.getDescription().contains("cold")){
                 String[] coldbevs = command.getName().split(",");
                 requestColdBeverages = Arrays.asList(coldbevs);
+            }else if(command.getDescription().contains("available")){
+                String[] availPlaces = command.getName().split(",");
+                requestAvailableCoffeePlaces = Arrays.asList(availPlaces);
             }
         }
     }
@@ -89,7 +99,6 @@ public class SpeechProcessorService {
     public Boolean isGreeting(String input){
         String[] splitted = input.split(" ");
         int size = Greetings.size();
-        Log.d(TAG,input);
         for (int i = 0; i < size; i++) {
             Log.d(TAG,Greetings.get(i));
             for (int j = 0; j < splitted.length; j++) {
@@ -195,7 +204,66 @@ public class SpeechProcessorService {
         return false;
     }
 
+    /**
+     * Determines if the user requested a hot drink from Okoa
+     * @param input
+     * @return true if the user requested both
+     * @return false otherwise
+     */
+    public Boolean isOkoaHot(String input){
+        if(isOkoaRequested(input) && isHotBeverageRequired(input)){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Determines if the user requested a cold drink from Okoa
+     * @param input
+     * @return true if the user requested both
+     * @return false otherwise
+     */
+    public Boolean isOkoaCold(String input){
+        if(isOkoaRequested(input) && isColdBeverageRequired(input)){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Determines if the user requested a hot drink from Doubleshot
+     * @param input
+     * @return true if the user requested both
+     * @return false otherwise
+     */
+    public Boolean isDoubleshotHot(String input){
+        if(isDoubleshotRequested(input) && isHotBeverageRequired(input)){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Determines if the user requested a cold drink from Doubleshot
+     * @param input
+     * @return true if the user requested both
+     * @return false otherwise
+     */
+    public Boolean isDoubleshotCold(String input){
+        if(isDoubleshotRequested(input) && isColdBeverageRequired(input)){
+            return true;
+        }
+        return false;
+    }
 
-
-
+    public Boolean isAvailablePlaces(String input){
+        int size = requestAvailableCoffeePlaces.size();
+        String[] splitted = input.split(" ");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < splitted.length; j++) {
+                if(splitted[j].equals(
+                        requestAvailableCoffeePlaces.get(i))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
