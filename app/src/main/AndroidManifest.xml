@@ -38,26 +38,26 @@
             </intent-filter>
         </receiver>
 
-            <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
         </activity>
         <activity android:name=".MapsActivity" />
-        <activity android:name=".Registration.RegisterCustomerActivity" />
+        <activity android:name=".Account.LoginActivity" />
         <activity
-            android:name=".Okoa.OkoaCategoryHot" />
+            android:name=".Okoa.OkoaCategoryCold" />
         <activity
-            android:name=".Registration.RegisterAdminActivity"/>
+            android:name=".Account.RegisterAdminActivity"/>
         <activity
             android:name=".SpeechAPI"/>
-        <activity android:name=".ProcessOrderActivity" />
+        <activity android:name=".Order.ProcessOrderActivity" />
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".Okoa.OkoaCategoryCold" />
+        <activity android:name=".Okoa.OkoaCategoryHot" />
+        <activity android:name=".Account.RegisterCustomerActivity" />
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />

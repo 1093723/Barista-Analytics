@@ -15,6 +15,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +47,7 @@ import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
 import maes.tech.intentanim.CustomIntent;
-import mini.com.baristaanalytics.LoginActivity;
+import mini.com.baristaanalytics.Account.LoginActivity;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
@@ -54,7 +56,7 @@ import utilities.MessageItem;
 public class OkoaCategoryCold extends AppCompatActivity {
     private final String TAG = "OKOA_COLD_CATEGORY";
     private Dialog helpDialog;
-
+    private TableRow tableRow;
     /**
      * Bruce-related variables
      */
@@ -76,11 +78,11 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private String order_description;
     private Boolean final_Confirmation;
     private ElegantNumberButton btnSmall,btnLarge;
-
+    private ProgressBar progressBar;
     /**
      * Layout-related variables
      */
-    ViewPager viewPager;
+    private ViewPager viewPager;
     private Context ctx;
     private Beverage beverage;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
@@ -144,17 +146,44 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
         }
     }
+    class WaitingTime extends AsyncTask<Integer, Integer, String> {
 
+        @Override
+        protected String doInBackground(Integer... params) {
+            viewPager.setVisibility(View.GONE);
+            tableRow.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (int count = 1; count <= params[0]; count++) {
+                try {
+                    Thread.sleep(1000);
+                    publishProgress(count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+            viewPager.setVisibility(View.VISIBLE);
+            tableRow.setVisibility(View.VISIBLE);
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
-        helpDialog = new Dialog(this);
 
         initVariables();
         initPollyClient();
         setupNewMediaPlayer();
-
+        new WaitingTime().execute(6);
 
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
@@ -185,7 +214,6 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
                 adapter = new OkoaColdMenuAdapter(beverageList, OkoaCategoryCold.this);
 
-                viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -240,6 +268,10 @@ public class OkoaCategoryCold extends AppCompatActivity {
      * Initialize global variables to be used
      */
     private void initVariables() {
+        viewPager = findViewById(R.id.viewPager);
+        tableRow = findViewById(R.id.tblRowCoffeeCupParent);
+        helpDialog = new Dialog(this);
+        progressBar = findViewById(R.id.okoa_cold_progress);
         database = FirebaseDatabase.getInstance();
         coffee_Order = database.getReference("OkoaCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuOkoa");

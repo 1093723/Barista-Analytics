@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics;
+package mini.com.baristaanalytics.Account;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -44,9 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import maes.tech.intentanim.CustomIntent;
-import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
+import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MyApplication;
 
@@ -79,7 +78,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
-    private View mLoginFormView;
     Button mEmailSignInButton;
     // Sign in with email and password
     private FirebaseAuth mAuth;
@@ -123,7 +121,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
         checkConnection();
@@ -224,7 +221,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            //showProgress(true);
+            showProgress(true);
             mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -236,8 +233,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             Intent x = new Intent(ctx, OrderConfirmed.class);
                             startActivity(x);
                             finish();
+                            showProgress(false);
                         }
-                        showProgress(false);
                         if(from_order != null){
                             finish();
                         }
@@ -246,6 +243,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         //startActivity(x);
                     }else {
                         Toast.makeText(ctx,task.getException().getMessage(),Toast.LENGTH_LONG).show();
+                        showProgress(false);
                     }
                 }
             });
@@ -275,14 +273,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(
@@ -296,7 +287,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 

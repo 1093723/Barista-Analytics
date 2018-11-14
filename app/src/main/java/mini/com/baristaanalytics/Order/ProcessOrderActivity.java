@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics;
+package mini.com.baristaanalytics.Order;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 import java.net.URISyntaxException;
 
 import maes.tech.intentanim.CustomIntent;
+import mini.com.baristaanalytics.R;
 
 public class ProcessOrderActivity extends AppCompatActivity{
     private String TAG = "ProcessOrderActivity";

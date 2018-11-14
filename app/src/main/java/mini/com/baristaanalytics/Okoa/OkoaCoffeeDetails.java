@@ -44,7 +44,7 @@ import Model.Beverage;
 import Services.OrderService;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
+import mini.com.baristaanalytics.Account.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 
@@ -116,42 +116,6 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_coffee_details);
         Log.d(TAG,"onCreate(): Activity started");
-        btnLarge = (ElegantNumberButton) findViewById(R.id.number_button_large);
-        btnSmall = (ElegantNumberButton) findViewById(R.id.number_button_small);
-
-        this.ctx = this;
-        initPollyClient();
-        setupNewMediaPlayer();
-        //Create new intent with details of coffee
-        Intent intent = getIntent();
-        setValues(intent);
-        // need this for getting a user to register or
-        // check that the user is logged in so that we can process the order
-        mAuth = FirebaseAuth.getInstance();
-        databaseRef = FirebaseDatabase.getInstance().getReference("ORDER");
-        ImageView imageView = findViewById(R.id.app_bar_coffee_image);
-        TextView beverage_name_small = findViewById(R.id.beverage_name_small);
-        TextView beverage_name_tall = findViewById(R.id.beverage_name_tall);
-        TextView beverage_price_small = findViewById(R.id.beverage_price_small);
-        TextView beverage_price_tall = findViewById(R.id.beverage_price_large);
-        TextView beverage_description = findViewById(R.id.beverage_description);
-
-        FloatingActionButton buttonCart = findViewById(R.id.btnCart);
-        /*FloatingActionButton needs to either:
-            1. Send the user to the reigster activity so that they can register.
-                After registering, they need to login so we know that we get the UID
-
-            2. Confirm the order details in the OkoaDetailConfirmed activity (not created)
-                After that, send them to the OrderConfirmed page.
-         */
-
-        // Load the stuff into the new activity
-        Picasso.with(getBaseContext()).load(Uri.parse(beverageImage)).into(imageView);
-        beverage_name_tall.setText(beverageName + " - Tall");
-        beverage_name_small.setText(beverageName + " - Small");
-        beverage_price_small.setText(beveragePriceSmall);
-        beverage_price_tall.setText(beveragePriceTall);
-        beverage_description.setText(beverageDescription);
     }
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();

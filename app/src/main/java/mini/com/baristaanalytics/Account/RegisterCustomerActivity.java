@@ -1,13 +1,17 @@
-package mini.com.baristaanalytics.Registration;
+package mini.com.baristaanalytics.Account;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,15 +27,15 @@ import java.util.ArrayList;
 
 import Services.CustomerService;
 import Services.ActorsServiceHelper;
-import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import mini.com.baristaanalytics.R;
 
 public class RegisterCustomerActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    Context ctx;
-    DatabaseReference databaseCustomer;
-    Activity  activity;
+    private Context ctx;
+    private DatabaseReference databaseCustomer;
+    private Activity  activity;
+    private ProgressBar mProgressView;
     ArrayList<EditText>registrationDetails;
     private String beverageName,beverageDescription,beveragePriceSmall,beveragePriceTall,beverageImage;
     String from_order;
@@ -40,7 +44,7 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_register);
         this.ctx = this;
-
+        mProgressView = findViewById(R.id.signUp_progress);
         mAuth = FirebaseAuth.getInstance();
         Intent intent = getIntent();
         if(intent != null){
@@ -81,7 +85,7 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         registrationDetails.add(textPhone);
         /******************************************************************************************/
         ActorsServiceHelper helper = new ActorsServiceHelper();
-
+        showProgress(true);
         if(helper.validate_edittext(registrationDetails)){
             // No field is left empty
             if(helper.validate_password(textPassword,textConfirmPassword)){
@@ -97,6 +101,7 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                         String password = textPassword.getText().toString();
                         signUpWithUserNamePassword(email,password);
                     }else {
+                        showProgress(false);
                         Toast.makeText(ctx, "Please Check Your Connection And Try Again", Toast.LENGTH_LONG).show();
                     }
                 }else {
@@ -108,6 +113,7 @@ public class RegisterCustomerActivity extends AppCompatActivity {
 
     private boolean signUpWithUserNamePassword(String email, String password) {
         Boolean check = true;
+
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -118,9 +124,11 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                             if(from_order != null){
                                 Toast.makeText(ctx, "Welcome. You're now registered",
                                         Toast.LENGTH_LONG).show();
+                                showProgress(false);
                                 finish();
                             }
                             else{
+                                showProgress(false);
                                 Intent goToOkoaCoffeeDetails = new Intent(ctx,OkoaCoffeeDetails.class);
                                 goToOkoaCoffeeDetails.putExtra("beverage_name", beverageName);
                                 goToOkoaCoffeeDetails.putExtra("beverage_description", beverageDescription);
@@ -133,6 +141,7 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                             }
                         } else {
                             // If sign in fails, display a message to the user.
+                            showProgress(false);
                             if(task.getException() instanceof FirebaseAuthUserCollisionException){
                                 Toast.makeText(ctx, "Admin already exists",
                                         Toast.LENGTH_LONG).show();
@@ -156,5 +165,29 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         beveragePriceSmall = intent.getStringExtra("price_small");
         // String intent_price_medium = intent.getStringExtra("price_medium");
         beveragePriceTall = intent.getStringExtra("price_tall");
+    }
+
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 }

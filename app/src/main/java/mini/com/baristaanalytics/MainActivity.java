@@ -1,17 +1,12 @@
 package mini.com.baristaanalytics;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import maes.tech.intentanim.CustomIntent;
-import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
-import mini.com.baristaanalytics.Registration.RegisterAdminActivity;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
+import mini.com.baristaanalytics.Account.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 

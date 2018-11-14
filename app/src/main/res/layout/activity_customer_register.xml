@@ -1,19 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/coffee_background"
-    tools:context=".Registration.RegisterCustomerActivity"
-    android:orientation="vertical">
+    tools:context=".Account.RegisterCustomerActivity">
 
+    <ProgressBar
+        android:id="@+id/signUp_progress"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="9dp"
         android:layout_weight="0.5"
         android:orientation="vertical">
-
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,4 +178,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

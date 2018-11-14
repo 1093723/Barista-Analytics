@@ -15,6 +15,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,12 +37,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.joda.time.DateTime;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,12 +47,9 @@ import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
-import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
-import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
-import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 
@@ -95,6 +91,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private Integer[] colors = null;
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private TextView txtViewPriceSmall,txtViewPriceLarge;
+    private ProgressBar progressBar;
+    private TableRow tableRow;
 
     /**
      * Firebase-related variables
@@ -155,6 +153,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
         setContentView(R.layout.activity_okoa_category_hot);
         initVariables();
         initPollyClient();
+        new WaitingTime().execute(8);
         setupNewMediaPlayer();
         helpDialog = new Dialog(this);
 
@@ -187,7 +186,6 @@ public class OkoaCategoryHot extends AppCompatActivity {
 
                 adapter = new OkoaColdMenuAdapter(beverageList, OkoaCategoryHot.this);
 
-                viewPager = findViewById(R.id.viewPager);
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
                 viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -243,6 +241,9 @@ public class OkoaCategoryHot extends AppCompatActivity {
      */
     private void initVariables() {
         coffeeNames = new ArrayList<>();
+        tableRow = findViewById(R.id.tblRowCoffeeCupParent);
+        progressBar = findViewById(R.id.okoa_hot_progress);
+        viewPager = findViewById(R.id.viewPager);
 
         ctx = OkoaCategoryHot.this;
         mAuth = FirebaseAuth.getInstance();
@@ -568,5 +569,35 @@ public class OkoaCategoryHot extends AppCompatActivity {
         }
 
 
+    }
+
+    class WaitingTime extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            viewPager.setVisibility(View.GONE);
+            tableRow.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (int count = 1; count <= params[0]; count++) {
+                try {
+                    Thread.sleep(1000);
+                    publishProgress(count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+            viewPager.setVisibility(View.VISIBLE);
+            tableRow.setVisibility(View.VISIBLE);
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
     }
 }
