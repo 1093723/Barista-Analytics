@@ -12,13 +12,13 @@ public class Barista {
     private String open_Hours_Saturday;
     private String close_hours_Saturday;
     private String is_Open_Sunday;
-    private Long Rating;
+    private Float Rating;
 
-    public Long getRating() {
+    public Float getRating() {
         return Rating;
     }
 
-    public void setRating(Long rating) {
+    public void setRating(Float rating) {
         Rating = rating;
     }
 

@@ -59,42 +59,4 @@ public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<Cust
             orderSummary = itemView.findViewById(R.id.order_sum);        }
     }
 
-    /*
-    @Override
-    public int getCount() {
-        return coffeeOrders.size();
-    }
-
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view.equals(object);
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        layoutInflater = LayoutInflater.from(context);
-        View view = layoutInflater.inflate(R.layout.current_orders_item, container, false);
-
-
-    }
-
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((View) object);
-    }
-    private Bitmap getImageBitmap(String url) {
-        Bitmap bm = null;
-        try {
-            URL aURL = new URL(url);
-            URLConnection conn = aURL.openConnection();
-            conn.connect();
-            InputStream is = conn.getInputStream();
-            BufferedInputStream bis = new BufferedInputStream(is);
-            bm = BitmapFactory.decodeStream(bis);
-            bis.close();
-            is.close();
-        } catch (IOException e) {
-        }
-        return bm;
-    }*/
 }

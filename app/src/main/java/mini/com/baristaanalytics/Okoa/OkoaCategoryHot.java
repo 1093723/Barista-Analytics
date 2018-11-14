@@ -49,6 +49,7 @@ import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
 import Services.SpeechProcessorService;
+import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
@@ -255,7 +256,11 @@ public class OkoaCategoryHot extends AppCompatActivity {
         coffee_Order = database.getReference("OkoaCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuOkoa");
     }
-
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
+    }
     @Override
     public void onResume(){
         super.onResume();

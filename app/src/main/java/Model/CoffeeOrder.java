@@ -10,14 +10,6 @@ public class CoffeeOrder {
     private String order_date;
     private String order_State;
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getOrder_Store() {
         return order_Store;
     }

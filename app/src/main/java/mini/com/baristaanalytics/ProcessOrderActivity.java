@@ -1,5 +1,6 @@
 package mini.com.baristaanalytics;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,13 +11,17 @@ import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
+import maes.tech.intentanim.CustomIntent;
+
 public class ProcessOrderActivity extends AppCompatActivity{
-    public String TAG = "ProcessOrderActivity";
+    private String TAG = "ProcessOrderActivity";
+    private Context ctx;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_process_orders);
         Log.d(TAG,"onCreate: Activity started");
+        ctx = this;
         try {
             Intent place  = Intent.getIntentOld("MapsActivity");
             String x = place.getStringExtra("Okoa");
@@ -24,5 +29,11 @@ public class ProcessOrderActivity extends AppCompatActivity{
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
     }
 }

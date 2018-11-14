@@ -43,6 +43,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
+import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.Registration.RegisterCustomerActivity;
@@ -171,6 +172,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
+    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.

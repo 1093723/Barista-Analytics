@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import maes.tech.intentanim.CustomIntent;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
@@ -108,7 +109,11 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
         });
         helpDialog.show();
     }
-
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

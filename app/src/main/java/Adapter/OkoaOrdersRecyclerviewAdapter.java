@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
+import Model.Barista;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.R;
 
@@ -39,7 +41,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.name.setText(coffeeOrders.get(position).getOrder_CustomerUsername());
         holder.description.setText(coffeeOrders.get(position).getOrder_Description());
         holder.date_ordered.setText(coffeeOrders.get(position).getOrder_date());
@@ -74,6 +76,39 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
             @Override
             public void onClick(View v) {
                 rejectOrder(coffeeOrders.get(position));
+            }
+        });
+
+        holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                //updateRating(v,holder);
+            }
+        });
+    }
+    private void updateRating(Float rating, final ViewHolder holder){
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("COFFEEPLACES");
+        final Float lastRating  = rating;
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snap : dataSnapshot.getChildren()){
+                    Barista barista = snap.getValue(Barista.class);
+                    if(barista.getName().contains("Okoa")){
+                        Float avg = (barista.getRating() + lastRating)/2;
+                        barista.setRating(avg);
+                        holder.ratingBar.setRating(avg);
+                        String key = snap.getKey().toString();
+                        databaseReference.child(key).setValue(barista);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -119,10 +154,11 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
         public TextView message;
         public Button confirmed,rejected, order_status;
         public TextView date_ordered, description,name,orderSummary;
+        public RatingBar ratingBar;
         public ViewHolder(View itemView) {
             super(itemView);
 
-
+            ratingBar = itemView.findViewById(R.id.rating_coffee_order);
             confirmed = itemView.findViewById(R.id.confirm_button);
             rejected = itemView.findViewById(R.id.reject_button);
             order_status = itemView.findViewById(R.id.order_status);
@@ -132,43 +168,4 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
             date_ordered = itemView.findViewById(R.id.date_ordered);
             orderSummary = itemView.findViewById(R.id.order_sum);        }
     }
-
-    /*
-    @Override
-    public int getCount() {
-        return coffeeOrders.size();
-    }
-
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view.equals(object);
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        layoutInflater = LayoutInflater.from(context);
-        View view = layoutInflater.inflate(R.layout.current_orders_item, container, false);
-
-
-    }
-
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((View) object);
-    }
-    private Bitmap getImageBitmap(String url) {
-        Bitmap bm = null;
-        try {
-            URL aURL = new URL(url);
-            URLConnection conn = aURL.openConnection();
-            conn.connect();
-            InputStream is = conn.getInputStream();
-            BufferedInputStream bis = new BufferedInputStream(is);
-            bm = BitmapFactory.decodeStream(bis);
-            bis.close();
-            is.close();
-        } catch (IOException e) {
-        }
-        return bm;
-    }*/
 }

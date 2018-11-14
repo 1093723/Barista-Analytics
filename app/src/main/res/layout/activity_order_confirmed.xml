@@ -23,12 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/relLayout2"
-            android:layout_below="@id/current_orders"
-            android:background="@color/white">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/coffee_beans_light"/>
+            android:layout_below="@id/current_orders">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerViewConfirmed"
                 android:layout_width="match_parent"

@@ -68,6 +68,7 @@ import Model.Barista;
 import Adapter.ImageAdapter;
 import Services.MapsServices;
 import Services.SpeechProcessorService;
+import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryCold;
 import mini.com.baristaanalytics.Doubleshot.DoubleshotCategoryHot;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
@@ -313,6 +314,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
+    }
+
     /**
      * Callback will be triggered when there is change in
      * network connection
@@ -583,12 +591,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 setupPlayButton("Hot drinks from Okoa coming up");// Reset boolean checker
                 isOkoaOrDoubleshotHotDrink = false;
                 startActivity(toOkoaHotCategory);
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else if(speechProcessorService.isDoubleshotRequested(norm_input)){
                 setupPlayButton("Doubleshot coming in hot. Get it? Cause you chose hot beverages " +
                         "and I said coming in 'HOT' but the drinks are actually cold?");
                 // Reset boolean checker
                 isOkoaOrDoubleshotHotDrink = false;
                 startActivity(toDoubleshotHotCategory);
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else {
                 setupPlayButton("I didn't quite get that");
             }
@@ -599,12 +609,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Reset boolean checker
                 isOkoaOrDoubleshotColdDrink = false;
                 startActivity(toOkoaColdCategory);
-
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else if(speechProcessorService.isDoubleshotRequested(norm_input)){
                 setupPlayButton("Doubleshot coming in hot. Get it?");
+                isOkoaOrDoubleshotColdDrink = false;
                 startActivity(toDoubleshotColdCategory);
                 // Reset boolean checker
-                isOkoaOrDoubleshotColdDrink = false;
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else {
                 setupPlayButton("I didn't quite get that");
             }
@@ -616,10 +627,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Take to Hot beverage menu Doubleshot
                 isHotOrColdQuestionDoubleshot = false;
                 startActivity(toDoubleshotHotCategory);
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else if(speechProcessorService.isColdBeverageRequired(norm_input)){
                 // Take to cold doubleshot beverages
                 isHotOrColdQuestionDoubleshot = false;
                 startActivity(toDoubleshotColdCategory);
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else {
                 // Check with user ro specify something hot or cold
                 // from doubleshot
@@ -635,10 +648,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Take to Hot beverage menu Okoa
                 isHotOrColdQuestionOkoa = false;
                 startActivity(toOkoaHotCategory);
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else if(speechProcessorService.isColdBeverageRequired(norm_input)){
                 // Take to Cold beverage menu Okoa
                 isHotOrColdQuestionOkoa = false;
                 startActivity(toOkoaColdCategory);
+                CustomIntent.customType(ctx,"fadein-to-fadeout");
             }else {
                 // Check with user ro specify something hot or cold
                 // from okoa
@@ -657,16 +672,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }else if(speechProcessorService.isOkoaHot(norm_input)){
                     // Handle smart order of Hot beverages from Okoa
                     startActivity(toOkoaHotCategory);
+                    CustomIntent.customType(ctx,"fadein-to-fadeout");
 
                 }else if(speechProcessorService.isOkoaCold(norm_input)){
                     // Handle smart order of Cold beverages from Okoa
                     startActivity(toOkoaColdCategory);
+                    CustomIntent.customType(ctx,"fadein-to-fadeout");
                 }else if(speechProcessorService.isDoubleshotHot(norm_input)){
                     // Handle smart order of hot beverages from Doubleshot
                     startActivity(toDoubleshotHotCategory);
+                    CustomIntent.customType(ctx,"fadein-to-fadeout");
                 }else if(speechProcessorService.isDoubleshotCold(norm_input)){
                     // Handle smart order of cold beverages from Doubleshot
                     startActivity(toDoubleshotColdCategory);
+                    CustomIntent.customType(ctx,"fadein-to-fadeout");
                 }else if(speechProcessorService.isHotBeverageRequired(norm_input)){
                     setupPlayButton(okoa_or_doubleshot);
                     isOkoaOrDoubleshotHotDrink = true;

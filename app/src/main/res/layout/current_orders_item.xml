@@ -164,7 +164,14 @@
                 android:gravity="center_horizontal"
                 android:text="Reject/Confirm"
                 android:visibility="gone" />
-
+            <RatingBar
+                android:id="@+id/rating_coffee_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignStart="@+id/desc"
+                android:isIndicator="false"
+                android:rating="4" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

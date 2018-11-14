@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "mini.com.baristaanalytics"
-        minSdkVersion 20
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -72,6 +72,8 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation group: "com.twilio.sdk", name: "twilio", version: "7.27.0"
     implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'com.github.hajiyevelnur92:intentanimation:1.0'
+
 
 }
 

@@ -44,6 +44,7 @@ import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
 import Model.CoffeeOrder;
 import Services.OrderService;
+import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.LoginActivity;
 import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
@@ -291,6 +292,12 @@ public class OkoaCategoryCold extends AppCompatActivity {
             }
 
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
     }
 
     public void promptSpeechInput(View view) {
