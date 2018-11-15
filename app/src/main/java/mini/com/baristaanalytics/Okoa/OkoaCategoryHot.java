@@ -157,7 +157,7 @@ public class OkoaCategoryHot extends AppCompatActivity implements ConnectivityRe
         setContentView(R.layout.activity_okoa_category_hot);
         initVariables();
         initPollyClient();
-        new WaitingTime().execute(8);
+        new WaitingTime().execute(6);
         setupNewMediaPlayer();
         helpDialog = new Dialog(this);
 
@@ -596,8 +596,8 @@ public class OkoaCategoryHot extends AppCompatActivity implements ConnectivityRe
             progressBar.setVisibility(View.GONE);
             viewPager.setVisibility(View.VISIBLE);
             tableRow.setVisibility(View.VISIBLE);
-            tableRow.animate().alpha(1.0f).setDuration(10000);
-            viewPager.animate().alpha(1.0f).setDuration(10000);
+            tableRow.animate().alpha(1.0f).setDuration(12000);
+            viewPager.animate().alpha(1.0f).setDuration(12000);
         }
         @Override
         protected void onProgressUpdate(Integer... values) {
