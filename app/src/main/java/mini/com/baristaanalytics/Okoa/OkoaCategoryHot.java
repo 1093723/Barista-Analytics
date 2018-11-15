@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,8 +54,9 @@ import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
+import utilities.MyApplication;
 
-public class OkoaCategoryHot extends AppCompatActivity {
+public class OkoaCategoryHot extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener{
     private String TAG = "OKOA HOT";
     private Dialog helpDialog;
     /**
@@ -88,12 +91,13 @@ public class OkoaCategoryHot extends AppCompatActivity {
     private ViewPager viewPager;
     private OkoaColdMenuAdapter adapter;
     private List<Beverage> beverageList;
-    private Integer[] colors = null;
-    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private TextView txtViewPriceSmall,txtViewPriceLarge;
+
     private ProgressBar progressBar;
     private TableRow tableRow;
 
+    private RelativeLayout relativeLayout;
+    private AnimationDrawable animationDrawable;
     /**
      * Firebase-related variables
      */
@@ -240,6 +244,12 @@ public class OkoaCategoryHot extends AppCompatActivity {
      * Initialize variables to be used
      */
     private void initVariables() {
+        relativeLayout = findViewById(R.id.relLayoutConvo);
+        animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(2000);
+        animationDrawable.start();
+
         coffeeNames = new ArrayList<>();
         tableRow = findViewById(R.id.tblRowCoffeeCupParent);
         progressBar = findViewById(R.id.okoa_hot_progress);
@@ -262,54 +272,45 @@ public class OkoaCategoryHot extends AppCompatActivity {
         super.finish();
         CustomIntent.customType(ctx,"fadein-to-fadeout");
     }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
     @Override
-    public void onResume(){
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showToast(isConnected);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        animationDrawable.stop();
+        //unregisterReceiver(connectivityReceiver);
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    protected void onResume() {
         super.onResume();
-        /**
-         * Resume from the sign-in activity
-         */
-        // Check if the user is signed-ins
-        if(mAuth.getCurrentUser() != null ){
-            if(final_Confirmation != null){
-                if(final_Confirmation){
-                    // Get final confirmation from the user
-                    String userReq = "The total is " + coffeeOrder.getOrder_Total() +
-                            " rands. Is that in order?";
-                    setupPlayButton(userReq);
-                    final_Confirmation= false;
-                }
-                else {
-                    // User confirmed in previous call
-                    // 1. Register their order
-                    // 2. Take them to the order layout
-                    OrderService orderService = new OrderService();
-                    coffeeOrder.setUUID(mAuth.getUid());
-                    String[] splitted = mAuth.getCurrentUser().getEmail().split("@");
-
-                    coffeeOrder.setOrder_CustomerUsername(splitted[0]);
-                    String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
-                            "ready.";
-                    setupPlayButton(complete);
-                    orderService.process_order(coffeeOrder,coffee_Order);
-                    Intent x = new Intent(this, OrderConfirmed.class);
-                    startActivity(x);
-                    finish();
-                }
-            }else {
-                Toast.makeText(ctx, "Final confirmation null", Toast.LENGTH_SHORT).show();
-            }
-
+        setupNewMediaPlayer();
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+        if(animationDrawable != null){
+            animationDrawable.start();
         }
     }
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        //updateUI(currentUser);
-    }
+
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();
+
         if(isConnected){
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -317,6 +318,7 @@ public class OkoaCategoryHot extends AppCompatActivity {
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                     getString(R.string.speech_prompt));
+            animationDrawable.stop();
             try {
                 //initRecyclerView();
                 startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
@@ -594,6 +596,8 @@ public class OkoaCategoryHot extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             viewPager.setVisibility(View.VISIBLE);
             tableRow.setVisibility(View.VISIBLE);
+            tableRow.animate().alpha(1.0f).setDuration(10000);
+            viewPager.animate().alpha(1.0f).setDuration(10000);
         }
         @Override
         protected void onProgressUpdate(Integer... values) {

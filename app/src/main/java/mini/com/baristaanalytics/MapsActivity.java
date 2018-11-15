@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -31,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -117,19 +119,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     CognitoCachingCredentialsProvider credentialsProvider;
     private List<Voice> voices;
     // Amazon Polly permissions.
-    private static final String COGNITO_POOL_ID = "CHANGEME";
-
-    // Region of Amazon Polly.
-    private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
     //AWS Lex tools
-    private String response_to_q;
-    private ConnectivityReceiver connectivityReceiver;
-    Dialog helpDialog;
+    private Dialog helpDialog;
     private Boolean isOkoaOrDoubleshotHotDrink;
     private Boolean isOkoaOrDoubleshotColdDrink;
     private Boolean isHotOrColdQuestionDoubleshot;
@@ -138,6 +134,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SpeechProcessorService speechProcessorService;
     private Intent toOkoaHotCategory,toOkoaColdCategory,toDoubleshotHotCategory,
                     toDoubleshotColdCategory;
+    private RelativeLayout relativeLayout;
+    private AnimationDrawable animationDrawable;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -152,18 +150,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                /*if(place.contains("Okoa")){
-                    String Hot = "Would you like a hot one?";
-                    setupPlayButton(Hot);
-                    //Intent okoa = new Intent(MapsActivity.this, OkoaCategories.class);
-                    //startActivity(okoa);
-                }else if(place.contains("Doubleshot")){
-                    String Hot = "Would you like Something to cool a hot summer day?";
-                    setupPlayButton(Hot);
-                    //Intent doubleshot = new Intent(MapsActivity.this, DoubleshotCategories.class);
-                    //startActivity(doubleshot);
-
-                }*/
             } });
         if (mPermissionGranted) {
             // Permission granted by the user
@@ -286,8 +272,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v){
                 helpDialog.dismiss();
+                animationDrawable.start();
             }
         });
+        animationDrawable.stop();
         helpDialog.show();
 
     }
@@ -306,9 +294,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
+            if(animationDrawable != null){
+                animationDrawable.start();
+            }
             //this.btn.setClickable(true);
 
         } else {
+            if(animationDrawable != null){
+                animationDrawable.stop();
+            }
             message = "Sorry! Please connect to the internet to proceed";
             //this.btn.setClickable(false);
         }
@@ -320,7 +314,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.finish();
         CustomIntent.customType(ctx,"fadein-to-fadeout");
     }
-
+    @Override
+    protected void onStop(){
+        super.onStop();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
     /**
      * Callback will be triggered when there is change in
      * network connection
@@ -328,9 +327,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
-
+        setupNewMediaPlayer();
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
+        if(animationDrawable != null){
+            animationDrawable.start();
+        }
     }
 
     /**
@@ -345,12 +347,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onPause(){
         super.onPause();
+        animationDrawable.stop();
         //unregisterReceiver(connectivityReceiver);
     }
     /**
      *This is for searching for available coffee places
      */
     private void init(){
+        relativeLayout = findViewById(R.id.relLayoutConvo);
+        animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(2000);
+        animationDrawable.start();
         toOkoaColdCategory = new Intent(this,OkoaCategoryCold.class);
         toOkoaHotCategory = new Intent(this,OkoaCategoryHot.class);
         toDoubleshotHotCategory = new Intent(this,DoubleshotCategoryHot.class);
@@ -534,6 +542,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * */
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();
+
         if(isConnected){
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -541,6 +550,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                     getString(R.string.speech_prompt));
+            animationDrawable.stop();
             try {
                 //initRecyclerView();
                 startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);

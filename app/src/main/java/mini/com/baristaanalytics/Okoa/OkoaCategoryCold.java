@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,8 +54,9 @@ import mini.com.baristaanalytics.Order.OrderConfirmed;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
+import utilities.MyApplication;
 
-public class OkoaCategoryCold extends AppCompatActivity {
+public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener{
     private final String TAG = "OKOA_COLD_CATEGORY";
     private Dialog helpDialog;
     private TableRow tableRow;
@@ -70,6 +73,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
+    private RelativeLayout relativeLayout;
+    private AnimationDrawable animationDrawable;
     /**
      * Order-related variables
      */
@@ -169,6 +174,8 @@ public class OkoaCategoryCold extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             viewPager.setVisibility(View.VISIBLE);
             tableRow.setVisibility(View.VISIBLE);
+            tableRow.animate().alpha(1.0f).setDuration(10000);
+            viewPager.animate().alpha(1.0f).setDuration(10000);
         }
         @Override
         protected void onProgressUpdate(Integer... values) {
@@ -252,22 +259,30 @@ public class OkoaCategoryCold extends AppCompatActivity {
         }
         return false;
     }
-    public void help_tutorial_hot(View v){
+    public void help_tutorial(View v){
         TextView textclose;
-        helpDialog.setContentView(R.layout.help_tutorial_hot);
+        helpDialog.setContentView(R.layout.activity_help_tutorial_maps);
         textclose = (TextView) helpDialog.findViewById(R.id.Xclose);
         textclose.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 helpDialog.dismiss();
+                animationDrawable.start();
             }
         });
+        animationDrawable.stop();
         helpDialog.show();
+
     }
     /**
      * Initialize global variables to be used
      */
     private void initVariables() {
+        relativeLayout = findViewById(R.id.relLayoutConvo);
+        animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(2000);
+        animationDrawable.start();
         viewPager = findViewById(R.id.viewPager);
         tableRow = findViewById(R.id.tblRowCoffeeCupParent);
         helpDialog = new Dialog(this);
@@ -288,41 +303,39 @@ public class OkoaCategoryCold extends AppCompatActivity {
         coffeeOrder = new CoffeeOrder();
     }
 
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
     @Override
-    public void onResume(){
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showToast(isConnected);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        animationDrawable.stop();
+        //unregisterReceiver(connectivityReceiver);
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    protected void onResume() {
         super.onResume();
-        /**
-         * Resume from the sign-in activity
-         */
-        // Check if the user is signed-ins
-        if(mAuth.getCurrentUser() != null && confirmation!=null){
-            // User has logged in
-            if(final_Confirmation != null){
-                if(final_Confirmation){
-                    // Get final confirmation from the user
-                    String userReq = "The total is " + coffeeOrder.getOrder_Total() +
-                            " rands. Is that in order?";
-                    setupPlayButton(userReq);
-                    final_Confirmation= false;
-                }
-                else {
-                    // User confirmed in previous call
-                    // 1. Register their order
-                    // 2. Take them to the order layout
-                    OrderService orderService = new OrderService();
-                    coffeeOrder.setUUID(mAuth.getUid());
-                    String complete = "All complete. Hold tight while the Okoa Barista gets your order " +
-                            "ready.";
-                    setupPlayButton(complete);
-                    orderService.process_order(coffeeOrder,coffee_Order);
-                    Intent x = new Intent(this, OrderConfirmed.class);
-                    startActivity(x);
-                    finish();
-                }
-            }else {
-
-            }
-
+        setupNewMediaPlayer();
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+        if(animationDrawable != null){
+            animationDrawable.start();
         }
     }
 
@@ -334,6 +347,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
 
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();
+
         if(isConnected){
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -341,6 +355,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                     getString(R.string.speech_prompt));
+            animationDrawable.stop();
             try {
                 //initRecyclerView();
                 startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
@@ -388,95 +403,7 @@ public class OkoaCategoryCold extends AppCompatActivity {
      * @param s is the input string from the user
      */
     private void decodeUserInput(String s) {
-        if((s.contains("ready") || s.contains("confirm") ||
-                s.contains("order") || s.contains("done")) && confirmation == null){
-            // User is making an order
-            // Get the screen they have slided to
-            String qtyLarge = btnLarge.getNumber();
-            String qtySmall = btnSmall.getNumber();
-            Integer large_Quantity = Integer.parseInt(qtyLarge);
-            Integer small_Quantity = Integer.parseInt(qtySmall);
-            String userRequest = "";
 
-            if(large_Quantity >0 && small_Quantity > 0){
-                // Give me both large and small
-                Long price_small = beverage.getPrice_small();
-                Long price_lrg = beverage.getPrice_tall();
-                Long total = price_lrg+price_small;
-                order_description = large_Quantity + "x Tall" + beverage.getBeverage_name() + '\n'
-                        + small_Quantity + "x Small " +
-                        beverage.getBeverage_name();
-                userRequest = "Just to confirm. You've ordered " + large_Quantity + " large and " +
-                        small_Quantity + " small " +
-                        beverage.getBeverage_name() + ". Is that correct?";
-                coffeeOrder.setOrder_Description(order_description);
-                coffeeOrder.setOrder_Total(total);
-                coffeeOrder.setOrder_Store("Okoa Coffee Co.");
-            }else if(large_Quantity > 0){
-                // Give me a large
-                Long price_lrg = beverage.getPrice_tall();
-                Long lrg_Total = price_lrg*large_Quantity;
-                if(large_Quantity > 1){
-                    userRequest = "You've ordered " + large_Quantity + " Tall " + beverage.getBeverage_name() +"'s"
-                            +". Is that correct?";
-                    order_description = large_Quantity + "x Tall " + beverage.getBeverage_name();
-                    coffeeOrder.setOrder_Description(order_description);
-                    coffeeOrder.setOrder_Total(lrg_Total);
-                }else {
-                    userRequest = "You've ordered one large " + beverage.getBeverage_name()
-                            +". Is that correct?";
-                    order_description = large_Quantity + " Tall " + beverage.getBeverage_name();
-                    coffeeOrder.setOrder_Description(order_description);
-                    coffeeOrder.setOrder_Total(lrg_Total);
-                }
-            }
-            else if(small_Quantity > 0){
-                // Give me a small
-                Long price_small = beverage.getPrice_small();
-                Long small_Total = price_small*small_Quantity;
-                if(small_Quantity > 1){
-                    userRequest = "You've ordered " + small_Quantity + " small "
-                            +beverage.getBeverage_name() + "'s"
-                            +". Is that correct?";
-                    order_description = small_Quantity + "x Small " + beverage.getBeverage_name();
-                    coffeeOrder.setOrder_Description(order_description);
-                    coffeeOrder.setOrder_Total(small_Total);
-                }else {
-                    userRequest = "You've ordered one small "
-                            +beverage.getBeverage_name()
-                            +". Is that correct?";
-                    order_description = small_Quantity + " Small " + beverage.getBeverage_name();
-                    coffeeOrder.setOrder_Description(order_description);
-                    coffeeOrder.setOrder_Total(small_Total);
-                }
-            }
-            else {
-                // I haven't decided on anything
-                userRequest = "Seems like you've forgotten to specify how many " + beverage.getBeverage_name() +
-                        " you would like.";
-            }
-            setupPlayButton(userRequest);
-        }else if(s.contains("yes")){
-            confirmation = "yes";
-            if(mAuth.getCurrentUser() != null){
-                String account = "Give me a second to send your order to the Barista";
-                coffeeOrder.setUUID(mAuth.getUid());
-                coffeeOrder.setOrder_CustomerUsername(mAuth.getCurrentUser().getEmail());
-                OrderService orderService = new OrderService();
-                orderService.process_order(coffeeOrder,coffee_Order);
-                Intent x = new Intent(this, OrderConfirmed.class);
-                startActivity(x);
-                finish();
-                setupPlayButton(account);
-            }else {
-                String confirm_account = "Let's get you signed in before wrapping this up";
-                setupPlayButton(confirm_account);
-                Intent sign_in = new Intent(this, LoginActivity.class);
-                sign_in.putExtra("sign_in","sign_in");
-                startActivity(sign_in);
-                final_Confirmation = true;
-            }
-        }
     }
 
     /**
@@ -497,9 +424,15 @@ public class OkoaCategoryCold extends AppCompatActivity {
         String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
+            if(animationDrawable != null){
+                animationDrawable.start();
+            }
             //this.btn.setClickable(true);
 
         } else {
+            if(animationDrawable != null){
+                animationDrawable.stop();
+            }
             message = "Sorry! Please connect to the internet to proceed";
             //this.btn.setClickable(false);
         }

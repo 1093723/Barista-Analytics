@@ -26,6 +26,7 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:clipToPadding="false"
+            android:animateLayoutChanges="true"
             android:foregroundGravity="center"
             android:overScrollMode="never">
 
@@ -44,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
+            android:animateLayoutChanges="true"
             android:background="@android:color/transparent"
             android:id="@+id/tblRowCoffeeCupParent">
 
@@ -150,7 +152,9 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="35dp"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentBottom="true"
+            android:id="@+id/relLayoutConvo"
+            android:background="@drawable/animation_list">
 
             <ImageButton
                 android:id="@+id/btnSpeak"
@@ -170,7 +174,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="3dp"
                 android:layout_marginRight="3dp"
-                android:onClick="help_tutorial_cold"
+                android:onClick="help_tutorial"
                 android:src="@drawable/ic_help_outline_black_24dp"
                 android:tint="@color/white" />
 

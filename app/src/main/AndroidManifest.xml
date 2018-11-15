@@ -45,10 +45,10 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
         </activity>
-        <activity android:name=".MapsActivity" />
+        <activity android:name=".Okoa.OkoaCategoryHot" />
         <activity android:name=".Account.LoginActivity" />
         <activity
-            android:name=".Okoa.OkoaCategoryCold" />
+            android:name=".Order.OrderConfirmed" />
         <activity
             android:name=".Account.RegisterAdminActivity"/>
         <activity
@@ -56,13 +56,13 @@
         <activity android:name=".Order.ProcessOrderActivity" />
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
-        <activity android:name=".Okoa.OkoaCategoryHot" />
+        <activity android:name=".Okoa.OkoaCategoryCold" />
         <activity android:name=".Account.RegisterCustomerActivity" />
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
         <activity android:name=".Order.CustomerOrders" />
-        <activity android:name=".Order.OrderConfirmed" />
+        <activity android:name=".MapsActivity" />
     </application>
 
 </manifest>

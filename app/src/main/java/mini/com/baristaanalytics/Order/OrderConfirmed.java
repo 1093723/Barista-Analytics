@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -48,8 +50,9 @@ import Model.CoffeeOrder;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
+import utilities.MyApplication;
 
-public class OrderConfirmed extends AppCompatActivity {
+public class OrderConfirmed extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     private String TAG = "ORDER CONFIRMED";
     private Context ctx;
     // Speech to text
@@ -81,7 +84,8 @@ public class OrderConfirmed extends AppCompatActivity {
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
-
+    private RelativeLayout relativeLayout;
+    private AnimationDrawable animationDrawable;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -120,11 +124,52 @@ public class OrderConfirmed extends AppCompatActivity {
 
         }
     }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showToast(isConnected);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        animationDrawable.stop();
+        //unregisterReceiver(connectivityReceiver);
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupNewMediaPlayer();
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+        if(animationDrawable != null){
+            animationDrawable.start();
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_confirmed);
         Log.d(TAG,"onCreate:Activity Started");
+        relativeLayout = findViewById(R.id.relLayoutConvo);
+        animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(2000);
+        animationDrawable.start();
+
         ctx = OrderConfirmed.this;
         coffeeOrderArrayList = new ArrayList<>();
         //initPollyClient();
@@ -179,6 +224,7 @@ public class OrderConfirmed extends AppCompatActivity {
     public void promptSpeechInput(View view) {
         boolean isConnected = ConnectivityReceiver.isConnected();
         if(isConnected){
+            animationDrawable.start();
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -257,12 +303,19 @@ public class OrderConfirmed extends AppCompatActivity {
         String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
+            if(animationDrawable != null){
+                animationDrawable.start();
+            }
             //this.btn.setClickable(true);
 
         } else {
+            if(animationDrawable != null){
+                animationDrawable.stop();
+            }
             message = "Sorry! Please connect to the internet to proceed";
             //this.btn.setClickable(false);
         }
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
     /**
