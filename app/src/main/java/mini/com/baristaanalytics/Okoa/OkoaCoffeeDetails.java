@@ -36,7 +36,7 @@ import java.util.Locale;
 import Adapter.FoodViewHolder;
 import Model.Beverage;
 import Services.OrderService;
-import mini.com.baristaanalytics.Order.OrderConfirmed;
+import mini.com.baristaanalytics.Order.OrderConfirmedActivity;
 import mini.com.baristaanalytics.R;
 import mini.com.baristaanalytics.Account_Management.RegisterCustomerActivity;
 import utilities.ConnectivityReceiver;
@@ -159,7 +159,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
                 Long beveragePrice = Long.parseLong(beveragePriceTall);
                 //orderService.processOrder("Okoa",mAuth.getCurrentUser().getUid(),mAuth.getCurrentUser().getUid().toString(),"1",beverageName,beveragePrice,databaseRef);
 
-                Intent orderConfirmed = new Intent(OkoaCoffeeDetails.this,OrderConfirmed.class);
+                Intent orderConfirmed = new Intent(OkoaCoffeeDetails.this,OrderConfirmedActivity.class);
                 startActivity(orderConfirmed);
             }else {
                 Intent registrationPage = new Intent(OkoaCoffeeDetails.this, RegisterCustomerActivity.class);
@@ -209,7 +209,7 @@ public class OkoaCoffeeDetails extends AppCompatActivity {
         // Check what the user gave as input
         if(s.contains("yes") || s.contains("sure") || s.contains("right")
                 || s.contains("definitely")){
-            Intent confirmed = new Intent(this,OrderConfirmed.class);
+            Intent confirmed = new Intent(this,OrderConfirmedActivity.class);
             startActivity(confirmed);
         }
     }

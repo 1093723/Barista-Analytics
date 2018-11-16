@@ -1,6 +1,8 @@
 package mini.com.baristaanalytics.Order;
 
 import android.animation.ArgbEvaluator;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +10,12 @@ import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,17 +49,19 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.OkoaOrdersRecyclerviewAdapter;
-import Adapter.RecyclerViewAdapter;
 import Adapter.SectionsPagerAdapter;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
+
+import static utilities.MyApplication.CHANNEL_2_ID;
+
 /**
  *This is the admin-side of viewing and managing customer orders
  */
-public class OrderConfirmed extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+public class OrderConfirmedActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
 
     private String TAG = "ORDER CONFIRMED";
@@ -79,6 +86,8 @@ public class OrderConfirmed extends AppCompatActivity implements ConnectivityRec
     // Amazon Polly permissions.
     private static final String COGNITO_POOL_ID = "CHANGEME";
 
+    private NotificationManagerCompat notificationManager;
+
     // Region of Amazon Polly.
     private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
@@ -90,6 +99,8 @@ public class OrderConfirmed extends AppCompatActivity implements ConnectivityRec
     private MediaPlayer mediaPlayer;
     private RelativeLayout relativeLayout;
     private AnimationDrawable animationDrawable;
+
+    private Integer notificationCount;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -141,11 +152,13 @@ public class OrderConfirmed extends AppCompatActivity implements ConnectivityRec
     protected void onPause(){
         super.onPause();
         animationDrawable.stop();
+        notificationCount =0;
         //unregisterReceiver(connectivityReceiver);
     }
     @Override
     protected void onStop(){
         super.onStop();
+        notificationCount=0;
         mediaPlayer.stop();
         mediaPlayer.release();
     }
@@ -169,12 +182,14 @@ public class OrderConfirmed extends AppCompatActivity implements ConnectivityRec
         setContentView(R.layout.activity_order_confirmed);
         Log.d(TAG,"onCreate:Activity Started");
         relativeLayout = findViewById(R.id.relLayoutConvo);
+        notificationCount = 1;
         animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
         animationDrawable.setExitFadeDuration(2000);
         animationDrawable.start();
 
-        ctx = OrderConfirmed.this;
+        notificationManager = NotificationManagerCompat.from(this);
+        ctx = OrderConfirmedActivity.this;
         coffeeOrderArrayList = new ArrayList<>();
         //initPollyClient();
         database = FirebaseDatabase.getInstance();
@@ -186,7 +201,12 @@ public class OrderConfirmed extends AppCompatActivity implements ConnectivityRec
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
+
+                    if(!exists(coffeeOrder)){
+                        // Update to order status
                         coffeeOrderArrayList.add(coffeeOrder);
+                        notifyCustomers(coffeeOrder);
+                    }
                 }
                 initRecyclerView();
             }
@@ -198,6 +218,61 @@ public class OrderConfirmed extends AppCompatActivity implements ConnectivityRec
 
         //setupViewPager();
     }
+    private void notifyCustomers(CoffeeOrder coffeeOrder){
+            if(coffeeOrder.getOrder_State().equals("Ordered")){
+                sendNotification();
+                notificationCount+=1;
+        }
+    }
+    private boolean exists(CoffeeOrder coffeeOrder) {
+        Boolean flag = false;
+        if(coffeeOrderArrayList.size() >0){
+
+            for (int i = 0; i < coffeeOrderArrayList.size(); i++) {
+                CoffeeOrder temp = coffeeOrderArrayList.get(i);
+                if(
+                        coffeeOrder.getUUID().equals(temp.getUUID())
+                                && coffeeOrder.getOrder_date().equals(temp.getOrder_date())
+                        ){
+                    // This is a new coffee order(not in arraylist)
+                    // Need to check if the status is 'Ordered'
+                    return true;
+                }
+
+            }
+        }
+        return false;
+    }
+
+    private void sendNotification() {
+        String message = "New order received. Click to review and process this order";
+
+        String title = "Barista Analytics Order Update";
+        String notficationGroup = "Customer Orders";
+        Intent intent = new Intent(this,CustomerOrders.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0,intent,0);
+
+        Notification notification =  new NotificationCompat.Builder(
+                this,CHANNEL_2_ID)
+                .setSmallIcon(R.drawable.ic_current_orders)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(new NotificationCompat.InboxStyle()
+                        .setSummaryText(notificationCount + " New Orders")
+                )
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setContentIntent(pendingIntent)
+                .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
+                .setGroup(notficationGroup)
+                .setGroupSummary(true)
+                .build();
+
+        notificationManager.notify(1,notification);
+
+    }
+
     private void initRecyclerView(){
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewConfirmed);
         recyclerView.setHasFixedSize(true);

@@ -38,7 +38,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".Order.CustomerOrders">
+        <activity android:name=".Account_Management.LoginActivity">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
@@ -46,9 +46,9 @@
         </intent-filter>
         </activity>
         <activity android:name=".Okoa.OkoaCategoryHot" />
-        <activity android:name=".Account_Management.LoginActivity" />
+        <activity android:name=".Order.OrderConfirmedActivity" />
         <activity
-            android:name=".Order.OrderConfirmed" />
+            android:name=".Order.CustomerOrders" />
         <activity
             android:name=".Account_Management.RegisterAdminActivity"/>
         <activity
@@ -61,8 +61,8 @@
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
-        <activity android:name=".MainActivity" />
         <activity android:name=".MapsActivity" />
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>
