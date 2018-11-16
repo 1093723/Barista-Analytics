@@ -14,9 +14,12 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -81,11 +84,14 @@ import utilities.MessageItem;
 import utilities.MyApplication;
 import utilities.Upload;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,ConnectivityReceiver.ConnectivityReceiverListener{
+public class MapsActivity extends AppCompatActivity implements
+        OnMapReadyCallback,
+        ConnectivityReceiver.ConnectivityReceiverListener,
+        RecognitionListener{
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
     private Boolean proceed;
-
+    private String message;
     private List<Upload> mUploads;
     //Order Specific
     private String hot_cold_option;
@@ -121,7 +127,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Voice> voices;
     // Amazon Polly permissions.
     private AmazonPollyPresigningClient client;
-
+    private SpeechRecognizer speech = null;
+    private Intent recognizerIntent;
+    static final int REQUEST_PERMISSION_KEY = 1;
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
@@ -346,17 +354,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onNetworkConnectionChanged(boolean isConnected) {
         showToast(isConnected);
     }
-
-    @Override
-    protected void onPause(){
-        super.onPause();
-        animationDrawable.stop();
-        //unregisterReceiver(connectivityReceiver);
-    }
     /**
      *This is for searching for available coffee places
      */
     private void init(){
+        String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_KEY);
+        }
+
+
+        speech = SpeechRecognizer.createSpeechRecognizer(this);
+        speech.setRecognitionListener(this);
+        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,
+                "en");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
+                this.getPackageName());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
+        /*
+        Minimum time to listen in millis. Here 5 seconds
+         */
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 5000);
+        recognizerIntent.putExtra("android.speech.extra.DICTATION_MODE", true);
+
+        message= "";
         relativeLayout = findViewById(R.id.relLayoutConvo);
         animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
@@ -540,6 +565,132 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(animationDrawable != null) animationDrawable.stop();
+        if (speech != null) {
+            speech.destroy();
+            Log.d("Log", "destroy");
+        }
+
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+        Log.d("Log", "onBeginningOfSpeech");
+    }
+
+    @Override
+    public void onBufferReceived(byte[] buffer) {
+        Log.d("Log", "onBufferReceived: " + buffer);
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        Log.d("Log", "onEndOfSpeech");
+        decodeUserInput(message);
+    }
+
+    @Override
+    public void onError(int errorCode) {
+        String errorMessage = getErrorText(errorCode);
+        Log.d("Log", "FAILED " + errorMessage);
+        //progressBar.setVisibility(View.INVISIBLE);
+        //returnedText.setText(errorMessage);
+        //recordbtn.setEnabled(true);
+    }
+
+    @Override
+    public void onEvent(int arg0, Bundle arg1) {
+        Log.d("Log", "onEvent");
+    }
+
+    @Override
+    public void onPartialResults(Bundle arg0) {
+        Log.d("Log", "onPartialResults");
+
+        ArrayList<String> matches = arg0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String text = "";
+        /* To get all close matchs
+        for (String result : matches)
+        {
+            text += result + "\n";
+        }
+        */
+        text = matches.get(0); //  Remove this line while uncommenting above    codes
+        message = text;
+
+        //returnedText.setText(text);
+    }
+
+    @Override
+    public void onReadyForSpeech(Bundle arg0) {
+        Log.d("Log", "onReadyForSpeech");
+    }
+
+    @Override
+    public void onResults(Bundle results) {
+        Log.d("Log", "onResults");
+
+    }
+
+    @Override
+    public void onRmsChanged(float rmsdB) {
+        Log.d("Log", "onRmsChanged: " + rmsdB);
+        //progressBar.setProgress((int) rmsdB);
+
+    }
+
+    public static String getErrorText(int errorCode) {
+        String message;
+        switch (errorCode) {
+            case SpeechRecognizer.ERROR_AUDIO:
+                message = "Audio recording error";
+                break;
+            case SpeechRecognizer.ERROR_CLIENT:
+                message = "Client side error";
+                break;
+            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                message = "Insufficient permissions";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK:
+                message = "Network error";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
+                message = "Network timeout";
+                break;
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                message = "No match";
+                break;
+            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                message = "RecognitionService busy";
+                break;
+            case SpeechRecognizer.ERROR_SERVER:
+                message = "error from server";
+                break;
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                message = "No speech input";
+                break;
+            default:
+                message = "Didn't understand, please try again.";
+                break;
+        }
+        return message;
+    }
+
+
+    public  boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Showing google speech input dialog
      * */
@@ -547,7 +698,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         boolean isConnected = ConnectivityReceiver.isConnected();
 
         if(isConnected){
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            /*Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
@@ -561,7 +712,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.speech_not_supported),
                         Toast.LENGTH_SHORT).show();
-            }
+            }*/
+            speech.startListening(recognizerIntent);
+
         }else {
             showToast(isConnected);
         }

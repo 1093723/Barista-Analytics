@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import maes.tech.intentanim.CustomIntent;
-import mini.com.baristaanalytics.Account.LoginActivity;
+import mini.com.baristaanalytics.Account_Management.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 

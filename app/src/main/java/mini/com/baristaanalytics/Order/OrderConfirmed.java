@@ -51,8 +51,12 @@ import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
-
+/**
+ *This is the admin-side of viewing and managing customer orders
+ */
 public class OrderConfirmed extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+
+
     private String TAG = "ORDER CONFIRMED";
     private Context ctx;
     // Speech to text

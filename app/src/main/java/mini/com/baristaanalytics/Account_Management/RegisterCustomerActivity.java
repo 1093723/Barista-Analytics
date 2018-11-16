@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics.Account;
+package mini.com.baristaanalytics.Account_Management;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

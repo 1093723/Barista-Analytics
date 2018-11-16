@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics.Account;
+package mini.com.baristaanalytics.Account_Management;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -228,6 +228,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     if(task.isSuccessful()){
                         String email = mAuth.getCurrentUser().getEmail();
                         String hardCodedAdmin = "sonti96@live.co.uk";
+                        showProgress(false);
                         if(email.equals(hardCodedAdmin)){
                             // Administrator
                             Intent x = new Intent(ctx, OrderConfirmed.class);

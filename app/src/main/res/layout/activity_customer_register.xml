@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/coffee_background"
-    tools:context=".Account.RegisterCustomerActivity">
+    tools:context=".Account_Management.RegisterCustomerActivity">
 
     <ProgressBar
         android:id="@+id/signUp_progress"

@@ -1,7 +1,9 @@
 package Adapter;
 
+import android.app.Notification;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,10 +26,12 @@ import Model.Barista;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.R;
 
+import static utilities.MyApplication.CHANNEL_1_ID;
+
 public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrdersRecyclerviewAdapter.ViewHolder>{
 
     private List<CoffeeOrder> coffeeOrders;
-    private LayoutInflater layoutInflater;
+    private FirebaseAuth mAuth;
     private Context context;
 
     public OkoaOrdersRecyclerviewAdapter(List<CoffeeOrder> orders, Context context) {
@@ -37,6 +42,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.current_orders_item, parent, false);
+
         return new ViewHolder(v);
     }
 
@@ -82,10 +88,11 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
-                //updateRating(v,holder);
+                updateRating(v,holder);
             }
         });
     }
+
     private void updateRating(Float rating, final ViewHolder holder){
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                 .getReference("COFFEEPLACES");
@@ -115,6 +122,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
 
     private void confirmOrder(final CoffeeOrder coffeeOrder) {
         coffeeOrder.setOrder_State("Confirmed");
+
         UpdateDatabase(coffeeOrder);
     }
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/coffee_background9"
-    tools:context=".Account.LoginActivity"
+    tools:context=".Account_Management.LoginActivity"
     >
 
     <!-- Login progress -->
