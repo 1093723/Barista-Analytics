@@ -998,7 +998,6 @@ public class MapsActivity extends AppCompatActivity implements
     void setupVoicesList() {
         // Asynchronously get available Polly voices.
         new GetPollyVoices().execute();
-
     }
 
     /**

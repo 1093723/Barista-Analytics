@@ -9,7 +9,7 @@ public class CoffeeOrder {
     private Long order_Total;
     private String order_date;
     private String order_State;
-
+    private Float order_rating;
     public String getOrder_Store() {
         return order_Store;
     }
@@ -32,8 +32,9 @@ public class CoffeeOrder {
     }
 
     public CoffeeOrder() {
-        this.order_State = "Requested";
+        this.order_State = "Ordered";
         this.order_date =java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+        order_rating = Float.valueOf("0");
     }
 
     public String getOrder_date() {
@@ -81,5 +82,13 @@ public class CoffeeOrder {
 
     public void setOrder_CustomerUsername(String order_CustomerUsername) {
         this.order_CustomerUsername = order_CustomerUsername;
+    }
+
+    public Float getOrder_rating() {
+        return order_rating;
+    }
+
+    public void setOrder_rating(Float order_rating) {
+        this.order_rating = order_rating;
     }
 }

@@ -43,7 +43,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
+import Model.Customer;
 import maes.tech.intentanim.CustomIntent;
+import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmedActivity;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
@@ -235,6 +237,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             startActivity(x);
                             finish();
                             showProgress(false);
+                        }else {
+                            final Intent intent = new Intent(ctx,CustomerOrders.class);
+                            startActivity(intent);
                         }
                         if(from_order != null){
                             finish();

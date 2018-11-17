@@ -155,7 +155,6 @@ public class OkoaCategoryHot extends AppCompatActivity implements ConnectivityRe
         initPollyClient();
         new WaitingTime().execute(6);
         setupNewMediaPlayer();
-        helpDialog = new Dialog(this);
 
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
@@ -240,6 +239,8 @@ public class OkoaCategoryHot extends AppCompatActivity implements ConnectivityRe
      * Initialize variables to be used
      */
     private void initVariables() {
+        helpDialog = new Dialog(this);
+
         relativeLayout = findViewById(R.id.relLayoutConvo);
         animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
@@ -486,11 +487,8 @@ public class OkoaCategoryHot extends AppCompatActivity implements ConnectivityRe
         String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
-            //this.btn.setClickable(true);
-
         } else {
             message = "Sorry! Please connect to the internet to proceed";
-            //this.btn.setClickable(false);
         }
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }

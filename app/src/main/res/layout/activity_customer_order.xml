@@ -6,41 +6,67 @@
     android:layout_height="match_parent"
     tools:context=".Order.CustomerOrders">
 
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-        <TextView
-            android:id="@+id/current_orders"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Your Orders"
-            android:textSize="24dp" />
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/relLayout2"
-            android:layout_below="@id/current_orders"
-            android:background="@color/white">
-            <!--<ImageView
-                android:background="@drawable/coffee_beans_light"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />-->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerViewCustomerConfirmed"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true">
+                android:id="@+id/relLayout2"
+                android:layout_below="@id/current_orders"
+                android:background="@color/white"
+                android:layout_weight="8">
+                <ProgressBar
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:visibility="gone"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/cust_orders_progress"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sign Out"
+                    android:id="@+id/btnSignOut"
+                    android:onClick="sign_Out"
+                    />
 
-            </android.support.v7.widget.RecyclerView>
-        </RelativeLayout>
+                <!--<ImageView
+                    android:background="@drawable/coffee_beans_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />-->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerViewCustomerConfirmed"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/btnSignOut"
+                    >
 
-        <include layout="@layout/layout_bottom_bruce"
-            />
-    </RelativeLayout>
+                </android.support.v7.widget.RecyclerView>
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_weight="92"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/bruceCustomerOrder"
+                android:background="@drawable/animation_list">
+                <ImageButton
+                    android:id="@+id/btnSpeak"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:background="@null"
+                    android:onClick="promptSpeechInput"
+                    android:src="@drawable/ic_mic" />
+            </RelativeLayout>
+
+    </LinearLayout>
+
+
+
 
 </RelativeLayout>

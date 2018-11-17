@@ -2,6 +2,7 @@ package Adapter;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import Model.Barista;
 import Model.CoffeeOrder;
+import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
 
 import static utilities.MyApplication.CHANNEL_1_ID;
@@ -85,40 +87,11 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
             }
         });
 
-        holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
-                updateRating(v,holder);
-            }
-        });
+
+
+
     }
 
-    private void updateRating(Float rating, final ViewHolder holder){
-        final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
-                .getReference("COFFEEPLACES");
-        final Float lastRating  = rating;
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snap : dataSnapshot.getChildren()){
-                    Barista barista = snap.getValue(Barista.class);
-                    if(barista.getName().contains("Okoa")){
-                        Float avg = (barista.getRating() + lastRating)/2;
-                        barista.setRating(avg);
-                        holder.ratingBar.setRating(avg);
-                        String key = snap.getKey().toString();
-                        databaseReference.child(key).setValue(barista);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     private void confirmOrder(final CoffeeOrder coffeeOrder) {
         coffeeOrder.setOrder_State("Confirmed");
@@ -160,7 +133,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView message;
-        public Button confirmed,rejected, order_status;
+        public Button confirmed,rejected, order_status,sign_out;
         public TextView date_ordered, description,name,orderSummary;
         public RatingBar ratingBar;
         public ViewHolder(View itemView) {
@@ -170,7 +143,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
             confirmed = itemView.findViewById(R.id.confirm_button);
             rejected = itemView.findViewById(R.id.reject_button);
             order_status = itemView.findViewById(R.id.order_status);
-
+            sign_out = itemView.findViewById(R.id.btnSignOut);
             name = itemView.findViewById(R.id.name_surname_user);
             description = itemView.findViewById(R.id.description_hard);
             date_ordered = itemView.findViewById(R.id.date_ordered);

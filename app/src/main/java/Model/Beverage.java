@@ -4,6 +4,7 @@ public class Beverage {
     private String beverage_name;
     private String beverage_description;
     private String beverage_image;
+    private Float beverage_rating;
     private String beverage_category;
     private Long price_small;
     private String price_medium;
@@ -13,7 +14,7 @@ public class Beverage {
     }
 
     public Beverage(String beverage_name, String beverage_description, String beverage_image,
-                    String beverage_category, Long price_small, String price_medium, Long price_tall) {
+                    String beverage_category, Float beverage_rating,Long price_small, String price_medium, Long price_tall) {
         this.beverage_name = beverage_name;
         this.beverage_description = beverage_description;
         this.beverage_image = beverage_image;
@@ -21,6 +22,7 @@ public class Beverage {
         this.price_small = price_small;
         this.price_medium = price_medium;
         this.price_tall = price_tall;
+        this.beverage_rating = beverage_rating;
     }
 
     public String getBeverage_name() {
@@ -77,5 +79,13 @@ public class Beverage {
 
     public void setPrice_tall(Long price_tall) {
         this.price_tall = price_tall;
+    }
+
+    public Float getBeverage_rating() {
+        return beverage_rating;
+    }
+
+    public void setBeverage_rating(Float beverage_rating) {
+        this.beverage_rating = beverage_rating;
     }
 }

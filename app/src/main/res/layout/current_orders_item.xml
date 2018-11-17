@@ -172,6 +172,7 @@
                 android:layout_alignStart="@+id/desc"
                 android:isIndicator="false"
                 android:rating="4" />
+
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

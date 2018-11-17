@@ -3,9 +3,13 @@ package mini.com.baristaanalytics.Order;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.NotificationCompat;
@@ -16,8 +20,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,12 +33,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import Adapter.CustomerOrdersRecyclerviewAdapter;
 import Adapter.OkoaOrdersRecyclerviewAdapter;
 import Adapter.SectionsPagerAdapter;
 import Model.CoffeeOrder;
+import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
+import utilities.ConnectivityReceiver;
 
 import static utilities.MyApplication.CHANNEL_1_ID;
 
@@ -46,6 +57,18 @@ public class CustomerOrders extends AppCompatActivity {
     private NotificationManagerCompat notificationManager;
     private Context ctx;
     private String TAG = "CUSTOMER ORDERS";
+    private FirebaseAuth firebaseAuth;
+    private ProgressBar progressBar;
+    private RelativeLayout relativeLayout;
+    private AnimationDrawable animationDrawable;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        animationDrawable.stop();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +79,16 @@ public class CustomerOrders extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         coffeeOrderArrayList = new ArrayList<>();
         notificationManager = NotificationManagerCompat.from(this);
-
+        firebaseAuth = FirebaseAuth.getInstance();
         coffee_Order = database.getReference("OkoaCoffeeOrders");
-
+        progressBar = findViewById(R.id.cust_orders_progress);        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
+        relativeLayout = findViewById(R.id.bruceCustomerOrder);
+        animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(2000);
+        animationDrawable.start();
+        new WaitingTime().execute(3);
         coffee_Order.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -78,23 +108,47 @@ public class CustomerOrders extends AppCompatActivity {
             }
         });
     }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        updateUI(firebaseAuth);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(animationDrawable != null){
+            animationDrawable.start();
+        }
+        updateUI(firebaseAuth);
+    }
+
+    private void updateUI(FirebaseAuth firebaseAuth){
+        if(firebaseAuth.getCurrentUser() == null){
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
 
     private boolean exists(CoffeeOrder coffeeOrder) {
+        Boolean exists = false;
         if(coffeeOrderArrayList.size() >0){
             for (int i = 0; i < coffeeOrderArrayList.size(); i++) {
                 CoffeeOrder temp = coffeeOrderArrayList.get(i);
-                if(/*coffeeOrder.getOrder_Description().equals(temp.getOrder_Description())*/
-                        coffeeOrder.getUUID().equals(temp.getUUID())
+                if(coffeeOrder.getUUID().equals(temp.getUUID())
                         && coffeeOrder.getOrder_date().equals(temp.getOrder_date())
-                        && (!coffeeOrder.getOrder_State().equals(temp.getOrder_State()))
                         ){
-                    coffeeOrderArrayList.get(i).setOrder_State(coffeeOrder.getOrder_State());
-                    sendNotification(coffeeOrder.getOrder_State());
-                    return true;
+                    coffeeOrderArrayList.get(i).setOrder_rating(coffeeOrder.getOrder_rating());
+                    exists = true;
+                    if(!coffeeOrder.getOrder_State().equals(temp.getOrder_State())){
+                        sendNotification(coffeeOrder.getOrder_State());
+                        coffeeOrderArrayList.get(i).setOrder_State(coffeeOrder.getOrder_State());
+                    }
                 }
             }
         }
-        return false;
+        return exists;
     }
 
     private void sendNotification(String orderState) {
@@ -134,10 +188,107 @@ public class CustomerOrders extends AppCompatActivity {
     }
 
     private void initRecyclerView(){
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new CustomerOrdersRecyclerviewAdapter(coffeeOrderArrayList,this);
         recyclerView.setAdapter(adapter);
+    }
+
+    public void sign_Out(View view) {
+        firebaseAuth.signOut();
+        updateUI(firebaseAuth);
+    }
+
+    public void promptSpeechInput(View view) {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+
+        if(isConnected){
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                    getString(R.string.speech_prompt));
+            animationDrawable.stop();
+            try {
+                //initRecyclerView();
+                startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+            } catch (ActivityNotFoundException a) {
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.speech_not_supported),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            showToast(isConnected);
+        }
+
+    }
+
+    private void showToast(boolean isConnected) {
+        String message = "Checking";
+        if (isConnected) {
+            message = "Good! Connected to Internet";
+            //this.btn.setClickable(true);
+
+        } else {
+            message = "Sorry! Please connect to the internet to proceed";
+            //this.btn.setClickable(false);
+        }
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+    }
+
+    class WaitingTime extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            recyclerView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (int count = 1; count <= params[0]; count++) {
+                try {
+                    Thread.sleep(1000);
+                    publishProgress(count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            recyclerView.animate().alpha(1.0f).setDuration(12000);
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
+    }
+    class SignOutWait extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            recyclerView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (int count = 1; count <= params[0]; count++) {
+                try {
+                    Thread.sleep(1000);
+                    publishProgress(count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
     }
 }
