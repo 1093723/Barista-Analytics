@@ -2,12 +2,24 @@
     <string name="app_name">Barista Analytics</string>
     <string name="title_activity_login">Sign in</string>
 
+    <!-- Strings related to welcome screen -->
+
+    <string name="slide_1_title">Coffee Ordering, Redefined</string>
+    <string name="slide_1_desc">The Barista App introduces a new way of ordering coffee.</string>
+
+    <string name="slide_2_title">Coffee you want at your fingers</string>
+    <string name="slide_2_desc">View all available coffee places and their menus</string>
+
+    <string name="slide_3_title">Hello Bruce!</string>
+    <string name="slide_3_desc">Use your voice entirely to make an order. Try it.</string>
+
     <!-- Strings related to login -->
     <string name="prompt_email" translatable="false">Email</string>
     <string-array name="roles_array">
         <item>Admin</item>
         <item>Super Admin</item>
     </string-array>
+    <string name="button_get_started">LET\'S GO!</string>
 
     <string name="prompt_password">Password (optional)</string>
     <string name="action_sign_in">Sign in or register</string>
@@ -64,10 +76,6 @@
         <item>ago</item>
         <item>cause</item>
     </string-array>
-
-
-
-
 
 
     =======

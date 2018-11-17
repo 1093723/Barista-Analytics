@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mini.com.baristaanalytics">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -21,10 +22,11 @@
     <application
         android:name="utilities.MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_coffee_lover"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_coffee_lover_round"
         android:supportsRtl="true"
+        tools:replace="android:icon"
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -38,21 +40,18 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MainActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".main_video_intro">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".Okoa.OkoaCategoryHot" />
         <activity android:name=".Account.LoginActivity" />
-        <activity
-            android:name=".Order.OrderConfirmed" />
-        <activity
-            android:name=".Account.RegisterAdminActivity"/>
-        <activity
-            android:name=".SpeechAPI"/>
+        <activity android:name=".Order.OrderConfirmed" />
+        <activity android:name=".Account.RegisterAdminActivity" />
+        <activity android:name=".SpeechAPI" />
         <activity android:name=".Order.ProcessOrderActivity" />
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
@@ -63,6 +62,9 @@
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
         <activity android:name=".Order.CustomerOrders" />
         <activity android:name=".MapsActivity" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".user_profile" />
+        <activity android:name=".user_password_edit"></activity>
     </application>
 
 </manifest>
