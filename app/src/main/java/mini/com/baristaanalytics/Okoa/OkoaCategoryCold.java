@@ -10,12 +10,15 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -41,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -53,13 +57,18 @@ import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
 
-public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener{
+public class OkoaCategoryCold extends AppCompatActivity implements
+        ConnectivityReceiver.ConnectivityReceiverListener,
+        RecognitionListener {
     private final String TAG = "OKOA_COLD_CATEGORY";
     private Dialog helpDialog;
     private TableRow tableRow;
     /**
      * Bruce-related variables
      */
+    private ImageButton btnBruce;
+    private SpeechRecognizer speech = null;
+    private Intent recognizerIntent;
     private final int REQ_CODE_SPEECH_INPUT = 100;
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
@@ -75,10 +84,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
     /**
      * Order-related variables
      */
-    private CoffeeOrder coffeeOrder;
-    private String confirmation;
-    private String order_description;
-    private Boolean final_Confirmation;
     private ElegantNumberButton btnSmall,btnLarge;
     private ProgressBar progressBar;
     /**
@@ -148,43 +153,14 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
 
         }
     }
-    class WaitingTime extends AsyncTask<Integer, Integer, String> {
 
-        @Override
-        protected String doInBackground(Integer... params) {
-            viewPager.setVisibility(View.GONE);
-            tableRow.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
-
-            for (int count = 1; count <= params[0]; count++) {
-                try {
-                    Thread.sleep(1000);
-                    publishProgress(count);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return "Task Completed.";
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            progressBar.setVisibility(View.GONE);
-            viewPager.setVisibility(View.VISIBLE);
-            tableRow.setVisibility(View.VISIBLE);
-            tableRow.animate().alpha(1.0f).setDuration(10000);
-            viewPager.animate().alpha(1.0f).setDuration(10000);
-        }
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            progressBar.setProgress(values[0]);
-        }
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_cold);
-
         initVariables();
+        setupBruce();
+
         initPollyClient();
         setupNewMediaPlayer();
         new WaitingTime().execute(6);
@@ -271,10 +247,45 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
         helpDialog.show();
 
     }
+
+    private void setupBruce() {
+        progressBar.setVisibility(View.INVISIBLE);
+        speech = SpeechRecognizer.createSpeechRecognizer(this);
+        speech.setRecognitionListener(this);
+        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,
+                "en");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
+                this.getPackageName());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
+        /*
+        Minimum time to listen in millis. Here 5 seconds
+         */
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 5000);
+        recognizerIntent.putExtra("android.speech.extra.DICTATION_MODE", true);
+
+        btnBruce.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View p1)
+            {
+                progressBar.setVisibility(View.VISIBLE);
+                speech.startListening(recognizerIntent);
+                btnBruce.setEnabled(false);
+
+            }
+        });
+    }
+
     /**
      * Initialize global variables to be used
      */
     private void initVariables() {
+        btnBruce = findViewById(R.id.btnSpeak);
+
         relativeLayout = findViewById(R.id.relLayoutConvo);
         animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
@@ -297,7 +308,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
 
         ctx = OkoaCategoryCold.this;
         beverageList = new ArrayList<>();
-        coffeeOrder = new CoffeeOrder();
     }
 
     /**
@@ -313,13 +323,26 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
     protected void onPause(){
         super.onPause();
         animationDrawable.stop();
+        if (mediaPlayer!= null) mediaPlayer.release();
         //unregisterReceiver(connectivityReceiver);
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(ctx,"fadein-to-fadeout");
+        if (speech != null) {
+            speech.destroy();
+            mediaPlayer.release();
+            Log.d("Log", "destroy");
+        }
+    }
+
     @Override
     protected void onStop(){
         super.onStop();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        if (mediaPlayer!= null) mediaPlayer.release();
+
     }
     /**
      * Callback will be triggered when there is change in
@@ -331,52 +354,32 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
         setupNewMediaPlayer();
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
+        btnBruce.setClickable(true);
+        btnBruce.setEnabled(true);
         if(animationDrawable != null){
             animationDrawable.start();
         }
     }
 
     @Override
-    public void finish() {
-        super.finish();
-        CustomIntent.customType(ctx,"fadein-to-fadeout");
+    protected void onStart(){
+        super.onStart();
+        btnBruce.setEnabled(true);
+        btnBruce.setClickable(true);
     }
-
-    public void promptSpeechInput(View view) {
-        boolean isConnected = ConnectivityReceiver.isConnected();
-
-        if(isConnected){
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                    getString(R.string.speech_prompt));
-            animationDrawable.stop();
-            try {
-                //initRecyclerView();
-                startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-            } catch (ActivityNotFoundException a) {
-                Toast.makeText(getApplicationContext(),
-                        getString(R.string.speech_not_supported),
-                        Toast.LENGTH_SHORT).show();
-            }
-        }else {
-            showToast(isConnected);
-        }
-
-    }
-
     /**
      * AWS Polly Media Player
      */
     void setupNewMediaPlayer() {
         mediaPlayer = new MediaPlayer();
+        btnBruce.setEnabled(false);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mp.release();
-                setupNewMediaPlayer();
+                //setupNewMediaPlayer();
+                btnBruce.setEnabled(true);
+                //setupNewMediaPlayer();
             }
         });
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -389,20 +392,43 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
         mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
+                btnBruce.setEnabled(true);
                 //playButton.setEnabled(true);
                 return false;
             }
         });
+
     }
 
-    /**
-     * This method processes the input from a user in order to process an order
-     * @param s is the input string from the user
-     */
     private void decodeUserInput(String s) {
 
     }
+    private Long getCoffeePrice(String coffeeName, String size) {
+        for (int i = 0; i < beverageList.size(); i++) {
+            String beverage = beverageList.get(i).getBeverage_name().toLowerCase();
+            if(beverage.contains(coffeeName)){
+                if(size.equals("small")){
+                    return beverageList.get(i).getPrice_small();
+                }else {
+                    return beverageList.get(i).getPrice_tall();
+                }
+            }
+        }
+        return null;
+    }
 
+    private String getCoffeeName(String order) {
+        String[] splittedOrder = order.split(" ");
+        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
+
+        for (int i = 0; i < tempOrder.size(); i++) {
+            String temp = tempOrder.get(i).toLowerCase();
+            if(coffeeNames.contains(temp)){
+                return temp;
+            }
+        }
+        return "-1";
+    }
     /**
      * Initialize amazon polly
      */
@@ -421,20 +447,126 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
         String message = "Checking";
         if (isConnected) {
             message = "Good! Connected to Internet";
-            if(animationDrawable != null){
-                animationDrawable.start();
-            }
-            //this.btn.setClickable(true);
-
         } else {
-            if(animationDrawable != null){
-                animationDrawable.stop();
-            }
             message = "Sorry! Please connect to the internet to proceed";
-            //this.btn.setClickable(false);
         }
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
+
+    /*******************************************************
+     * Bruce Functionality : Speech To Text W/O Dialogue
+     ******************************************************/
+
+    @Override
+    public void onBeginningOfSpeech() {
+        Log.d("Log", "onBeginningOfSpeech");
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBufferReceived(byte[] buffer) {
+        Log.d("Log", "onBufferReceived: " + buffer);
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        Log.d("Log", "onEndOfSpeech");
+        progressBar.setVisibility(View.INVISIBLE);
+        btnBruce.setEnabled(true);
+//        decodeUserInput(userInput);
+//        Toast.makeText(ctx, userInput, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(int errorCode) {
+        String errorMessage = getErrorText(errorCode);
+        Log.d("Log", "FAILED " + errorMessage);
+        progressBar.setVisibility(View.INVISIBLE);
+        Log.i(TAG,errorMessage);
+        //returnedText.setText(errorMessage);
+        Toast.makeText(ctx, errorMessage, Toast.LENGTH_SHORT).show();
+        btnBruce.setEnabled(true);
+    }
+
+    @Override
+    public void onEvent(int arg0, Bundle arg1) {
+        Log.d("Log", "onEvent");
+    }
+
+    @Override
+    public void onPartialResults(Bundle arg0) {
+        Log.d("Log", "onPartialResults");
+
+        ArrayList<String> matches = arg0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String text = "";
+        /* To get all close matchs
+        for (String result : matches)
+        {
+            text += result + "\n";
+        }
+        */
+
+
+        //returnedText.setText(text);
+    }
+
+    @Override
+    public void onReadyForSpeech(Bundle arg0) {
+        Log.d("Log", "onReadyForSpeech");
+    }
+
+    @Override
+    public void onResults(Bundle results) {
+        Log.d("Log", "onResults");
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String text = matches.get(0); //  Remove this line while uncommenting above    codes
+        decodeUserInput(text);
+    }
+
+    @Override
+    public void onRmsChanged(float rmsdB) {
+        Log.d("Log", "onRmsChanged: " + rmsdB);
+        //progressBar.setProgress((int) rmsdB);
+
+    }
+
+    public static String getErrorText(int errorCode) {
+        String message;
+        switch (errorCode) {
+            case SpeechRecognizer.ERROR_AUDIO:
+                message = "Audio recording error";
+                break;
+            case SpeechRecognizer.ERROR_CLIENT:
+                message = "Client side error";
+                break;
+            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                message = "Insufficient permissions";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK:
+                message = "Network error";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
+                message = "Network timeout";
+                break;
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                message = "No match";
+                break;
+            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                message = "RecognitionService busy";
+                break;
+            case SpeechRecognizer.ERROR_SERVER:
+                message = "error from server";
+                break;
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                message = "No speech input";
+                break;
+            default:
+                message = "Didn't understand, please try again.";
+                break;
+        }
+        return message;
+    }
+
     /**
      * Setup responding to the user
      */
@@ -448,7 +580,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
                             // Set text to synthesize.
                             .withText(words)
                             // Set voice selected by the user.
-                            .withVoiceId(voices.get(33).getId())
+                            .withVoiceId(voices.get(36).getId())
                             // Set format to MP3.
                             .withOutputFormat(OutputFormat.Mp3);
 
@@ -459,7 +591,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
             Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
 
             // Create a media player to play the synthesized audio stream.
-            if (mediaPlayer.isPlaying()) {
+            if (!mediaPlayer.isPlaying()) {
                 setupNewMediaPlayer();
             }
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -503,10 +635,42 @@ public class OkoaCategoryCold extends AppCompatActivity implements ConnectivityR
 
             // Log a message with a list of available TTS voices.
             Log.i(TAG, "Available Polly voices: " + voices);
-
+            setupPlayButton("Let's get Something to cool down the summer heat from Okoa");
             return null;
         }
 
 
+    }
+
+    class WaitingTime extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            viewPager.setVisibility(View.GONE);
+            tableRow.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (int count = 1; count <= params[0]; count++) {
+                try {
+                    Thread.sleep(1000);
+                    publishProgress(count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+            viewPager.setVisibility(View.VISIBLE);
+            tableRow.setVisibility(View.VISIBLE);
+            tableRow.animate().alpha(1.0f).setDuration(12000);
+            viewPager.animate().alpha(1.0f).setDuration(12000);
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
     }
 }

@@ -34,6 +34,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -91,8 +92,9 @@ public class MapsActivity extends AppCompatActivity implements
     private RecyclerView mRecyclerView;
     private ImageAdapter mAdapter;
     private Boolean proceed;
-    private String message;
     private List<Upload> mUploads;
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+
     //Order Specific
     private String hot_cold_option;
     // Firebase vars
@@ -110,13 +112,17 @@ public class MapsActivity extends AppCompatActivity implements
     private static final float DEFAULT_ZOOM = 15f;
     private Boolean mPermissionGranted = false;
 
-
+    private ImageButton btnBruce;
+    private ProgressBar progressBar;
+    private SpeechRecognizer speech = null;
+    private Intent recognizerIntent;
+    static final int REQUEST_PERMISSION_KEY = 1;
     // Google Maps
     private FusedLocationProviderClient mproviderClient;
     private GoogleMap gMap;
     private MapsServices mapsServices;
     public String place;
-
+    private String userInput = "";
     // Speech to text
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
@@ -127,9 +133,6 @@ public class MapsActivity extends AppCompatActivity implements
     private List<Voice> voices;
     // Amazon Polly permissions.
     private AmazonPollyPresigningClient client;
-    private SpeechRecognizer speech = null;
-    private Intent recognizerIntent;
-    static final int REQUEST_PERMISSION_KEY = 1;
     private ImageButton btn;
     // AWS Media Player
     private MediaPlayer mediaPlayer;
@@ -162,6 +165,7 @@ public class MapsActivity extends AppCompatActivity implements
             @Override
             public void onInfoWindowClick(Marker marker) {
             } });
+
         if (mPermissionGranted) {
             // Permission granted by the user
             getDeviceLocation();
@@ -233,13 +237,14 @@ public class MapsActivity extends AppCompatActivity implements
         Log.d(TAG,"onCreate: Activity started");
 
         init();
+        setupBruce();
+        if(mapsServices.isServiceOK(this)){
+            get_permission_location();
+        }
         checkConnection();
         initPollyClient();
         setupNewMediaPlayer();
 
-        if(mapsServices.isServiceOK(this)){
-            get_permission_location();
-        }
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         commandsDatabaseRef = database.getReference("COMMANDS");
 
@@ -269,6 +274,38 @@ public class MapsActivity extends AppCompatActivity implements
             }
         });
 
+    }
+
+    private void setupBruce() {
+        progressBar.setVisibility(View.INVISIBLE);
+        speech = SpeechRecognizer.createSpeechRecognizer(this);
+        speech.setRecognitionListener(this);
+        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,
+                "en");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
+                this.getPackageName());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
+        /*
+        Minimum time to listen in millis. Here 5 seconds
+         */
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 5000);
+        recognizerIntent.putExtra("android.speech.extra.DICTATION_MODE", true);
+
+        btnBruce.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View p1)
+            {
+                progressBar.setVisibility(View.VISIBLE);
+                speech.startListening(recognizerIntent);
+                btnBruce.setEnabled(false);
+
+            }
+        });
     }
 
     /**
@@ -324,12 +361,18 @@ public class MapsActivity extends AppCompatActivity implements
     public void finish() {
         super.finish();
         CustomIntent.customType(ctx,"fadein-to-fadeout");
+        if (speech != null) {
+            speech.destroy();
+            Log.d("Log", "destroy");
+        }
     }
     @Override
     protected void onStop(){
         super.onStop();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        //if(!mediaPlayer.isPlaying()){
+        //    mediaPlayer.stop();
+            mediaPlayer.release();
+        //}
     }
     /**
      * Callback will be triggered when there is change in
@@ -339,6 +382,7 @@ public class MapsActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         setupNewMediaPlayer();
+        this.btnBruce.setEnabled(true);
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
         if(animationDrawable != null){
@@ -358,30 +402,9 @@ public class MapsActivity extends AppCompatActivity implements
      *This is for searching for available coffee places
      */
     private void init(){
-        String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
-        if(!hasPermissions(this, PERMISSIONS)){
-            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSION_KEY);
-        }
+        btnBruce = findViewById(R.id.btnSpeak);
+        progressBar = findViewById(R.id.progressBar1);
 
-
-        speech = SpeechRecognizer.createSpeechRecognizer(this);
-        speech.setRecognitionListener(this);
-        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,
-                "en");
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
-                this.getPackageName());
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-
-        /*
-        Minimum time to listen in millis. Here 5 seconds
-         */
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 5000);
-        recognizerIntent.putExtra("android.speech.extra.DICTATION_MODE", true);
-
-        message= "";
         relativeLayout = findViewById(R.id.relLayoutConvo);
         animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
@@ -509,6 +532,7 @@ public class MapsActivity extends AppCompatActivity implements
 
         }
     }
+
     /**
      * This method is to initialize the user interface of the Maps API
      */
@@ -528,7 +552,7 @@ public class MapsActivity extends AppCompatActivity implements
     public void get_permission_location(){
         Log.d(TAG, "get_permission_location(): Getting location permission");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION};
+                Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.RECORD_AUDIO};
         if(ContextCompat.checkSelfPermission(this.getApplicationContext(),FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             // We have access to the Fine_Location(Precise location)
@@ -563,187 +587,21 @@ public class MapsActivity extends AppCompatActivity implements
                     initialiaze_map();
                 }
             }
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(animationDrawable != null) animationDrawable.stop();
-        if (speech != null) {
-            speech.destroy();
-            Log.d("Log", "destroy");
-        }
-
-    }
-
-    @Override
-    public void onBeginningOfSpeech() {
-        Log.d("Log", "onBeginningOfSpeech");
-    }
-
-    @Override
-    public void onBufferReceived(byte[] buffer) {
-        Log.d("Log", "onBufferReceived: " + buffer);
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-        Log.d("Log", "onEndOfSpeech");
-        decodeUserInput(message);
-    }
-
-    @Override
-    public void onError(int errorCode) {
-        String errorMessage = getErrorText(errorCode);
-        Log.d("Log", "FAILED " + errorMessage);
-        //progressBar.setVisibility(View.INVISIBLE);
-        //returnedText.setText(errorMessage);
-        //recordbtn.setEnabled(true);
-    }
-
-    @Override
-    public void onEvent(int arg0, Bundle arg1) {
-        Log.d("Log", "onEvent");
-    }
-
-    @Override
-    public void onPartialResults(Bundle arg0) {
-        Log.d("Log", "onPartialResults");
-
-        ArrayList<String> matches = arg0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        String text = "";
-        /* To get all close matchs
-        for (String result : matches)
-        {
-            text += result + "\n";
-        }
-        */
-        text = matches.get(0); //  Remove this line while uncommenting above    codes
-        message = text;
-
-        //returnedText.setText(text);
-    }
-
-    @Override
-    public void onReadyForSpeech(Bundle arg0) {
-        Log.d("Log", "onReadyForSpeech");
-    }
-
-    @Override
-    public void onResults(Bundle results) {
-        Log.d("Log", "onResults");
-
-    }
-
-    @Override
-    public void onRmsChanged(float rmsdB) {
-        Log.d("Log", "onRmsChanged: " + rmsdB);
-        //progressBar.setProgress((int) rmsdB);
-
-    }
-
-    public static String getErrorText(int errorCode) {
-        String message;
-        switch (errorCode) {
-            case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
-                break;
-            case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
-                break;
-            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
-                break;
-            case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
-                break;
-            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
-                break;
-            case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
-                break;
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
-                break;
-            default:
-                message = "Didn't understand, please try again.";
-                break;
-        }
-        return message;
-    }
-
-
-    public  boolean hasPermissions(Context context, String... permissions) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
+            case REQ_CODE_SPEECH_INPUT:{
+                if(grantResults.length > 0){
+                    for (int i = 0; i < permissions.length; i++) {
+                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                            mPermissionGranted = false;
+                            Log.d(TAG, "onRequestPermissionsResult(): Permission Denied");
+                        }
+                    }
+                    Log.d(TAG, "onRequestPermissionsResult(): Permission Permission Granted");
+                    mPermissionGranted = true;
                 }
             }
         }
-        return true;
     }
 
-    /**
-     * Showing google speech input dialog
-     * */
-    public void promptSpeechInput(View view) {
-        boolean isConnected = ConnectivityReceiver.isConnected();
-
-        if(isConnected){
-            /*Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                    getString(R.string.speech_prompt));
-            animationDrawable.stop();
-            try {
-                //initRecyclerView();
-                startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-            } catch (ActivityNotFoundException a) {
-                Toast.makeText(getApplicationContext(),
-                        getString(R.string.speech_not_supported),
-                        Toast.LENGTH_SHORT).show();
-            }*/
-            speech.startListening(recognizerIntent);
-
-        }else {
-            showToast(isConnected);
-        }
-
-    }
-    /**
-     * Receiving speech input
-     * */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG,"onActivityResult(): Result from speech to text");
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case REQ_CODE_SPEECH_INPUT: {
-                if (resultCode == RESULT_OK && null != data) {
-                    ArrayList<String> result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    MessageItem message_item = new MessageItem(result.get(0));
-                    message_items.add(message_item);
-                    Log.d(TAG,result.get(0));
-
-                    decodeUserInput(result.get(0));
-                }
-                break;
-            }
-
-        }
-    }
 
     private void decodeUserInput(String userInput) {
         String norm_input = userInput.toLowerCase();
@@ -936,7 +794,7 @@ public class MapsActivity extends AppCompatActivity implements
                 Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
 
                 // Create a media player to play the synthesized audio stream.
-                if (mediaPlayer.isPlaying()) {
+                if (!mediaPlayer.isPlaying()) {
                     setupNewMediaPlayer();
                 }
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -1005,11 +863,13 @@ public class MapsActivity extends AppCompatActivity implements
      */
     void setupNewMediaPlayer() {
         mediaPlayer = new MediaPlayer();
+        btnBruce.setEnabled(false);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mp.release();
-                setupNewMediaPlayer();
+                //setupNewMediaPlayer();
+                btnBruce.setEnabled(true);
                 //setupNewMediaPlayer();
             }
         });
@@ -1023,6 +883,7 @@ public class MapsActivity extends AppCompatActivity implements
         mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
+                btnBruce.setEnabled(true);
                 //playButton.setEnabled(true);
                 return false;
             }
@@ -1058,8 +919,126 @@ public class MapsActivity extends AppCompatActivity implements
 
             return null;
         }
+    }
 
+    /*******************************************************
+     * Bruce Functionality : Speech To Text W/O Dialogue
+     ******************************************************/
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer!= null) mediaPlayer.release();
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+        Log.d("Log", "onBeginningOfSpeech");
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBufferReceived(byte[] buffer) {
+        Log.d("Log", "onBufferReceived: " + buffer);
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        Log.d("Log", "onEndOfSpeech");
+        progressBar.setVisibility(View.INVISIBLE);
+        btnBruce.setEnabled(true);
+//        decodeUserInput(userInput);
+//        Toast.makeText(ctx, userInput, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(int errorCode) {
+        String errorMessage = getErrorText(errorCode);
+        Log.d("Log", "FAILED " + errorMessage);
+        progressBar.setVisibility(View.INVISIBLE);
+        Log.i(TAG,errorMessage);
+        //returnedText.setText(errorMessage);
+        Toast.makeText(ctx, errorMessage, Toast.LENGTH_SHORT).show();
+        btnBruce.setEnabled(true);
+    }
+
+    @Override
+    public void onEvent(int arg0, Bundle arg1) {
+        Log.d("Log", "onEvent");
+    }
+
+    @Override
+    public void onPartialResults(Bundle arg0) {
+        Log.d("Log", "onPartialResults");
+
+        ArrayList<String> matches = arg0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String text = "";
+        /* To get all close matchs
+        for (String result : matches)
+        {
+            text += result + "\n";
+        }
+        */
+
+
+        //returnedText.setText(text);
+    }
+
+    @Override
+    public void onReadyForSpeech(Bundle arg0) {
+        Log.d("Log", "onReadyForSpeech");
+    }
+
+    @Override
+    public void onResults(Bundle results) {
+        Log.d("Log", "onResults");
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String text = matches.get(0); //  Remove this line while uncommenting above    codes
+        decodeUserInput(text);
+    }
+
+    @Override
+    public void onRmsChanged(float rmsdB) {
+        Log.d("Log", "onRmsChanged: " + rmsdB);
+        //progressBar.setProgress((int) rmsdB);
 
     }
 
+    public static String getErrorText(int errorCode) {
+        String message;
+        switch (errorCode) {
+            case SpeechRecognizer.ERROR_AUDIO:
+                message = "Audio recording error";
+                break;
+            case SpeechRecognizer.ERROR_CLIENT:
+                message = "Client side error";
+                break;
+            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                message = "Insufficient permissions";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK:
+                message = "Network error";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
+                message = "Network timeout";
+                break;
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                message = "No match";
+                break;
+            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                message = "RecognitionService busy";
+                break;
+            case SpeechRecognizer.ERROR_SERVER:
+                message = "error from server";
+                break;
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                message = "No speech input";
+                break;
+            default:
+                message = "Didn't understand, please try again.";
+                break;
+        }
+        return message;
+    }
 }

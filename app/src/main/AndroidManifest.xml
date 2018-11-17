@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mini.com.baristaanalytics">
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -38,7 +39,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MapsActivity">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
@@ -61,7 +62,7 @@
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
-        <activity android:name=".MapsActivity" />
+        <activity android:name=".MainActivity" />
         <activity android:name=".Account_Management.LoginActivity" />
     </application>
 
