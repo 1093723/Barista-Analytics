@@ -244,7 +244,12 @@ public class MapsActivity extends AppCompatActivity implements
         checkConnection();
         initPollyClient();
         setupNewMediaPlayer();
+        setupDataFromFirebase();
 
+
+    }
+
+    private void setupDataFromFirebase() {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         commandsDatabaseRef = database.getReference("COMMANDS");
 
@@ -273,7 +278,6 @@ public class MapsActivity extends AppCompatActivity implements
 
             }
         });
-
     }
 
     private void setupBruce() {

@@ -160,7 +160,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         setContentView(R.layout.activity_okoa_category_cold);
         initVariables();
         setupBruce();
-
         initPollyClient();
         setupNewMediaPlayer();
         new WaitingTime().execute(6);

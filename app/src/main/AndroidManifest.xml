@@ -39,7 +39,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MapsActivity">
+        <activity android:name=".WelcomeScreen.WelcomeLaunchActivity">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
@@ -63,6 +63,8 @@
         <activity android:name=".Doubleshot.DoubleShotSize" />
         <activity android:name=".Okoa.OkoaCoffeeDetails" />
         <activity android:name=".MainActivity" />
+        <activity android:name=".MapsActivity" />
+        <activity android:name=".Account_Management.UserProfileActivity" />
         <activity android:name=".Account_Management.LoginActivity" />
     </application>
 

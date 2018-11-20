@@ -8,7 +8,7 @@ android:padding="5dp"
 android:background="@drawable/coffee_background8"
 android:layout_gravity="center"
 android:orientation="vertical"
-tools:context=".help_tutorial">
+tools:context=".HelpTutorialActivity">
 
 <TextView
     android:id="@+id/Xclose"
