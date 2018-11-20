@@ -2,7 +2,6 @@ package mini.com.baristaanalytics.Okoa;
 
 import android.animation.ArgbEvaluator;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
@@ -19,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -33,7 +33,6 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
-import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,11 +45,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
-import Model.CoffeeOrder;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
@@ -73,10 +70,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
     private List<Voice> voices;
-    // Amazon Polly permissions.
-    private static final String COGNITO_POOL_ID = "CHANGEME";
-    // Region of Amazon Polly.
-    private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
     private RelativeLayout relativeLayout;
@@ -84,7 +77,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     /**
      * Order-related variables
      */
-    private ElegantNumberButton btnSmall,btnLarge;
     private ProgressBar progressBar;
     /**
      * Layout-related variables
@@ -114,6 +106,9 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private MediaPlayer mediaPlayer;
 
     private List<String> coffeeNames;
+    private ImageView cupSmall,cupTall;
+    private TextView txtView_beverage_price_small,
+            txtView_beverage_price_tall,txtView_rands_small,txtView_beverage_rands_tall;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -163,7 +158,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         initPollyClient();
         setupNewMediaPlayer();
         new WaitingTime().execute(6);
-
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -199,8 +193,32 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                         beverage = beverageList.get(position);
-                        txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
-                        txtViewPriceSmall.setText(beverage.getPrice_small().toString());
+                        if(beverage.getPrice_small().equals(Long.valueOf(0))){
+                            cupSmall.setVisibility(View.GONE);
+                            txtViewPriceSmall.setVisibility(View.GONE);
+                            txtView_rands_small.setVisibility(View.GONE);
+                            txtView_beverage_price_small.setVisibility(View.GONE);
+                        }else {
+                            cupSmall.setVisibility(View.VISIBLE);
+                            txtViewPriceSmall.setVisibility(View.VISIBLE);
+                            txtViewPriceSmall.setText(beverage.getPrice_small().toString());
+                            txtView_beverage_price_small.setVisibility(View.VISIBLE);
+                            txtView_rands_small.setVisibility(View.VISIBLE);
+                        }
+                        if(beverage.getPrice_tall().equals(Long.valueOf(0))){
+                            cupTall.setVisibility(View.GONE);
+                            txtView_beverage_price_tall.setVisibility(View.GONE);
+                            txtViewPriceLarge.setVisibility(View.GONE);
+                            txtView_beverage_rands_tall.setVisibility(View.GONE);
+                        }else {
+                            txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
+                            cupTall.setVisibility(View.VISIBLE);
+                            txtView_beverage_price_tall.setVisibility(View.VISIBLE);
+                            txtViewPriceLarge.setVisibility(View.VISIBLE);
+                            txtView_beverage_rands_tall.setVisibility(View.VISIBLE);
+                        }
+
+
                     }
 
                     @Override
@@ -285,6 +303,15 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private void initVariables() {
         btnBruce = findViewById(R.id.btnSpeak);
 
+        cupSmall = findViewById(R.id.small_size_coffee_cup);
+        cupTall = findViewById(R.id.large_size_coffee_cup);
+
+        txtView_beverage_price_small = findViewById(R.id.txtView_beverage_price_small);
+        txtView_beverage_price_tall = findViewById(R.id.txtView_beverage_price_large);
+
+        txtView_rands_small = findViewById(R.id.randsSmall);
+        txtView_beverage_rands_tall = findViewById(R.id.randTall);
+
         relativeLayout = findViewById(R.id.relLayoutConvo);
         animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
@@ -300,8 +327,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         mAuth = FirebaseAuth.getInstance();
         coffeeNames = new ArrayList<>();
 
-        btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
-        btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
         txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
 

@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -119,6 +120,9 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     // Array of input speech from user
     private List<MessageItem> message_items = new ArrayList<>();
 
+    private ImageView cupSmall,cupTall;
+    private TextView txtView_beverage_price_small,
+            txtView_beverage_price_tall,txtView_rands_small,txtView_beverage_rands_tall;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -204,8 +208,32 @@ public class OkoaCategoryHot extends AppCompatActivity implements
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                             beverage = beverageList.get(position);
-                            txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
+
+
+                        if(beverage.getPrice_small().equals(Long.valueOf(0))){
+                            cupSmall.setVisibility(View.GONE);
+                            txtViewPriceSmall.setVisibility(View.GONE);
+                            txtView_rands_small.setVisibility(View.GONE);
+                            txtView_beverage_price_small.setVisibility(View.GONE);
+                        }else {
+                            cupSmall.setVisibility(View.VISIBLE);
+                            txtViewPriceSmall.setVisibility(View.VISIBLE);
                             txtViewPriceSmall.setText(beverage.getPrice_small().toString());
+                            txtView_beverage_price_small.setVisibility(View.VISIBLE);
+                            txtView_rands_small.setVisibility(View.VISIBLE);
+                        }
+                        if(beverage.getPrice_tall().equals(Long.valueOf(0))){
+                            cupTall.setVisibility(View.GONE);
+                            txtView_beverage_price_tall.setVisibility(View.GONE);
+                            txtViewPriceLarge.setVisibility(View.GONE);
+                            txtView_beverage_rands_tall.setVisibility(View.GONE);
+                        }else {
+                            txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
+                            cupTall.setVisibility(View.VISIBLE);
+                            txtView_beverage_price_tall.setVisibility(View.VISIBLE);
+                            txtViewPriceLarge.setVisibility(View.VISIBLE);
+                            txtView_beverage_rands_tall.setVisibility(View.VISIBLE);
+                        }
                     }
                     @Override
                     public void onPageSelected(int position) {
@@ -285,6 +313,15 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     private void initVariables() {
         btnBruce = findViewById(R.id.btnSpeak);
         progressBar = findViewById(R.id.okoa_hot_progress);
+
+        cupSmall = findViewById(R.id.small_size_coffee_cup);
+        cupTall = findViewById(R.id.large_size_coffee_cup);
+
+        txtView_beverage_price_small = findViewById(R.id.txtView_beverage_price_small);
+        txtView_beverage_price_tall = findViewById(R.id.txtView_beverage_price_large);
+
+        txtView_rands_small = findViewById(R.id.randsSmall);
+        txtView_beverage_rands_tall = findViewById(R.id.randTall);
 
         helpDialog = new Dialog(this);
 
