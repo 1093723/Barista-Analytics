@@ -42,4 +42,4 @@ cache:
     - $HOME/.gradle/wrapper     #Cache the gradle
 
 script:
-  - ./gradlew test coveralls
+  - ./gradlew connectedAndroidTest coveralls
