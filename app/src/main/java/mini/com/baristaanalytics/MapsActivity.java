@@ -375,7 +375,7 @@ public class MapsActivity extends AppCompatActivity implements
         super.onStop();
         //if(!mediaPlayer.isPlaying()){
         //    mediaPlayer.stop();
-            mediaPlayer.release();
+            mediaPlayer.reset();
         //}
     }
     /**
@@ -384,7 +384,6 @@ public class MapsActivity extends AppCompatActivity implements
      */
     @Override
     protected void onResume() {
-        super.onResume();
         setupNewMediaPlayer();
         this.btnBruce.setEnabled(true);
         // register connection status listener
@@ -392,6 +391,7 @@ public class MapsActivity extends AppCompatActivity implements
         if(animationDrawable != null){
             animationDrawable.start();
         }
+        super.onResume();
     }
 
     /**
@@ -695,16 +695,20 @@ public class MapsActivity extends AppCompatActivity implements
                 if(speechProcessorService.isGreeting(norm_input)){
                     setupPlayButton("What would you like today");
                 }else if(speechProcessorService.isHelpRequired(norm_input)){
-                    setupPlayButton("I'll help you in a second");
+                    setupPlayButton("Take a look at some of these instructions that'll ease" +
+                            " your frustration to kick start your order");
                     help_tutorial(mRecyclerView);
                 }else if(speechProcessorService.isOkoaHot(norm_input)){
                     // Handle smart order of Hot beverages from Okoa
+
                     startActivity(toOkoaHotCategory);
                     CustomIntent.customType(ctx,"fadein-to-fadeout");
 
                 }else if(speechProcessorService.isOkoaCold(norm_input)){
                     // Handle smart order of Cold beverages from Okoa
+                    setupPlayButton("Cool beverages for the winter coming up");
                     startActivity(toOkoaColdCategory);
+
                     CustomIntent.customType(ctx,"fadein-to-fadeout");
                 }else if(speechProcessorService.isDoubleshotHot(norm_input)){
                     // Handle smart order of hot beverages from Doubleshot
@@ -728,7 +732,7 @@ public class MapsActivity extends AppCompatActivity implements
                     isHotOrColdQuestionOkoa = true;
                 }else if(speechProcessorService.isAvailablePlaces(norm_input)){
                     String supported = "I currently support these locations on the map." +
-                            "I hope they're near your address";
+                            " I hope they're near your address";
                     setupPlayButton(supported);
                     geoLocate(mapsServices.getLocations());
                 }else {
@@ -831,7 +835,7 @@ public class MapsActivity extends AppCompatActivity implements
                 Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
 
                 // Create a media player to play the synthesized audio stream.
-                if (mediaPlayer.isPlaying()) {
+                if (!mediaPlayer.isPlaying()) {
                     setupNewMediaPlayer();
                 }
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -871,7 +875,7 @@ public class MapsActivity extends AppCompatActivity implements
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.release();
+                mp.reset();
                 //setupNewMediaPlayer();
                 btnBruce.setEnabled(true);
                 //setupNewMediaPlayer();
@@ -893,6 +897,11 @@ public class MapsActivity extends AppCompatActivity implements
             }
         });
 
+    }
+
+    public void goToOkoaCold(View view) {
+        Intent intent = new Intent(this,OkoaCategoryCold.class);
+        startActivity(intent);
     }
 
     private class GetPollyVoices extends AsyncTask<Void, Void, Void> {
@@ -932,8 +941,8 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause() {
+        if (mediaPlayer!= null) mediaPlayer.stop();mediaPlayer.reset();
         super.onPause();
-        if (mediaPlayer!= null) mediaPlayer.release();
     }
 
     @Override

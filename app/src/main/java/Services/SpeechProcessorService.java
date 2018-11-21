@@ -7,8 +7,11 @@ import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import Model.CoffeeRecognition;
 import Model.Command;
 import mini.com.baristaanalytics.R;
 
@@ -22,32 +25,14 @@ public class SpeechProcessorService {
     private List<String>requestHotBeverages;
     private List<String>requestColdBeverages;
     private List<String> requestAvailableCoffeePlaces;
+    private List<Map<List<String>,String>> dictionaryListForCoffeeTranslations;
 
-    public List<String> getOkoaRequest() {
-        return okoaRequest;
-    }
-
-    public List<String> getDoubleshotRequest() {
-        return doubleshotRequest;
-    }
-
-    public List<String> getGreetings() {
-        return Greetings;
-    }
-
-    public List<String> getRequestHelp() {
-        return requestHelp;
-    }
 
     public List<String> getRequestHotBeverages() {
         return requestHotBeverages;
     }
 
-    public List<String> getRequestColdBeverages() {
-        return requestColdBeverages;
-    }
 
-    private String userInput;
     public SpeechProcessorService(){
         okoaRequest = new ArrayList<>();
         requestHelp = new ArrayList<>();
@@ -56,6 +41,11 @@ public class SpeechProcessorService {
         requestAvailableCoffeePlaces = new ArrayList<>();
         Greetings = new ArrayList<>();
         doubleshotRequest = new ArrayList<>();
+        dictionaryListForCoffeeTranslations = new ArrayList<>();
+    }
+
+    public List<Map<List<String>,String>> getDictionaryListForCoffeeTranslations() {
+        return dictionaryListForCoffeeTranslations;
     }
 
     public void initializeAcceptedCommands(DataSnapshot dataSnapshot){
@@ -253,6 +243,11 @@ public class SpeechProcessorService {
         return false;
     }
 
+    /**
+     * Determines if the user requested to view supported coffee places on the app
+     * @param input is the user command/sentence/request
+     * @return true if they asked for supported places and false otherwise
+     */
     public Boolean isAvailablePlaces(String input){
         int size = requestAvailableCoffeePlaces.size();
         String[] splitted = input.split(" ");
@@ -265,5 +260,35 @@ public class SpeechProcessorService {
             }
         }
         return false;
+    }
+
+
+    /********************************************************************************
+     *                    Functionality related to Processing User                  *
+     *                                                                              *
+     ********************************************************************************/
+    public void initializeBruceCoffeePlaceRecognition(DataSnapshot dataSnapshot){
+        for (DataSnapshot snap :
+                dataSnapshot.getChildren()) {
+            CoffeeRecognition coffeeRecognition = snap.getValue(CoffeeRecognition.class);
+            processCoffeeDescription(coffeeRecognition.getBruceIterpretationCoffeeNames(),
+                    coffeeRecognition.getCoffeeName());
+        }
+    }
+
+    /**
+     * This method processes the possible ways in which Bruce can translate the users'
+     * coffee name request.
+     * @param bruceIterpretationCoffeeNames is the input with the possible strings of words
+     *                                      which refer to individual coffee names
+     * @param coffeeName is the actual name of the coffee
+     */
+    private void processCoffeeDescription(String bruceIterpretationCoffeeNames,
+                                          String coffeeName) {
+        String[] coffeeNamesInterpretations = bruceIterpretationCoffeeNames.split(",");
+        List<String> intepretations  = Arrays.asList(coffeeNamesInterpretations);
+        Map<List<String>, String> tempDict = new HashMap<>();
+        tempDict.put(intepretations,coffeeName);
+        dictionaryListForCoffeeTranslations.add(tempDict);
     }
 }

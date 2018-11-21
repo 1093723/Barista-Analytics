@@ -10,24 +10,18 @@ public class CoffeeOrder {
     private String order_date;
     private String order_State;
     private Float order_rating;
-    public String getOrder_Store() {
-        return order_Store;
-    }
-
-    public void setOrder_Store(String order_Store) {
-        this.order_Store = order_Store;
-    }
 
     private String order_Store;
-
+    private String coffeePlaceName;
 
     public CoffeeOrder(String UUID, String order_Description,
-                       String order_CustomerUsername, Long order_Total, String order_date) {
+                       String order_CustomerUsername, Long order_Total, String order_date, String coffeePlaceName) {
         this.uuid = UUID;
         this.order_Description = order_Description;
         this.order_CustomerUsername = order_CustomerUsername;
         this.order_Total = order_Total;
         this.order_date = order_date;
+        this.coffeePlaceName = coffeePlaceName;
         this.order_State = "Confirmed";
     }
 
@@ -37,6 +31,12 @@ public class CoffeeOrder {
         order_rating = Float.valueOf("0");
     }
 
+    public String getOrder_Store() {
+        return order_Store;
+    }
+    public void setOrder_Store(String order_Store) {
+        this.order_Store = order_Store;
+    }
     public String getOrder_date() {
         return order_date;
     }
@@ -90,5 +90,13 @@ public class CoffeeOrder {
 
     public void setOrder_rating(Float order_rating) {
         this.order_rating = order_rating;
+    }
+
+    public String getCoffeePlaceName() {
+        return coffeePlaceName;
+    }
+
+    public void setCoffeePlaceName(String coffeePlaceName) {
+        this.coffeePlaceName = coffeePlaceName;
     }
 }

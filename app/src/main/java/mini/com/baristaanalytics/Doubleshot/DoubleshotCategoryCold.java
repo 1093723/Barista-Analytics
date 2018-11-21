@@ -4,15 +4,23 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +32,12 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,33 +45,67 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import Adapter.OkoaColdMenuAdapter;
+import Model.Beverage;
+import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
+import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
 
 public class DoubleshotCategoryCold extends AppCompatActivity {
     private String TAG = "DOUBLESHOT COLD";
-    private Context ctx;
-    // Speech to text
-    // Array of input speech from user
-    private List<MessageItem> message_items = new ArrayList<>();
+    /**
+     * Bruce-related variables
+     */
+    private ImageButton btnBruce;
+    private SpeechRecognizer speech = null;
+    private Intent recognizerIntent;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private SpeechProcessorService speechProcessorService;
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
     private List<Voice> voices;
-    // Amazon Polly permissions.
-    private static final String COGNITO_POOL_ID = "CHANGEME";
-
-    // Region of Amazon Polly.
-    private static final Regions MY_REGION = Regions.US_EAST_1;
     private AmazonPollyPresigningClient client;
 
-    Dialog helpDialog;
+    private RelativeLayout relativeLayout;
+    private AnimationDrawable animationDrawable;
+    /**
+     * Order-related variables
+     */
+    private ProgressBar progressBar;
+    /**
+     * Layout-related variables
+     */
+    private ViewPager viewPager;
+    private Context ctx;
+    private Beverage beverage;
+    private TextView txtViewPriceSmall,txtViewPriceLarge;
+    private OkoaColdMenuAdapter adapter;
+    private List<Beverage> beverageList;
+    private Dialog helpDialog;
+    private TableRow tableRow;
 
-    private ImageButton btn;
-    // AWS Media Player
+    /**
+     * Firebase-related variables
+     */
+    private FirebaseAuth mAuth;
+    private FirebaseDatabase database;
+    private DatabaseReference coffeeList,bruce_translations;
+
+    /**
+     * Google speech to text
+     */
+    // Array of input speech from user
+    private List<MessageItem> message_items = new ArrayList<>();
+    // Media player
     private MediaPlayer mediaPlayer;
+
+    private List<String> coffeeNames;
+    private ImageView cupSmall,cupTall;
+    private TextView txtView_beverage_price_small,
+            txtView_beverage_price_tall,txtView_rands_small,txtView_beverage_rands_tall;
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -119,13 +167,145 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doubleshot_category_cold);
         Log.d(TAG,"onCreate:Activity Started");
-        helpDialog = new Dialog(this);
-        this.ctx = this;
+        initVariables();
 
         initPollyClient();
         setupNewMediaPlayer();
-        String Greeting = "What beverage would you like?";
-        setupPlayButton(Greeting);
+//        String Greeting = "What beverage would you like?";
+//        setupPlayButton(Greeting);
+        new WaitingTime().execute(6);
+        coffeeList.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap :
+                        dataSnapshot.getChildren()) {
+                    Beverage beverage = snap.getValue(Beverage.class);
+                    String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
+                    beverage.setBeverage_name(tempCoffeeName);
+                    if(beverageList.size() > 0){
+                        if(!beverageExists(beverage)){
+                            if(beverage.getBeverage_category().equals("cold")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                beverageList.add(beverage);
+                            }
+                        }
+                    }else {
+                        if(beverage == null){
+                            Toast.makeText(ctx, "Coffee Will Not Be Served Today", Toast.LENGTH_SHORT).show();
+                        }else {
+                            if(beverage.getBeverage_category().equals("cold")){
+                                String coffeeName = beverage.getBeverage_name().toLowerCase();
+                                beverage.setBeverage_name(coffeeName);
+                                coffeeNames.add(beverage.getBeverage_name());
+                                beverageList.add(beverage);
+                            }
+                        }
+                    }
+                }
+
+                adapter = new OkoaColdMenuAdapter(beverageList, DoubleshotCategoryCold.this);
+
+                viewPager.setAdapter(adapter);
+                viewPager.setPadding(130,0,130,0);
+                viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        beverage = beverageList.get(position);
+                        if(beverage.getPrice_small().equals(Long.valueOf(0))){
+                            cupSmall.setVisibility(View.GONE);
+                            txtViewPriceSmall.setVisibility(View.GONE);
+                            txtView_rands_small.setVisibility(View.GONE);
+                            txtView_beverage_price_small.setVisibility(View.GONE);
+                        }else {
+                            cupSmall.setVisibility(View.VISIBLE);
+                            txtViewPriceSmall.setVisibility(View.VISIBLE);
+                            txtViewPriceSmall.setText(beverage.getPrice_small().toString());
+                            txtView_beverage_price_small.setVisibility(View.VISIBLE);
+                            txtView_rands_small.setVisibility(View.VISIBLE);
+                        }
+                        if(beverage.getPrice_tall().equals(Long.valueOf(0))){
+                            cupTall.setVisibility(View.GONE);
+                            txtView_beverage_price_tall.setVisibility(View.GONE);
+                            txtViewPriceLarge.setVisibility(View.GONE);
+                            txtView_beverage_rands_tall.setVisibility(View.GONE);
+                        }else {
+                            txtViewPriceLarge.setText(beverage.getPrice_tall().toString());
+                            cupTall.setVisibility(View.VISIBLE);
+                            txtView_beverage_price_tall.setVisibility(View.VISIBLE);
+                            txtViewPriceLarge.setVisibility(View.VISIBLE);
+                            txtView_beverage_rands_tall.setVisibility(View.VISIBLE);
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onPageSelected(int position) {
+
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+
+                    }
+                });
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private Boolean beverageExists(Beverage beverage){
+        for (int i = 0; i < beverageList.size(); i++) {
+            if(beverageList.get(i).getBeverage_name().equals(beverage.getBeverage_name())){
+                beverage.setBeverage_name(beverage.getBeverage_name());
+                // Update the array
+                beverageList.set(i,beverage);
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Initialize global variables to be used
+     */
+    private void initVariables() {
+        btnBruce = findViewById(R.id.btnSpeak);
+
+        speechProcessorService = new SpeechProcessorService();
+
+        cupSmall = findViewById(R.id.small_size_coffee_cup);
+        cupTall = findViewById(R.id.large_size_coffee_cup);
+
+        txtView_beverage_price_small = findViewById(R.id.txtView_beverage_price_small);
+        txtView_beverage_price_tall = findViewById(R.id.txtView_beverage_price_large);
+
+        txtView_rands_small = findViewById(R.id.randsSmall);
+        txtView_beverage_rands_tall = findViewById(R.id.randTall);
+
+        relativeLayout = findViewById(R.id.relLayoutConvo);
+        animationDrawable = (AnimationDrawable)  relativeLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(2000);
+        animationDrawable.start();
+        viewPager = findViewById(R.id.viewPager);
+        tableRow = findViewById(R.id.tblRowCoffeeCupParent);
+        helpDialog = new Dialog(this);
+        progressBar = findViewById(R.id.okoa_cold_progress);
+        database = FirebaseDatabase.getInstance();
+        coffeeList = database.getReference("CoffeeMenuDoubleshot");
+        bruce_translations = database.getReference("TRANSLATE_COFFEE_NAMES");
+        mAuth = FirebaseAuth.getInstance();
+        coffeeNames = new ArrayList<>();
+
+        txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
+        txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
+
+        ctx = DoubleshotCategoryCold.this;
+        beverageList = new ArrayList<>();
     }
 
     public void promptSpeechInput(View view) {
@@ -180,30 +360,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
     }
 
     private void decodeUserInput(String s) {
-        // Check what the user gave as input
-        // It can be an americano
-        Intent okoa = new Intent(this, DoubleShotSize.class);
-        String coffeeName = "coffeeName";
-        String almostThere;
-        if(s.contains("Frappe")){
-            // Add the coffee name to the intent and retrieve it in the OkoaSize class
-            almostThere = s + " coming up. Let's confirm the size";
-            setupPlayButton(almostThere);
-            // Send the name of the coffee to the next screen
-            // Make sure the key 'coffeeName' is the same in OkoaCategoryCold,OkoaCategoryHot,
-            // DoubleshotCategoryHot, and DoubleshotCategoryCold when transitioning activities
-            okoa.putExtra(coffeeName,"Frappe");
-            startActivity(okoa);
-            // User would like americano
-        }
-        else if(s.contains("Slush")){
-            // User would like a Chai Latte
-            // Add the coffee name to the intent and retrieve it in the OkoaSize class
-            almostThere = s + " coming up. Let's confirm the size";
-            setupPlayButton(almostThere);
-            okoa.putExtra(coffeeName,"Slush Poppy");
-            startActivity(okoa);
-        }
+
     }
 
     /**
@@ -274,6 +431,38 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
             Toast.makeText(ctx, "Unable to get voice response.", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    class WaitingTime extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            viewPager.setVisibility(View.GONE);
+            tableRow.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            for (int count = 1; count <= params[0]; count++) {
+                try {
+                    Thread.sleep(1000);
+                    publishProgress(count);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.GONE);
+            viewPager.setVisibility(View.VISIBLE);
+            tableRow.setVisibility(View.VISIBLE);
+            tableRow.animate().alpha(1.0f).setDuration(12000);
+            viewPager.animate().alpha(1.0f).setDuration(12000);
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
     }
 
     private class GetPollyVoices extends AsyncTask<Void, Void, Void> {

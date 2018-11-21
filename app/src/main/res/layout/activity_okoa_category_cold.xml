@@ -55,7 +55,11 @@
                 android:layout_gravity="bottom"
                 android:orientation="vertical"
                 android:translationY="-65dp">
-
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Go To SIGN IN"
+                    android:onClick="SignIn"/>
                 <ImageView
                     android:id="@+id/small_size_coffee_cup"
                     android:layout_width="wrap_content"
