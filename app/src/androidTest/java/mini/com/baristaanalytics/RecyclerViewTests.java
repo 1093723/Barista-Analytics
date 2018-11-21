@@ -1,20 +1,18 @@
 package mini.com.baristaanalytics;
 
 import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+// import org.junit.runner.RunWith;
+// import org.mockito.runners.MockitoJUnitRunner;
+
 import utilities.MessageItem;
+
 import static org.junit.Assert.assertEquals;
+// import static org.junit.Assert.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
+// @RunWith(MockitoJUnitRunner.class)
 public class RecyclerViewTests {
-
-    /* @Rule
-    public ActivityTestRule<LoginActivity> main = new ActivityTestRule<>(LoginActivity.class); */
-
     @Test
     @SmallTest
     public void add_message_item_test(){
