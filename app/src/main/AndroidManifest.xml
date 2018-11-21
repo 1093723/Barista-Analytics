@@ -39,7 +39,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".WelcomeScreen.WelcomeLaunchActivity">
+        <activity android:name=".Doubleshot.DoubleshotCategoryCold">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
@@ -56,7 +56,7 @@
             android:name=".SpeechAPI"/>
         <activity android:name=".Order.ProcessOrderActivity" />
         <activity android:name=".Doubleshot.DoubleshotCategoryHot" />
-        <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
+        <activity android:name=".WelcomeScreen.WelcomeLaunchActivity" />
         <activity android:name=".Okoa.OkoaCategoryHot" />
         <activity android:name=".Account_Management.RegisterCustomerActivity" />
         <activity android:name=".Okoa.OkoaSize" />

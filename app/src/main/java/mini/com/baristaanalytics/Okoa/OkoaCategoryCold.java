@@ -48,7 +48,9 @@ import java.util.List;
 
 import Adapter.OkoaColdMenuAdapter;
 import Model.Beverage;
+import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
+import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
@@ -58,8 +60,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         ConnectivityReceiver.ConnectivityReceiverListener,
         RecognitionListener {
     private final String TAG = "OKOA_COLD_CATEGORY";
-    private Dialog helpDialog;
-    private TableRow tableRow;
+
     /**
      * Bruce-related variables
      */
@@ -67,6 +68,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private SpeechProcessorService speechProcessorService;
     // AWS Polly vars
     CognitoCachingCredentialsProvider credentialsProvider;
     private List<Voice> voices;
@@ -85,17 +87,17 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private Context ctx;
     private Beverage beverage;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
-    private Integer[] colors = null;
-    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
     private OkoaColdMenuAdapter adapter;
     private List<Beverage> beverageList;
+    private Dialog helpDialog;
+    private TableRow tableRow;
 
     /**
      * Firebase-related variables
      */
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
-    private DatabaseReference coffeeList,coffee_Order;
+    private DatabaseReference coffeeList,bruce_translations;
 
     /**
      * Google speech to text
@@ -303,6 +305,8 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private void initVariables() {
         btnBruce = findViewById(R.id.btnSpeak);
 
+        speechProcessorService = new SpeechProcessorService();
+
         cupSmall = findViewById(R.id.small_size_coffee_cup);
         cupTall = findViewById(R.id.large_size_coffee_cup);
 
@@ -322,8 +326,8 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         helpDialog = new Dialog(this);
         progressBar = findViewById(R.id.okoa_cold_progress);
         database = FirebaseDatabase.getInstance();
-        coffee_Order = database.getReference("OkoaCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuOkoa");
+        bruce_translations = database.getReference("TRANSLATE_COFFEE_NAMES");
         mAuth = FirebaseAuth.getInstance();
         coffeeNames = new ArrayList<>();
 
@@ -366,7 +370,6 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     protected void onStop(){
         super.onStop();
         if (mediaPlayer!= null) mediaPlayer.release();
-
     }
     /**
      * Callback will be triggered when there is change in
@@ -391,6 +394,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         btnBruce.setEnabled(true);
         btnBruce.setClickable(true);
     }
+
     /**
      * AWS Polly Media Player
      */
@@ -425,7 +429,10 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     }
 
     private void decodeUserInput(String s) {
-
+        if(s.contains("login") || s.contains("sign")){
+            Intent loginActivity = new Intent(this,LoginActivity.class);
+            startActivity(loginActivity);
+        }
     }
     private Long getCoffeePrice(String coffeeName, String size) {
         for (int i = 0; i < beverageList.size(); i++) {
@@ -633,6 +640,11 @@ public class OkoaCategoryCold extends AppCompatActivity implements
             Toast.makeText(ctx, "Unable to get voice response.", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    public void SignIn(View view) {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
     }
 
     private class GetPollyVoices extends AsyncTask<Void, Void, Void> {

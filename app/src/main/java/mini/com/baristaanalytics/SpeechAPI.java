@@ -156,75 +156,37 @@ public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver
      * Setup responding to the user
      */
     private void setupPlayButton(String words){
-        if(words.equals("welcome")){
-            String welcome_message = "Hello. I'm Bruce. Your voice-assistant Barista throughout your " +
-                    "use of the application. I can help you search for coffee places and view available coffee shops near you";
-            MessageItem item = new MessageItem(welcome_message);
-            message_items.add(item);
-            // Create speech synthesis request.
-            SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
-                    new SynthesizeSpeechPresignRequest()
-                            // Set text to synthesize.
-                            .withText(welcome_message)
-                            // Set voice selected by the user.
-                            .withVoiceId(voices.get(33).getId())
-                            // Set format to MP3.
-                            .withOutputFormat(OutputFormat.Mp3);
+        // Create speech synthesis request.
+        SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
+                new SynthesizeSpeechPresignRequest()
+                        // Set text to synthesize.
+                        .withText(words)
+                        // Set voice selected by the user.
+                        .withVoiceId(voices.get(36).getId())
+                        // Set format to MP3.
+                        .withOutputFormat(OutputFormat.Mp3);
 
-            // Get the presigned URL for synthesized speech audio stream.
-            URL presignedSynthesizeSpeechUrl =
-                    client.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
+        // Get the presigned URL for synthesized speech audio stream.
+        URL presignedSynthesizeSpeechUrl =
+                client.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
 
-            Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
+        Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
 
-            // Create a media player to play the synthesized audio stream.
-            if (mediaPlayer.isPlaying()) {
-                setupNewMediaPlayer();
-            }
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-            try {
-                // Set media player's data source to previously obtained URL.
-                mediaPlayer.setDataSource(presignedSynthesizeSpeechUrl.toString());
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to set data source for the media player! " + e.getMessage());
-            }
-
-            // Start the playback asynchronously (since the data source is a network stream).
-            mediaPlayer.prepareAsync();
-        }else {
-            // Create speech synthesis request.
-            SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest =
-                    new SynthesizeSpeechPresignRequest()
-                            // Set text to synthesize.
-                            .withText(words)
-                            // Set voice selected by the user.
-                            .withVoiceId(voices.get(33).getId())
-                            // Set format to MP3.
-                            .withOutputFormat(OutputFormat.Mp3);
-
-            // Get the presigned URL for synthesized speech audio stream.
-            URL presignedSynthesizeSpeechUrl =
-                    client.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
-
-            Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
-
-            // Create a media player to play the synthesized audio stream.
-            if (mediaPlayer.isPlaying()) {
-                setupNewMediaPlayer();
-            }
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-            try {
-                // Set media player's data source to previously obtained URL.
-                mediaPlayer.setDataSource(presignedSynthesizeSpeechUrl.toString());
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to set data source for the media player! " + e.getMessage());
-            }
-
-            // Start the playback asynchronously (since the data source is a network stream).
-            mediaPlayer.prepareAsync();
+        // Create a media player to play the synthesized audio stream.
+        if (!mediaPlayer.isPlaying()) {
+            setupNewMediaPlayer();
         }
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            // Set media player's data source to previously obtained URL.
+            mediaPlayer.setDataSource(presignedSynthesizeSpeechUrl.toString());
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to set data source for the media player! " + e.getMessage());
+        }
+
+        // Start the playback asynchronously (since the data source is a network stream).
+        mediaPlayer.prepareAsync();
 
     }
     /**
@@ -358,7 +320,6 @@ public class SpeechAPI extends AppCompatActivity implements ConnectivityReceiver
             // Log a message with a list of available TTS voices.
             Log.i(TAG, "Available Polly voices: " + voices);
 
-            setupPlayButton("welcome");
             return null;
         }
 

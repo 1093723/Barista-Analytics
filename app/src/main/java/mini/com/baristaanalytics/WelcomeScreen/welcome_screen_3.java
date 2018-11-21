@@ -47,6 +47,14 @@ public class welcome_screen_3 extends Fragment implements RecognitionListener {
         // The button moves you to change password activity. Not part of the logic, just for debugging.
         // Remove the button if you are satisfied with the functionality
         Button button = (Button)view.findViewById(R.id.button_get_started);
+        Button maps = (Button)view.findViewById(R.id.btnMaps);
+        maps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(),MapsActivity.class);
+                startActivity(intent);
+            }
+        });
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

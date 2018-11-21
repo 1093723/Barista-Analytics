@@ -126,7 +126,7 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        setupVoicesList();
+
 
     }
     /**
@@ -167,12 +167,12 @@ public class OkoaCategoryHot extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_hot);
         initVariables();
-
         setupBruce();
         initPollyClient();
         new WaitingTime().execute(4);
         setupNewMediaPlayer();
-
+        setupVoicesList();
+        //setupPlayButton("Something warm from Okoa Coming up.");
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
