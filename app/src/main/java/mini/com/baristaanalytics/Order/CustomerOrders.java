@@ -1,7 +1,6 @@
 package mini.com.baristaanalytics.Order;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -19,7 +18,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import Adapter.CustomerOrdersRecyclerviewAdapter;
-import Adapter.OkoaOrdersRecyclerviewAdapter;
 import Adapter.SectionsPagerAdapter;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
@@ -137,9 +134,9 @@ public class CustomerOrders extends AppCompatActivity {
             for (int i = 0; i < coffeeOrderArrayList.size(); i++) {
                 CoffeeOrder temp = coffeeOrderArrayList.get(i);
                 if(coffeeOrder.getUUID().equals(temp.getUUID())
-                        && coffeeOrder.getOrder_date().equals(temp.getOrder_date())
+                        && coffeeOrder.getOrder_Date().equals(temp.getOrder_Date())
                         ){
-                    coffeeOrderArrayList.get(i).setOrder_rating(coffeeOrder.getOrder_rating());
+                    coffeeOrderArrayList.get(i).setOrder_Rating(coffeeOrder.getOrder_Rating());
                     exists = true;
                     if(!coffeeOrder.getOrder_State().equals(temp.getOrder_State())){
                         sendNotification(coffeeOrder.getOrder_State());

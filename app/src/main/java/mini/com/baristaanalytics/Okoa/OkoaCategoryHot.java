@@ -49,8 +49,10 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.OkoaColdMenuAdapter;
+import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
+import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
@@ -66,6 +68,7 @@ public class OkoaCategoryHot extends AppCompatActivity implements
      * Bruce-related variables
      */
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    private SpeechProcessorService speechProcessorService;
     // AWS Polly vars
     private List<String> coffeeNames;
 
@@ -80,11 +83,10 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     /**
      * Order-related variables
      */
+    private ProgressBar progressBar;
     private CoffeeOrder coffeeOrder;
-    private String confirmation;
-    String order_description;
-    private Boolean final_Confirmation;
-    private ElegantNumberButton btnSmall,btnLarge;
+    private Boolean validCoffeeSize;
+    private Boolean validCoffeeName;
 
     /**
      * Layout-related variables
@@ -96,7 +98,6 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     private List<Beverage> beverageList;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
 
-    private ProgressBar progressBar;
     private TableRow tableRow;
 
     private ImageButton btnBruce;
@@ -311,6 +312,14 @@ public class OkoaCategoryHot extends AppCompatActivity implements
      * Initialize variables to be used
      */
     private void initVariables() {
+
+        validCoffeeSize = false;
+        validCoffeeName = false;
+
+        speechProcessorService = new SpeechProcessorService();
+
+        coffeeOrder = new CoffeeOrder();
+
         btnBruce = findViewById(R.id.btnSpeak);
         progressBar = findViewById(R.id.okoa_hot_progress);
 
@@ -340,8 +349,6 @@ public class OkoaCategoryHot extends AppCompatActivity implements
         mAuth = FirebaseAuth.getInstance();
         txtViewPriceSmall = (TextView)findViewById(R.id.txtView_beverage_price_small);
         txtViewPriceLarge = (TextView)findViewById(R.id.txtView_beverage_price_large);
-        btnLarge = (ElegantNumberButton)findViewById(R.id.number_button_large);
-        btnSmall = (ElegantNumberButton)findViewById(R.id.number_button_small);
         beverageList = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
         database = FirebaseDatabase.getInstance();
@@ -425,7 +432,50 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     }
 
     private void decodeUserInput(String s) {
+        String normalized = s.toLowerCase();
+        String coffeeName = speechProcessorService.getCoffeeName(normalized,coffeeNames);
 
+        if(validCoffeeName || coffeeName!=null){
+            validCoffeeName = true;
+            String coffeeSize = speechProcessorService.getCoffeeSize(normalized);
+            if(coffeeSize != null || validCoffeeSize){
+                validCoffeeSize = true;
+                if(validCoffeeName && validCoffeeSize){
+                    Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
+                    // Prepare order
+                    String description = "1x " + coffeeSize + " " + coffeeName;
+
+                    //String[] splitEmail = mAuth.getCurrentUser().getEmail().split("@");
+                    //String userName = splitEmail[0];
+                    String userName = "MO";
+                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+                        // Proceed to confirm the order
+                        coffeeOrder.setOrder_Description(description);
+                        coffeeOrder.setOrder_CustomerUsername(userName);
+                        coffeeOrder.setOrder_Total(coffeePrice);
+                        coffeeOrder.setOrder_State("Ordered");
+                        coffeeOrder.setOrder_Store("Okoa Coffee Co.");
+                        if(new Database(ctx).databaseExists(ctx)){
+                            new Database(getBaseContext()).addToCart(coffeeOrder);
+                        }else {
+                            Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        String bruceConfirmation = "Just to confirm : That's one " +
+                                coffeeSize + " " + coffeeName + ". Is that correct?";
+                        setupPlayButton(bruceConfirmation);
+                    }
+                }
+
+            }else {
+                String missedCoffeeSize = "Is that a small or tall size cup of coffee";
+                setupPlayButton(missedCoffeeSize);
+            }
+        }else {
+            String didNotGetEntireOrder = "I'm sorry I didn't get your order. Please include the name " +
+                    "and whether you prefer small or tall";
+            setupPlayButton(didNotGetEntireOrder);
+        }
     }
     private Long getCoffeePrice(String coffeeName, String size) {
         for (int i = 0; i < beverageList.size(); i++) {

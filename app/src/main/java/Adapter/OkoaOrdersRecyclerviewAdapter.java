@@ -1,12 +1,8 @@
 package Adapter;
 
-import android.app.Notification;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +19,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-import Model.Barista;
 import Model.CoffeeOrder;
-import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
-
-import static utilities.MyApplication.CHANNEL_1_ID;
 
 public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrdersRecyclerviewAdapter.ViewHolder>{
 
@@ -52,7 +44,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.name.setText(coffeeOrders.get(position).getOrder_CustomerUsername());
         holder.description.setText(coffeeOrders.get(position).getOrder_Description());
-        holder.date_ordered.setText(coffeeOrders.get(position).getOrder_date());
+        holder.date_ordered.setText(coffeeOrders.get(position).getOrder_Date());
         holder.orderSummary.setText(coffeeOrders.get(position).getOrder_Total().toString());
 
         if(coffeeOrders.get(position).getOrder_State().equals("Rejected") ||
@@ -112,7 +104,7 @@ public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrde
                 for(DataSnapshot snap : dataSnapshot.getChildren()){
                     CoffeeOrder coffeeOrder1 = snap.getValue(CoffeeOrder.class);
                     if(coffeeOrder.getUUID().equals(coffeeOrder1.getUUID()) &&
-                            coffeeOrder.getOrder_date().equals(coffeeOrder1.getOrder_date())){
+                            coffeeOrder.getOrder_Date().equals(coffeeOrder1.getOrder_Date())){
                         String key = snap.getKey().toString();
                         databaseReference.child(key).setValue(coffeeOrder);
                     }

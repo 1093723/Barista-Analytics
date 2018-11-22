@@ -46,7 +46,9 @@ import java.util.List;
 import java.util.Locale;
 
 import Adapter.OkoaColdMenuAdapter;
+import Database.Database;
 import Model.Beverage;
+import Model.CoffeeOrder;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
@@ -74,7 +76,11 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
     /**
      * Order-related variables
      */
+    private List<String> coffeeNames;
     private ProgressBar progressBar;
+    private CoffeeOrder coffeeOrder;
+    private Boolean validCoffeeSize;
+    private Boolean validCoffeeName;
     /**
      * Layout-related variables
      */
@@ -102,7 +108,6 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
     // Media player
     private MediaPlayer mediaPlayer;
 
-    private List<String> coffeeNames;
     private ImageView cupSmall,cupTall;
     private TextView txtView_beverage_price_small,
             txtView_beverage_price_tall,txtView_rands_small,txtView_beverage_rands_tall;
@@ -275,6 +280,14 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
     private void initVariables() {
         btnBruce = findViewById(R.id.btnSpeak);
 
+        validCoffeeSize = false;
+        validCoffeeName = false;
+
+        speechProcessorService = new SpeechProcessorService();
+
+        coffeeOrder = new CoffeeOrder();
+
+
         speechProcessorService = new SpeechProcessorService();
 
         cupSmall = findViewById(R.id.small_size_coffee_cup);
@@ -359,9 +372,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
         });
     }
 
-    private void decodeUserInput(String s) {
 
-    }
 
     /**
      * Initialize amazon polly
@@ -431,6 +442,53 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
             Toast.makeText(ctx, "Unable to get voice response.", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void decodeUserInput(String s) {
+        String normalized = s.toLowerCase();
+        String coffeeName = speechProcessorService.getCoffeeName(normalized,coffeeNames);
+
+        if(validCoffeeName || coffeeName!=null){
+            validCoffeeName = true;
+            String coffeeSize = speechProcessorService.getCoffeeSize(normalized);
+            if(coffeeSize != null || validCoffeeSize){
+                validCoffeeSize = true;
+                if(validCoffeeName && validCoffeeSize){
+                    Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
+                    // Prepare order
+                    String description = "1x " + coffeeSize + " " + coffeeName;
+
+                    //String[] splitEmail = mAuth.getCurrentUser().getEmail().split("@");
+                    //String userName = splitEmail[0];
+                    String userName = "MO";
+                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+                        // Proceed to confirm the order
+                        coffeeOrder.setOrder_Description(description);
+                        coffeeOrder.setOrder_CustomerUsername(userName);
+                        coffeeOrder.setOrder_Total(coffeePrice);
+                        coffeeOrder.setOrder_State("Ordered");
+                        coffeeOrder.setOrder_Store("Doubleshot Coffee & Tea");
+                        if(new Database(ctx).databaseExists(ctx)){
+                            new Database(getBaseContext()).addToCart(coffeeOrder);
+                        }else {
+                            Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        String bruceConfirmation = "Just to confirm : That's one " +
+                                coffeeSize + " " + coffeeName + ". Is that correct?";
+                        setupPlayButton(bruceConfirmation);
+                    }
+                }
+
+            }else {
+                String missedCoffeeSize = "Is that a small or tall size cup of coffee";
+                setupPlayButton(missedCoffeeSize);
+            }
+        }else {
+            String didNotGetEntireOrder = "I'm sorry I didn't get your order. Please include the name " +
+                    "and whether you prefer small or tall";
+            setupPlayButton(didNotGetEntireOrder);
+        }
     }
 
     class WaitingTime extends AsyncTask<Integer, Integer, String> {

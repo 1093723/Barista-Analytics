@@ -3,32 +3,37 @@ package Model;
 import java.util.Calendar;
 
 public class CoffeeOrder {
+
+    private Integer order_ID;
     private String uuid;
     private String order_Description;
     private String order_CustomerUsername;
     private Long order_Total;
-    private String order_date;
+    private String order_Date;
     private String order_State;
-    private Float order_rating;
-
+    private Float order_Rating;
     private String order_Store;
-    private String coffeePlaceName;
 
-    public CoffeeOrder(String UUID, String order_Description,
-                       String order_CustomerUsername, Long order_Total, String order_date, String coffeePlaceName) {
-        this.uuid = UUID;
+
+
+    public CoffeeOrder(Integer order_ID, String uuid, String order_Description,
+                       String order_CustomerUsername, Long order_Total, String order_Date,
+                       String order_State, Float order_Rating, String order_Store) {
+        this.order_ID = order_ID;
+        this.uuid = uuid;
         this.order_Description = order_Description;
         this.order_CustomerUsername = order_CustomerUsername;
         this.order_Total = order_Total;
-        this.order_date = order_date;
-        this.coffeePlaceName = coffeePlaceName;
-        this.order_State = "Confirmed";
+        this.order_Date = order_Date;
+        this.order_State = order_State;
+        this.order_Rating = order_Rating;
+        this.order_Store = order_Store;
     }
 
     public CoffeeOrder() {
         this.order_State = "Ordered";
-        this.order_date =java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-        order_rating = Float.valueOf("0");
+        this.order_Date =java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+        order_Rating = Float.valueOf("0");
     }
 
     public String getOrder_Store() {
@@ -37,12 +42,12 @@ public class CoffeeOrder {
     public void setOrder_Store(String order_Store) {
         this.order_Store = order_Store;
     }
-    public String getOrder_date() {
-        return order_date;
+    public String getOrder_Date() {
+        return order_Date;
     }
 
-    public void setOrder_date(String order_date) {
-        this.order_date = order_date;
+    public void setOrder_Date(String order_Date) {
+        this.order_Date = order_Date;
     }
 
     public String getOrder_State() {
@@ -84,19 +89,19 @@ public class CoffeeOrder {
         this.order_CustomerUsername = order_CustomerUsername;
     }
 
-    public Float getOrder_rating() {
-        return order_rating;
+    public Float getOrder_Rating() {
+        return order_Rating;
     }
 
-    public void setOrder_rating(Float order_rating) {
-        this.order_rating = order_rating;
+    public void setOrder_Rating(Float order_Rating) {
+        this.order_Rating = order_Rating;
     }
 
-    public String getCoffeePlaceName() {
-        return coffeePlaceName;
+    public Integer getOrder_ID() {
+        return order_ID;
     }
 
-    public void setCoffeePlaceName(String coffeePlaceName) {
-        this.coffeePlaceName = coffeePlaceName;
+    public void setOrder_ID(Integer order_ID) {
+        this.order_ID = order_ID;
     }
 }

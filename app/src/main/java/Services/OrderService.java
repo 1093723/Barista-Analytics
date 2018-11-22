@@ -2,11 +2,8 @@ package Services;
 
 import com.google.firebase.database.DatabaseReference;
 
-import org.joda.time.DateTime;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import Model.CoffeeOrder;
@@ -22,7 +19,7 @@ public class OrderService {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date_temp = new Date();
         String temp = dateFormat.format(date_temp).toString();
-        order.setOrder_date(temp);
+        order.setOrder_Date(temp);
         if(reference.child(id).setValue(order).isComplete()){
             flag = true;
         }

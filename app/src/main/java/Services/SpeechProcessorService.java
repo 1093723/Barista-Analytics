@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Model.Beverage;
 import Model.CoffeeRecognition;
 import Model.Command;
 import mini.com.baristaanalytics.R;
@@ -291,4 +292,69 @@ public class SpeechProcessorService {
         tempDict.put(intepretations,coffeeName);
         dictionaryListForCoffeeTranslations.add(tempDict);
     }
+
+    /**
+     * Given a single request by a user,
+     * this method will return the name of the coffee that is ordered
+     * e.g input :'I would like 1 small ice tea'
+     * e.g output: 'ice tea
+     * @param userInput
+     * @param coffeeNames
+     * @return
+     */
+    public String getCoffeeName(String userInput, List<String> coffeeNames){
+        List<String> splittedUserOrder = Arrays.asList(userInput.split("and"));
+            List<String> order = Arrays.asList(splittedUserOrder.get(0).split(" "));
+            for (int i = 0; i < coffeeNames.size(); i++) {
+                if(userInput.contains(coffeeNames.get(i))){
+                    return coffeeNames.get(i);
+                }
+            }
+
+        return null;
+    }
+    /**
+     * Given the name of the coffee, list of beverages available and the size of the coffee
+     * ordered,
+     * this method will return the price of the coffee
+     * e.g input :'ice tea', 'small', {name='ice tea',small='25',tall='30'}
+     * e.g output: 25
+     * @param coffeeName
+     * @param coffeeSize
+     * @param beverages
+     * @return price of ordered coffee or null for an invalid name
+     */
+    public Long getCoffeePrice(String coffeeName, String coffeeSize, List<Beverage> beverages){
+        for (int i = 0; i < beverages.size(); i++) {
+            if(beverages.get(i).getBeverage_name().equals(coffeeName)){
+                if(coffeeSize.equals("small")){
+                    return beverages.get(i).getPrice_small();
+                }else if(coffeeSize.equals("tall")){
+                    return beverages.get(i).getPrice_tall();
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * Given the user order,
+     * this method will return the size of the coffee ordered
+     * e.g input : 'I would like 1 small americano'
+     * e.g output: small
+     * @param userInput
+     * @return size of ordered coffee or null for no size specified
+     */
+    public String getCoffeeSize(String userInput){
+        List<String> userSplitted = Arrays.asList(userInput.split(" "));
+        for (int i = 0; i < userSplitted.size(); i++) {
+            if(userSplitted.get(i).equals("small")){
+                return "small";
+            }else if(userSplitted.equals("tall")){
+                return "tall";
+            }
+        }
+        return null;
+    }
+
+
 }

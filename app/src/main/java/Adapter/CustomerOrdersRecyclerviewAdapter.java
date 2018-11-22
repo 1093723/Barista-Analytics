@@ -1,7 +1,6 @@
 package Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,19 +10,16 @@ import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.net.MalformedURLException;
 import java.util.List;
 
 import Model.Barista;
 import Model.CoffeeOrder;
-import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
 
 public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<CustomerOrdersRecyclerviewAdapter.ViewHolder>{
@@ -45,17 +41,17 @@ public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<Cust
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.description.setText(coffeeOrders.get(position).getOrder_Description());
-        holder.date_ordered.setText(coffeeOrders.get(position).getOrder_date());
+        holder.date_ordered.setText(coffeeOrders.get(position).getOrder_Date());
         holder.orderSummary.setText("R" + coffeeOrders.get(position).getOrder_Total().toString());
         holder.confirmed.setText(coffeeOrders.get(position).getOrder_State());
         /*if(!flag){
             flag = true;
-        }*/holder.ratingBar.setRating(coffeeOrders.get(position).getOrder_rating());
+        }*/holder.ratingBar.setRating(coffeeOrders.get(position).getOrder_Rating());
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
 
-                //holder.ratingBar.setRating(coffeeOrders.get(position).getOrder_rating());
+                //holder.ratingBar.setRating(coffeeOrders.get(position).getOrder_Rating());
                 updateOrder(v,coffeeOrders.get(position),holder);
                 updateRating(v,holder);
             }
@@ -71,8 +67,8 @@ public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<Cust
                 for(DataSnapshot snap : dataSnapshot.getChildren()){
                     CoffeeOrder tempOrder = snap.getValue(CoffeeOrder.class);
                     if(tempOrder.getUUID().equals(coffeeOrder.getUUID())
-                            && tempOrder.getOrder_date().equals(coffeeOrder.getOrder_date())){
-                        tempOrder.setOrder_rating(rating);
+                            && tempOrder.getOrder_Date().equals(coffeeOrder.getOrder_Date())){
+                        tempOrder.setOrder_Rating(rating);
                         String key = snap.getKey();
                         databaseReference.child(key).setValue(tempOrder);
 

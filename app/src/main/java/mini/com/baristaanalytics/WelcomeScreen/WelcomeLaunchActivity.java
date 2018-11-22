@@ -16,6 +16,8 @@ import com.yqritc.scalablevideoview.ScalableVideoView;
 
 import java.io.IOException;
 
+import Database.Database;
+import Model.CoffeeOrder;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.R;
 
@@ -29,8 +31,7 @@ public class WelcomeLaunchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_video_intro);
-        scalableVideoView = findViewById(R.id.intro_video);
-        ctx = getApplicationContext();
+        initVariables();
         try {
             scalableVideoView.setRawData(R.raw.background);
             scalableVideoView.setLooping(true);
@@ -43,16 +44,6 @@ public class WelcomeLaunchActivity extends AppCompatActivity {
         } catch (IOException ioe) {
             // handle error
         }
-         introVideoViewPager = findViewById(R.id.intro_viewPager);
-         introVideoViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
-
-        //videoView = findViewById(R.id.intro_video);
-        /*videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.setLooping(true);
-            }
-        });*/
 
         // String path = "android.resource://" + getPackageName() + "/" + "/" + R.raw.background;
         Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.background);
@@ -61,6 +52,17 @@ public class WelcomeLaunchActivity extends AppCompatActivity {
         //videoView.setVideoURI(uri);
         //videoView.start();
     }
+
+    public void initVariables(){
+
+        scalableVideoView = findViewById(R.id.intro_video);
+        ctx = getApplicationContext();
+
+        introVideoViewPager = findViewById(R.id.intro_viewPager);
+        introVideoViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+
+    }
+
     @Override
     public void finish() {
         super.finish();

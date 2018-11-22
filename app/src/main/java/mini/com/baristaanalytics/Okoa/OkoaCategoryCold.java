@@ -1,6 +1,5 @@
 package mini.com.baristaanalytics.Okoa;
 
-import android.animation.ArgbEvaluator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -43,11 +42,12 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import Adapter.OkoaColdMenuAdapter;
+import Database.Database;
 import Model.Beverage;
+import Model.CoffeeOrder;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
@@ -80,6 +80,9 @@ public class OkoaCategoryCold extends AppCompatActivity implements
      * Order-related variables
      */
     private ProgressBar progressBar;
+    private CoffeeOrder coffeeOrder;
+    private Boolean validCoffeeSize;
+    private Boolean validCoffeeName;
     /**
      * Layout-related variables
      */
@@ -163,6 +166,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
@@ -173,7 +177,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                             if(beverage.getBeverage_category().equals("cold")){
                                 String coffeeName = beverage.getBeverage_name().toLowerCase();
                                 beverage.setBeverage_name(coffeeName);
-                                coffeeNames.add(beverage.getBeverage_name());
+                                coffeeNames.add(coffeeName);
                                 beverageList.add(beverage);
                             }
                         }
@@ -181,7 +185,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                         if(beverage.getBeverage_category().equals("cold")){
                             String coffeeName = beverage.getBeverage_name().toLowerCase();
                             beverage.setBeverage_name(coffeeName);
-                            coffeeNames.add(beverage.getBeverage_name());
+                            coffeeNames.add(coffeeName);
                             beverageList.add(beverage);
                         }
                     }
@@ -305,7 +309,12 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private void initVariables() {
         btnBruce = findViewById(R.id.btnSpeak);
 
+        validCoffeeSize = false;
+        validCoffeeName = false;
+
         speechProcessorService = new SpeechProcessorService();
+
+        coffeeOrder = new CoffeeOrder();
 
         cupSmall = findViewById(R.id.small_size_coffee_cup);
         cupTall = findViewById(R.id.large_size_coffee_cup);
@@ -351,7 +360,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     protected void onPause(){
         super.onPause();
         animationDrawable.stop();
-        if (mediaPlayer!= null) mediaPlayer.release();
+        if (mediaPlayer!= null) mediaPlayer.reset();
         //unregisterReceiver(connectivityReceiver);
     }
 
@@ -369,7 +378,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     @Override
     protected void onStop(){
         super.onStop();
-        if (mediaPlayer!= null) mediaPlayer.release();
+        if (mediaPlayer!= null) mediaPlayer.reset();
     }
     /**
      * Callback will be triggered when there is change in
@@ -404,7 +413,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.release();
+                mp.reset();
                 //setupNewMediaPlayer();
                 btnBruce.setEnabled(true);
                 //setupNewMediaPlayer();
@@ -429,36 +438,50 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     }
 
     private void decodeUserInput(String s) {
-        if(s.contains("login") || s.contains("sign")){
-            Intent loginActivity = new Intent(this,LoginActivity.class);
-            startActivity(loginActivity);
-        }
-    }
-    private Long getCoffeePrice(String coffeeName, String size) {
-        for (int i = 0; i < beverageList.size(); i++) {
-            String beverage = beverageList.get(i).getBeverage_name().toLowerCase();
-            if(beverage.contains(coffeeName)){
-                if(size.equals("small")){
-                    return beverageList.get(i).getPrice_small();
-                }else {
-                    return beverageList.get(i).getPrice_tall();
+        String normalized = s.toLowerCase();
+        String coffeeName = speechProcessorService.getCoffeeName(normalized,coffeeNames);
+
+        if(validCoffeeName || coffeeName!=null){
+            validCoffeeName = true;
+            String coffeeSize = speechProcessorService.getCoffeeSize(normalized);
+            if(coffeeSize != null || validCoffeeSize){
+                validCoffeeSize = true;
+                if(validCoffeeName && validCoffeeSize){
+                    Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
+                    // Prepare order
+                    String description = "1x " + coffeeSize + " " + coffeeName;
+
+                    //String[] splitEmail = mAuth.getCurrentUser().getEmail().split("@");
+                    //String userName = splitEmail[0];
+                    String userName = "MO";
+                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+                        // Proceed to confirm the order
+                        coffeeOrder.setOrder_Description(description);
+                        coffeeOrder.setOrder_CustomerUsername(userName);
+                        coffeeOrder.setOrder_Total(coffeePrice);
+                        coffeeOrder.setOrder_State("Ordered");
+                        coffeeOrder.setOrder_Store("Okoa Coffee Co.");
+                        if(new Database(ctx).databaseExists(ctx)){
+                            new Database(getBaseContext()).addToCart(coffeeOrder);
+                        }else {
+                            Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        String bruceConfirmation = "Just to confirm : That's one " +
+                                coffeeSize + " " + coffeeName + ". Is that correct?";
+                        setupPlayButton(bruceConfirmation);
+                    }
                 }
-            }
-        }
-        return null;
-    }
 
-    private String getCoffeeName(String order) {
-        String[] splittedOrder = order.split(" ");
-        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
-
-        for (int i = 0; i < tempOrder.size(); i++) {
-            String temp = tempOrder.get(i).toLowerCase();
-            if(coffeeNames.contains(temp)){
-                return temp;
+            }else {
+                String missedCoffeeSize = "Is that a small or tall size cup of coffee";
+                setupPlayButton(missedCoffeeSize);
             }
+        }else {
+            String didNotGetEntireOrder = "I'm sorry I didn't get your order. Please include the name " +
+                    "and whether you prefer small or tall";
+            setupPlayButton(didNotGetEntireOrder);
         }
-        return "-1";
     }
     /**
      * Initialize amazon polly
