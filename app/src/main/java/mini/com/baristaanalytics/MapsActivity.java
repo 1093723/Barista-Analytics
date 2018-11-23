@@ -560,7 +560,7 @@ public class MapsActivity extends AppCompatActivity implements
     public void get_permission_location(){
         Log.d(TAG, "get_permission_location(): Getting location permission");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if(ContextCompat.checkSelfPermission(this.getApplicationContext(),FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             // We have access to the Fine_Location(Precise location)

@@ -49,8 +49,10 @@ import Adapter.OkoaColdMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
+import Services.OrderService;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
+import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
@@ -98,7 +100,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
      */
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
-    private DatabaseReference coffeeList,bruce_translations;
+    private DatabaseReference coffeeList,doubleshotCoffeeOrders;
 
     /**
      * Google speech to text
@@ -310,7 +312,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
         progressBar = findViewById(R.id.okoa_cold_progress);
         database = FirebaseDatabase.getInstance();
         coffeeList = database.getReference("CoffeeMenuDoubleshot");
-        bruce_translations = database.getReference("TRANSLATE_COFFEE_NAMES");
+        doubleshotCoffeeOrders = database.getReference("TRANSLATE_COFFEE_NAMES");
         mAuth = FirebaseAuth.getInstance();
         coffeeNames = new ArrayList<>();
 
@@ -470,6 +472,16 @@ public class DoubleshotCategoryCold extends AppCompatActivity {
                         coffeeOrder.setOrder_Store("Doubleshot Coffee & Tea");
                         if(new Database(ctx).databaseExists(ctx)){
                             new Database(getBaseContext()).addToCart(coffeeOrder);
+                            if(mAuth.getCurrentUser() != null){
+                                // Process and confirm user order
+                                OrderService orderService = new OrderService();
+                                orderService.process_order(coffeeOrder,doubleshotCoffeeOrders);
+                            }else {
+                                // Take to the sign-in service
+                                Intent intent = new Intent(this,LoginActivity.class);
+                                intent.putExtra("order","ordered");
+                                startActivity(intent);
+                            }
                         }else {
                             Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
                         }

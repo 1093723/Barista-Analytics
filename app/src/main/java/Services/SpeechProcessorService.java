@@ -303,8 +303,6 @@ public class SpeechProcessorService {
      * @return
      */
     public String getCoffeeName(String userInput, List<String> coffeeNames){
-        List<String> splittedUserOrder = Arrays.asList(userInput.split("and"));
-            List<String> order = Arrays.asList(splittedUserOrder.get(0).split(" "));
             for (int i = 0; i < coffeeNames.size(); i++) {
                 if(userInput.contains(coffeeNames.get(i))){
                     return coffeeNames.get(i);

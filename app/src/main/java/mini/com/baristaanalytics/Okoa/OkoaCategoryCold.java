@@ -48,6 +48,7 @@ import Adapter.OkoaColdMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
+import Services.OrderService;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
@@ -100,8 +101,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
      */
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
-    private DatabaseReference coffeeList,bruce_translations;
-
+    private DatabaseReference coffeeList, coffeeOrdersOkoa,bruce_translations;
     /**
      * Google speech to text
      */
@@ -336,6 +336,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         progressBar = findViewById(R.id.okoa_cold_progress);
         database = FirebaseDatabase.getInstance();
         coffeeList = database.getReference("CoffeeMenuOkoa");
+        coffeeOrdersOkoa = database.getReference("OkoaCoffeeOrders");
         bruce_translations = database.getReference("TRANSLATE_COFFEE_NAMES");
         mAuth = FirebaseAuth.getInstance();
         coffeeNames = new ArrayList<>();
@@ -360,7 +361,15 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     protected void onPause(){
         super.onPause();
         animationDrawable.stop();
-        if (mediaPlayer!= null) mediaPlayer.reset();
+        if (mediaPlayer!= null){
+            if(mediaPlayer !=null && mediaPlayer.isPlaying()){
+                Log.d(TAG, "player is running");
+                mediaPlayer.stop();
+                Log.d(TAG, "player is stopped");
+                mediaPlayer.release();
+                Log.d(TAG, "player is released");
+            }
+        }
         //unregisterReceiver(connectivityReceiver);
     }
 
@@ -463,6 +472,16 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                         coffeeOrder.setOrder_Store("Okoa Coffee Co.");
                         if(new Database(ctx).databaseExists(ctx)){
                             new Database(getBaseContext()).addToCart(coffeeOrder);
+                            if(mAuth.getCurrentUser() != null){
+                                // Process and confirm user order
+                                OrderService orderService = new OrderService();
+                                orderService.process_order(coffeeOrder,coffeeOrdersOkoa);
+                            }else {
+                                // Take to the sign-in service
+                                Intent intent = new Intent(this,LoginActivity.class);
+                                intent.putExtra("order","ordered");
+                                startActivity(intent);
+                            }
                         }else {
                             Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
                         }

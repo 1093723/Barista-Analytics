@@ -18,9 +18,9 @@ public class OrderService {
         String id = reference.push().getKey();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date_temp = new Date();
-        String temp = dateFormat.format(date_temp).toString();
+        String temp = dateFormat.format(date_temp);
         order.setOrder_Date(temp);
-        if(reference.child(id).setValue(order).isComplete()){
+        if(reference.child(id).setValue(order).isSuccessful()){
             flag = true;
         }
         return flag;

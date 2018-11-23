@@ -58,8 +58,8 @@
             android:name=".SpeechAPI"/>
         <activity android:name=".Order.ProcessOrderActivity" />
         <activity android:name=".Doubleshot.DoubleshotCategoryCold" />
-        <activity android:name=".Okoa.OkoaCategoryCold" />
         <activity android:name=".Okoa.OkoaCategoryHot" />
+        <activity android:name=".Okoa.OkoaCategoryCold" />
         <activity android:name=".Account_Management.RegisterCustomerActivity" />
         <activity android:name=".Okoa.OkoaSize" />
         <activity android:name=".Doubleshot.DoubleShotSize" />
