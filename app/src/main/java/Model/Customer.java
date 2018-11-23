@@ -11,6 +11,37 @@ public class Customer {
     private String customerUserName;
     private String customerPassword;
     private String customerPhoneNumber;
+    public Customer(){
+
+    }
+    public void setCustomerFirstName(String customerFirstName) {
+        this.customerFirstName = customerFirstName;
+    }
+
+    public void setCustomerLastName(String customerLastName) {
+        this.customerLastName = customerLastName;
+    }
+
+    public void setCustomerAge(String customerAge) {
+        CustomerAge = customerAge;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public void setCustomerUserName(String customerUserName) {
+        this.customerUserName = customerUserName;
+    }
+
+    public void setCustomerPassword(String customerPassword) {
+        this.customerPassword = customerPassword;
+    }
+
+    public void setCustomerPhoneNumber(String customerPhoneNumber) {
+        this.customerPhoneNumber = customerPhoneNumber;
+    }
+
 
 
     public Customer(String customerFirstName, String customerLastName, String customerAge,
