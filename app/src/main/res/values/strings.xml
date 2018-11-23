@@ -47,6 +47,15 @@
         <item>Bruce</item>
     </string-array>
 
+    <string-array name="wordsUpToTen">
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>four</item>
+        <item>five</item>
+        <item>six</item>
+    </string-array>
+
     <string-array name="helpHotwordList">
         <item>help</item>
         <item>useless</item>

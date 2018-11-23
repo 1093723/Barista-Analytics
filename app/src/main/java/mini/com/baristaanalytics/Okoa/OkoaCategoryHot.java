@@ -42,6 +42,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import Adapter.CoffeeMenuAdapter;
@@ -87,7 +89,8 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     private CoffeeOrder coffeeOrder;
     private Boolean validCoffeeSize;
     private Boolean validCoffeeName;
-
+    private List<String> wordCount;
+    private HashMap<String,Integer> matchWordsToNumber;
     /**
      * Layout-related variables
      */
@@ -155,7 +158,7 @@ public class OkoaCategoryHot extends AppCompatActivity implements
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     MessageItem message_item = new MessageItem(result.get(0));
                     message_items.add(message_item);
-                    decodeUserInput(result.get(0));
+                    decodeUserInput(result.get(0).toLowerCase());
                 }
                 break;
             }
@@ -168,6 +171,8 @@ public class OkoaCategoryHot extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_okoa_category_hot);
         initVariables();
+        initWordCountList();
+        initHashMap();
         setupBruce();
         initPollyClient();
         new WaitingTime().execute(4);
@@ -252,6 +257,18 @@ public class OkoaCategoryHot extends AppCompatActivity implements
             }
         });
     }
+
+    private void initWordCountList(){
+        String[] words = getResources().getStringArray(R.array.wordsUpToTen);
+        wordCount = Arrays.asList(words);
+    }
+
+    private void initHashMap() {
+        for (int i = 1; i <= wordCount.size(); i++) {
+            matchWordsToNumber.put(wordCount.get(i),i);
+        }
+    }
+
     private Boolean beverageExists(Beverage beverage){
         for (int i = 0; i < beverageList.size(); i++) {
             if(beverageList.get(i).getBeverage_name().equals(beverage.getBeverage_name())){
@@ -312,6 +329,9 @@ public class OkoaCategoryHot extends AppCompatActivity implements
      * Initialize variables to be used
      */
     private void initVariables() {
+
+        wordCount = new ArrayList<>();
+        matchWordsToNumber = new HashMap<>();
 
         validCoffeeSize = false;
         validCoffeeName = false;
@@ -437,9 +457,22 @@ public class OkoaCategoryHot extends AppCompatActivity implements
         if(isSingleOrder){
             processSingleOrder(s);
         }else {
+            processMultiOrder(s);
             Toast.makeText(ctx, "Multiple orders", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private void processMultiOrder(String input) {
+        String[] orders = input.split("and");
+
+        String orderDescription = "";
+        for (int i = 0; i < orders.length; i++) {
+            String coffeeName = speechProcessorService.getCoffeeName(orders[i],coffeeNames);
+            String coffeeSize = speechProcessorService.getCoffeeSize(orders[i]);
+            Integer quantity = speechProcessorService.getCoffeeQuantity(matchWordsToNumber,input);
+            Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
+        }
     }
 
     private void processSingleOrder(String s) {

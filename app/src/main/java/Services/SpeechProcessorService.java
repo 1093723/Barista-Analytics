@@ -1,11 +1,13 @@
 package Services;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -394,5 +396,18 @@ public class SpeechProcessorService {
      */
     public boolean isSingleOrder(String userInput){
         return userInput.split("and").length>1?false:true;
+    }
+
+    public Integer getCoffeeQuantity(HashMap<String, Integer> matchWordsToNumber, String input) {
+        List<String> splitted = Arrays.asList(input.split(" "));
+        for (int i = 0; i <splitted.size(); i++) {
+            String possibleSize = splitted.get(i);
+            if(matchWordsToNumber.containsKey(possibleSize)){
+                return matchWordsToNumber.get(possibleSize);
+            }else if(TextUtils.isDigitsOnly(possibleSize)){
+                return Integer.parseInt(possibleSize);
+            }
+        }
+        return null;
     }
 }

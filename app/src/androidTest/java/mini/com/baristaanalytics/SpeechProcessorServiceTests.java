@@ -1,9 +1,14 @@
 package mini.com.baristaanalytics;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import Services.SpeechProcessorService;
@@ -158,5 +163,24 @@ public class SpeechProcessorServiceTests {
 
         Assert.assertTrue(speechProcessorService.isDoubleshotCold(line));
         Assert.assertFalse(speechProcessorService.isDoubleshotCold(lineFalse));
+    }
+
+    @Test
+    public void coffeeQuantityTest() throws Exception{
+        Context appContext = InstrumentationRegistry.getTargetContext();
+
+        List<String> wordCount = Arrays.asList(appContext.getResources().getStringArray(R.array.wordsUpToTen));
+        HashMap<String,Integer> matchWordsToNumber = new HashMap<>();
+        for (int i = 0; i < wordCount.size(); i++) {
+            matchWordsToNumber.put(wordCount.get(i),i+1);
+        }
+        String order = "I would like one macchiato";
+        String orderTrueA = "I would like three macchiato";
+        String orderTrue ="I would like 1 macchiato";
+        Integer one = 1;
+        Integer three = 3;
+        Assert.assertEquals(one,speechProcessorService.getCoffeeQuantity(matchWordsToNumber,order));
+        Assert.assertEquals(one,speechProcessorService.getCoffeeQuantity(matchWordsToNumber,orderTrue));
+        Assert.assertEquals(three,speechProcessorService.getCoffeeQuantity(matchWordsToNumber,orderTrueA));
     }
 }
