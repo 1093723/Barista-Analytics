@@ -71,8 +71,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import Database.Database;
 import Model.Barista;
 import Adapter.ImageAdapter;
+import Model.CoffeeOrder;
 import Services.MapsServices;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
@@ -406,6 +408,8 @@ public class MapsActivity extends AppCompatActivity implements
      *This is for searching for available coffee places
      */
     private void init(){
+
+
         btnBruce = findViewById(R.id.btnSpeak);
         progressBar = findViewById(R.id.progressBar1);
 
@@ -556,7 +560,7 @@ public class MapsActivity extends AppCompatActivity implements
     public void get_permission_location(){
         Log.d(TAG, "get_permission_location(): Getting location permission");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.RECORD_AUDIO};
+                Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if(ContextCompat.checkSelfPermission(this.getApplicationContext(),FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             // We have access to the Fine_Location(Precise location)

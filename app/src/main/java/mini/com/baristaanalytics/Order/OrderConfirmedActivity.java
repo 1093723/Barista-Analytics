@@ -1,61 +1,34 @@
 package mini.com.baristaanalytics.Order;
 
-import android.animation.ArgbEvaluator;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.AsyncTask;
-import android.os.SystemClock;
-import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.polly.AmazonPollyPresigningClient;
-import com.amazonaws.services.polly.model.DescribeVoicesRequest;
-import com.amazonaws.services.polly.model.DescribeVoicesResult;
-import com.amazonaws.services.polly.model.OutputFormat;
-import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
-import com.amazonaws.services.polly.model.Voice;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import Adapter.OkoaOrdersRecyclerviewAdapter;
-import Adapter.SectionsPagerAdapter;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
-import utilities.MessageItem;
 import utilities.MyApplication;
 
 import static utilities.MyApplication.CHANNEL_2_ID;
@@ -178,7 +151,7 @@ public class OrderConfirmedActivity extends AppCompatActivity implements Connect
                 CoffeeOrder temp = coffeeOrderArrayList.get(i);
                 if(
                         coffeeOrder.getUUID().equals(temp.getUUID())
-                                && coffeeOrder.getOrder_date().equals(temp.getOrder_date())
+                                && coffeeOrder.getOrder_Date().equals(temp.getOrder_Date())
                         ){
                     // This is a new coffee order(not in arraylist)
                     // Need to check if the status is 'Ordered'

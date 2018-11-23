@@ -1,7 +1,6 @@
 package mini.com.baristaanalytics.Order;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -19,7 +18,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import Adapter.CustomerOrdersRecyclerviewAdapter;
-import Adapter.OkoaOrdersRecyclerviewAdapter;
 import Adapter.SectionsPagerAdapter;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
@@ -51,13 +48,14 @@ import static utilities.MyApplication.CHANNEL_1_ID;
 public class CustomerOrders extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
-    private DatabaseReference coffeeList,coffee_Order;    // Speech to text
+    private DatabaseReference doubleshot,coffee_Order;    // Speech to text
     private ArrayList<CoffeeOrder> coffeeOrderArrayList;
     private FirebaseDatabase database;
     private NotificationManagerCompat notificationManager;
     private Context ctx;
     private String TAG = "CUSTOMER ORDERS";
     private FirebaseAuth firebaseAuth;
+    private String firebaseUserName;
     private ProgressBar progressBar;
     private RelativeLayout relativeLayout;
     private AnimationDrawable animationDrawable;
@@ -80,7 +78,9 @@ public class CustomerOrders extends AppCompatActivity {
         coffeeOrderArrayList = new ArrayList<>();
         notificationManager = NotificationManagerCompat.from(this);
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUserName = firebaseAuth.getCurrentUser().getEmail().split("@")[0];
         coffee_Order = database.getReference("OkoaCoffeeOrders");
+        doubleshot = database.getReference("DoubleshotCoffeeOrders");
         progressBar = findViewById(R.id.cust_orders_progress);        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
         relativeLayout = findViewById(R.id.bruceCustomerOrder);
@@ -89,6 +89,29 @@ public class CustomerOrders extends AppCompatActivity {
         animationDrawable.setExitFadeDuration(2000);
         animationDrawable.start();
         new WaitingTime().execute(3);
+
+        doubleshot.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap :
+                        dataSnapshot.getChildren()) {
+                    CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
+                    if(!exists(coffeeOrder)){
+                        // Update to order status
+                        if(coffeeOrder.getUUID().equals(firebaseAuth.getUid())){
+                            coffeeOrderArrayList.add(coffeeOrder);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         coffee_Order.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -97,7 +120,9 @@ public class CustomerOrders extends AppCompatActivity {
                     CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
                     if(!exists(coffeeOrder)){
                         // Update to order status
-                        coffeeOrderArrayList.add(coffeeOrder);
+                        if(coffeeOrder.getUUID().equals(firebaseAuth.getUid())){
+                            coffeeOrderArrayList.add(coffeeOrder);
+                        }
                     }
                 }
                 initRecyclerView();
@@ -137,9 +162,9 @@ public class CustomerOrders extends AppCompatActivity {
             for (int i = 0; i < coffeeOrderArrayList.size(); i++) {
                 CoffeeOrder temp = coffeeOrderArrayList.get(i);
                 if(coffeeOrder.getUUID().equals(temp.getUUID())
-                        && coffeeOrder.getOrder_date().equals(temp.getOrder_date())
+                        && coffeeOrder.getOrder_Date().equals(temp.getOrder_Date())
                         ){
-                    coffeeOrderArrayList.get(i).setOrder_rating(coffeeOrder.getOrder_rating());
+                    coffeeOrderArrayList.get(i).setOrder_Rating(coffeeOrder.getOrder_Rating());
                     exists = true;
                     if(!coffeeOrder.getOrder_State().equals(temp.getOrder_State())){
                         sendNotification(coffeeOrder.getOrder_State());

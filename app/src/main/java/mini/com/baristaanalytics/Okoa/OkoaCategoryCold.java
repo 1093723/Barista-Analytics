@@ -1,6 +1,5 @@
 package mini.com.baristaanalytics.Okoa;
 
-import android.animation.ArgbEvaluator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -43,14 +42,18 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import Adapter.OkoaColdMenuAdapter;
+import Database.Database;
 import Model.Beverage;
+import Model.CoffeeOrder;
+import Services.OrderService;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
+import mini.com.baristaanalytics.Account_Management.RegisterCustomerActivity;
+import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
@@ -80,6 +83,9 @@ public class OkoaCategoryCold extends AppCompatActivity implements
      * Order-related variables
      */
     private ProgressBar progressBar;
+    private CoffeeOrder coffeeOrder;
+    private Boolean validCoffeeSize;
+    private Boolean validCoffeeName;
     /**
      * Layout-related variables
      */
@@ -97,8 +103,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
      */
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
-    private DatabaseReference coffeeList,bruce_translations;
-
+    private DatabaseReference okoaCoffeeOrders,coffeeList, coffeeOrdersOkoa,bruce_translations;
     /**
      * Google speech to text
      */
@@ -163,6 +168,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         coffeeList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot snap :
                         dataSnapshot.getChildren()) {
                     Beverage beverage = snap.getValue(Beverage.class);
@@ -173,7 +179,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                             if(beverage.getBeverage_category().equals("cold")){
                                 String coffeeName = beverage.getBeverage_name().toLowerCase();
                                 beverage.setBeverage_name(coffeeName);
-                                coffeeNames.add(beverage.getBeverage_name());
+                                coffeeNames.add(coffeeName);
                                 beverageList.add(beverage);
                             }
                         }
@@ -181,7 +187,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                         if(beverage.getBeverage_category().equals("cold")){
                             String coffeeName = beverage.getBeverage_name().toLowerCase();
                             beverage.setBeverage_name(coffeeName);
-                            coffeeNames.add(beverage.getBeverage_name());
+                            coffeeNames.add(coffeeName);
                             beverageList.add(beverage);
                         }
                     }
@@ -305,7 +311,12 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private void initVariables() {
         btnBruce = findViewById(R.id.btnSpeak);
 
+        validCoffeeSize = false;
+        validCoffeeName = false;
+
         speechProcessorService = new SpeechProcessorService();
+
+        coffeeOrder = new CoffeeOrder();
 
         cupSmall = findViewById(R.id.small_size_coffee_cup);
         cupTall = findViewById(R.id.large_size_coffee_cup);
@@ -326,7 +337,9 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         helpDialog = new Dialog(this);
         progressBar = findViewById(R.id.okoa_cold_progress);
         database = FirebaseDatabase.getInstance();
+        okoaCoffeeOrders = database.getReference("OkoaCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuOkoa");
+        coffeeOrdersOkoa = database.getReference("OkoaCoffeeOrders");
         bruce_translations = database.getReference("TRANSLATE_COFFEE_NAMES");
         mAuth = FirebaseAuth.getInstance();
         coffeeNames = new ArrayList<>();
@@ -351,7 +364,15 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     protected void onPause(){
         super.onPause();
         animationDrawable.stop();
-        if (mediaPlayer!= null) mediaPlayer.release();
+        if (mediaPlayer!= null){
+            if(mediaPlayer !=null && mediaPlayer.isPlaying()){
+                Log.d(TAG, "player is running");
+                mediaPlayer.stop();
+                Log.d(TAG, "player is stopped");
+                mediaPlayer.release();
+                Log.d(TAG, "player is released");
+            }
+        }
         //unregisterReceiver(connectivityReceiver);
     }
 
@@ -369,7 +390,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     @Override
     protected void onStop(){
         super.onStop();
-        if (mediaPlayer!= null) mediaPlayer.release();
+        if (mediaPlayer!= null) mediaPlayer.reset();
     }
     /**
      * Callback will be triggered when there is change in
@@ -404,7 +425,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.release();
+                mp.reset();
                 //setupNewMediaPlayer();
                 btnBruce.setEnabled(true);
                 //setupNewMediaPlayer();
@@ -427,38 +448,87 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         });
 
     }
-
     private void decodeUserInput(String s) {
-        if(s.contains("login") || s.contains("sign")){
-            Intent loginActivity = new Intent(this,LoginActivity.class);
-            startActivity(loginActivity);
-        }
-    }
-    private Long getCoffeePrice(String coffeeName, String size) {
-        for (int i = 0; i < beverageList.size(); i++) {
-            String beverage = beverageList.get(i).getBeverage_name().toLowerCase();
-            if(beverage.contains(coffeeName)){
-                if(size.equals("small")){
-                    return beverageList.get(i).getPrice_small();
-                }else {
-                    return beverageList.get(i).getPrice_tall();
+
+        String normalized = s.toLowerCase();
+        String coffeeName = speechProcessorService.getCoffeeName(normalized,coffeeNames);
+
+        if(validCoffeeName || coffeeName!=null){
+            validCoffeeName = true;
+            String coffeeSize = speechProcessorService.getCoffeeSize(normalized);
+            if(coffeeSize != null || validCoffeeSize){
+                validCoffeeSize = true;
+                if(validCoffeeName && validCoffeeSize){
+                    Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
+                    // Proceed to confirm the order
+                    if(coffeePrice != null && coffeeName != null){
+                        String userName = "MO";
+                        String description = "1x " + coffeeSize + " " + coffeeName;
+                        coffeeOrder.setOrder_Description(description);
+                        coffeeOrder.setOrder_CustomerUsername(userName);
+                        coffeeOrder.setOrder_Total(coffeePrice);
+                        coffeeOrder.setOrder_State("Ordered");
+                        coffeeOrder.setOrder_Store("Okoa Coffee Co.");
+                        coffeeOrder.setOrder_Rating(Float.valueOf(0));
+                        coffeeOrder.setOrder_Date("23/11/20180");
+                        new Database(getBaseContext()).clearCart();
+                        new Database(getBaseContext()).addToCart(coffeeOrder);
+                    }
+
+
+                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+                        if(mAuth.getCurrentUser() != null){
+                            // Process and confirm user order
+                            OrderService orderService = new OrderService();
+                            coffeeOrder.setUUID(mAuth.getUid());
+                            String[] splitted = mAuth.getCurrentUser().getEmail().split("@");
+                            coffeeOrder.setOrder_CustomerUsername(splitted[0]);
+                            boolean confirmOrder = orderService.process_order(coffeeOrder,okoaCoffeeOrders);
+                            if(confirmOrder){
+                                Intent intent = new Intent(this,CustomerOrders.class);
+                                resetOrder();
+                                startActivity(intent);
+                            }else {
+                                String failedOrder = "Your order could not be processed at this time";
+                                setupPlayButton(failedOrder);
+                            }
+
+                        }else {
+                            // Take to the sign-in service
+                            Intent intent = new Intent(this,LoginActivity.class);
+                            intent.putExtra("coffeePlaceName","Okoa Coffee Co");
+                            startActivity(intent);
+                        }
+                    }else if(s.contains("no") || s.contains("do not")){
+                        Intent intent = new Intent(this,RegisterCustomerActivity.class);
+                        intent.putExtra("coffeePlaceName","Okoa Coffee Co");
+                        startActivity(intent);
+                    }
+                    else {
+                        String bruceConfirmation = "We're almost there. Do ' a sign-in account?";
+                        setupPlayButton(bruceConfirmation);
+                    }
+                }
+                else {
+                    String missedCoffeeSize = "Is that a small or tall size cup of coffee";
+                    setupPlayButton(missedCoffeeSize);
                 }
             }
+        }else {
+            String didNotGetEntireOrder = "I'm sorry I didn't get your order. Please include the name " +
+                    "and whether you prefer small or tall";
+            setupPlayButton(didNotGetEntireOrder);
         }
-        return null;
     }
-
-    private String getCoffeeName(String order) {
-        String[] splittedOrder = order.split(" ");
-        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
-
-        for (int i = 0; i < tempOrder.size(); i++) {
-            String temp = tempOrder.get(i).toLowerCase();
-            if(coffeeNames.contains(temp)){
-                return temp;
-            }
-        }
-        return "-1";
+    private void resetOrder() {
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
     }
     /**
      * Initialize amazon polly

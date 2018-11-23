@@ -39,11 +39,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import Database.Database;
+import Model.CoffeeOrder;
 import Model.Customer;
+import Services.OrderService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.Order.OrderConfirmedActivity;
@@ -75,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private UserLoginTask mAuthTask = null;
     // Context of application
-    Context ctx;
+    private Context ctx;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -84,21 +89,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // Sign in with email and password
     private FirebaseAuth mAuth;
 
-    ConnectivityReceiver connectivityReceiver;
-    String from_order;
-    TextView account;
+    private ConnectivityReceiver connectivityReceiver;
+    private String from_order;
+    private TextView account;
+
+    // Firebase variables
+    private DatabaseReference orderReference;
+    FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
+
         Intent intent = getIntent();
         account = (TextView)findViewById(R.id.txtViewCreate);
         ctx = this;
+        database = FirebaseDatabase.getInstance();
+
         if(intent != null){
             account.setVisibility(View.GONE);
-            from_order = intent.getStringExtra("sign_in");
-            Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
+            from_order = intent.getStringExtra("coffeePlaceName");
+            if(from_order != null){
+                if(from_order.contains("Okoa")){
+                    // Submit order to the okoa database
+                    orderReference = database.getReference("OkoaCoffeeOrders");
+                }else {
+                    // Take to doubleshot
+                    orderReference = database.getReference("DoubleshotCoffeeOrders");
+                }
+                Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
+            }
         }
         mAuth = FirebaseAuth.getInstance();
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -238,8 +259,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             finish();
                             showProgress(false);
                         }else {
-                            final Intent intent = new Intent(ctx,CustomerOrders.class);
-                            startActivity(intent);
+                            if(from_order != null){
+                                submitOrder();
+                                Intent intent = new Intent(ctx, CustomerOrders.class);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                // Go to customer orders class
+                                Intent intent = new Intent(ctx, UserProfileActivity.class);
+                                startActivity(intent);
+                            }
+
                         }
                         if(from_order != null){
                             finish();
@@ -256,6 +286,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //mAuthTask = new UserLoginTask(email, password);
             //mAuthTask.execute((Void) null);
         }
+    }
+
+    private void submitOrder() {
+        Database database = new Database(ctx);
+
+        List<CoffeeOrder> coffeeOrders = new Database(this).getCarts();
+        OrderService orderService = new OrderService();
+        coffeeOrders.get(0).setUUID(mAuth.getUid());
+        String[] uName = mAuth.getCurrentUser().getEmail().split("@");
+        coffeeOrders.get(0).setOrder_CustomerUsername(uName[0]);
+
+        orderService.process_order(coffeeOrders.get(0),orderReference);
+
     }
 
     private boolean isEmailValid(String email) {

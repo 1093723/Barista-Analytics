@@ -50,7 +50,7 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/order_date"
+                android:id="@+id/order_Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/description_hard"
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_alignTop="@+id/order_date"
+                android:layout_alignTop="@+id/order_Date"
                 android:layout_marginStart="103dp"
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
@@ -81,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/desc"
-                android:layout_below="@+id/order_date"
+                android:layout_below="@+id/order_Date"
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
                 android:text="Order Total:"
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/order_date"
+                android:layout_below="@+id/order_Date"
                 android:layout_marginStart="111dp"
                 android:drawablePadding="10dp"
                 android:ellipsize="end"
