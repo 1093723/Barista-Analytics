@@ -378,7 +378,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
         super.onStop();
         //if(!mediaPlayer.isPlaying()){
         //    mediaPlayer.stop();
-        mediaPlayer.reset();
+        mediaPlayer.release();
         //}
     }
     /**
@@ -407,7 +407,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.release();
+                mp.reset();
                 //setupNewMediaPlayer();
                 btnBruce.setEnabled(true);
                 //setupNewMediaPlayer();
@@ -445,15 +445,15 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
                     Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
                     // Proceed to confirm the order
                     if(coffeePrice != null && coffeeName != null){
-                        String userName = "";
+                        String userName = "MO";
                         String description = "1x " + coffeeSize + " " + coffeeName;
                         coffeeOrder.setOrder_Description(description);
                         coffeeOrder.setOrder_CustomerUsername(userName);
                         coffeeOrder.setOrder_Total(coffeePrice);
                         coffeeOrder.setOrder_State("Ordered");
-                        coffeeOrder.setOrder_Store("Okoa Coffee Co.");
+                        coffeeOrder.setOrder_Store("Doubleshot Coffee & Tea.");
                         coffeeOrder.setOrder_Rating(Float.valueOf(0));
-                        coffeeOrder.setOrder_Date("");
+                        coffeeOrder.setOrder_Date("23/11/20180");
                         new Database(getBaseContext()).clearCart();
                         new Database(getBaseContext()).addToCart(coffeeOrder);
                     }
@@ -527,6 +527,8 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
         // Create a client that supports generation of presigned URLs.
         client = new AmazonPollyPresigningClient(credentialsProvider);
     }
+
+
     private void showToast(boolean isConnected) {
         String message = "Checking";
         if (isConnected) {

@@ -354,5 +354,14 @@ public class SpeechProcessorService {
         return null;
     }
 
-
+    /**
+     * Given a line from a user request, this method determines whether the user requested for one
+     * or more coffee items
+     * @param userInput
+     * @return true if one order is requested
+     * @return false otherwise
+     */
+    public boolean isSingleOrder(String userInput){
+        return userInput.split("and").length>1?false:true;
+    }
 }

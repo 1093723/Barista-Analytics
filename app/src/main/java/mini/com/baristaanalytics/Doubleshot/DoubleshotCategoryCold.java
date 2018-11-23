@@ -746,7 +746,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity implements
 
             // Log a message with a list of available TTS voices.
             Log.i(TAG, "Available Polly voices: " + voices);
-            setupPlayButton("Let's get Something to cool down the summer heat from Okoa");
+            setupPlayButton("Let's get Something to cool down the summer heat from Doubleshot");
             return null;
         }
 

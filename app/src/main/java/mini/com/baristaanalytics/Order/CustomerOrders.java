@@ -48,7 +48,7 @@ import static utilities.MyApplication.CHANNEL_1_ID;
 public class CustomerOrders extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
-    private DatabaseReference coffeeList,coffee_Order;    // Speech to text
+    private DatabaseReference doubleshot,coffee_Order;    // Speech to text
     private ArrayList<CoffeeOrder> coffeeOrderArrayList;
     private FirebaseDatabase database;
     private NotificationManagerCompat notificationManager;
@@ -80,6 +80,7 @@ public class CustomerOrders extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUserName = firebaseAuth.getCurrentUser().getEmail().split("@")[0];
         coffee_Order = database.getReference("OkoaCoffeeOrders");
+        doubleshot = database.getReference("DoubleshotCoffeeOrders");
         progressBar = findViewById(R.id.cust_orders_progress);        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
         relativeLayout = findViewById(R.id.bruceCustomerOrder);
@@ -88,6 +89,29 @@ public class CustomerOrders extends AppCompatActivity {
         animationDrawable.setExitFadeDuration(2000);
         animationDrawable.start();
         new WaitingTime().execute(3);
+
+        doubleshot.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap :
+                        dataSnapshot.getChildren()) {
+                    CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
+                    if(!exists(coffeeOrder)){
+                        // Update to order status
+                        if(coffeeOrder.getUUID().equals(firebaseAuth.getUid())){
+                            coffeeOrderArrayList.add(coffeeOrder);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         coffee_Order.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
