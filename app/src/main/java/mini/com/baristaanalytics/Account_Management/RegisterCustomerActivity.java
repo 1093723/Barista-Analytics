@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,18 +23,25 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.twilio.rest.chat.v1.service.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import Database.Database;
+import Model.CoffeeOrder;
 import Services.CustomerService;
 import Services.ActorsServiceHelper;
+import Services.OrderService;
 import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
+import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.R;
 
 public class RegisterCustomerActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Context ctx;
-    private DatabaseReference databaseCustomer;
+    private DatabaseReference databaseCustomer,orderReference;
+    private FirebaseDatabase database;
     private Activity  activity;
     private ProgressBar mProgressView;
     ArrayList<EditText>registrationDetails;
@@ -45,12 +53,14 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_customer_register);
         this.ctx = this;
         mProgressView = findViewById(R.id.signUp_progress);
-        mAuth = FirebaseAuth.getInstance();
         Intent intent = getIntent();
+        ctx = this;
+        database = FirebaseDatabase.getInstance();
+
         if(intent != null){
-            from_order = intent.getStringExtra("sign_in");
-            Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
+            from_order = intent.getStringExtra("coffeePlaceName");
         }
+        mAuth = FirebaseAuth.getInstance();
         setValues(intent);
         this.activity  = this;
         databaseCustomer = FirebaseDatabase.getInstance().getReference("CUSTOMER");
@@ -119,25 +129,23 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
                             if(from_order != null){
-                                Toast.makeText(ctx, "Welcome. You're now registered",
-                                        Toast.LENGTH_LONG).show();
-                                showProgress(false);
-                                finish();
-                            }
-                            else{
-                                showProgress(false);
-                                Intent goToOkoaCoffeeDetails = new Intent(ctx,OkoaCoffeeDetails.class);
-                                goToOkoaCoffeeDetails.putExtra("beverage_name", beverageName);
-                                goToOkoaCoffeeDetails.putExtra("beverage_description", beverageDescription);
-                                goToOkoaCoffeeDetails.putExtra("beverage_image", beverageImage);
-                                goToOkoaCoffeeDetails.putExtra("price_small", beveragePriceSmall);
-                                goToOkoaCoffeeDetails.putExtra("price_tall", beveragePriceTall);
-                                goToOkoaCoffeeDetails.putExtra("orderQuantity", 1);
-                                startActivity(goToOkoaCoffeeDetails);
+                                if(from_order.contains("Okoa")){
+                                    // Submit order to the okoa database
+                                    orderReference = database.getReference("OkoaCoffeeOrders");
+                                    submitOrder();
+                                    Intent intent = new Intent(ctx,CustomerOrders.class);
+                                    startActivity(intent);
+                                }else {
+                                    // Take to doubleshot
+                                    orderReference = database.getReference("DoubleshotCoffeeOrders");
+                                    submitOrder();
 
+                                }
+                                Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
+                            }else {
+                                Intent intent = new Intent(ctx,UserProfileActivity.class);
+                                startActivity(intent);
                             }
                         } else {
                             // If sign in fails, display a message to the user.
@@ -157,6 +165,21 @@ public class RegisterCustomerActivity extends AppCompatActivity {
         }
         return check;
     }
+
+    private void submitOrder() {
+        Database database = new Database(ctx);
+
+        List<CoffeeOrder> coffeeOrders = new Database(this).getCarts();
+        OrderService orderService = new OrderService();
+        coffeeOrders.get(0).setUUID(mAuth.getUid());
+        String[] uName = mAuth.getCurrentUser().getEmail().split("@");
+        coffeeOrders.get(0).setOrder_CustomerUsername(uName[0]);
+
+        orderService.process_order(coffeeOrders.get(0),orderReference);
+
+    }
+
+
     private void setValues(Intent intent) {
         beverageName = intent.getStringExtra("beverage_name");
         beverageDescription = intent.getStringExtra("beverage_description");

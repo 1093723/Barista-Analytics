@@ -53,6 +53,7 @@ import Services.OrderService;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
+import mini.com.baristaanalytics.Account_Management.RegisterCustomerActivity;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
@@ -483,6 +484,10 @@ public class OkoaCategoryHot extends AppCompatActivity implements
                                 intent.putExtra("coffeePlaceName","Okoa Coffee Co");
                                 startActivity(intent);
                             }
+                    }else if(s.contains("no") || s.contains("do not")){
+                        Intent intent = new Intent(this,RegisterCustomerActivity.class);
+                        intent.putExtra("coffeePlaceName","Okoa Coffee Co");
+                        startActivity(intent);
                     }
                     else {
                             String bruceConfirmation = "We're almost there. Do ' a sign-in account?";

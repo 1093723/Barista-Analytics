@@ -113,14 +113,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if(from_order != null){
                 if(from_order.contains("Okoa")){
                     // Submit order to the okoa database
-   if(from_order.contains("Okoa")){
-                // Submit order to the okoa database
-                orderReference = database.getReference("OkoaCoffeeOrders");
-            }else {
-                // Take to doubleshot
-                orderReference = database.getReference("DoubleshotCoffeeOrders");
-            }
-            Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();                 orderReference = database.getReference("OkoaCoffeeOrders");
+                    orderReference = database.getReference("OkoaCoffeeOrders");
                 }else {
                     // Take to doubleshot
                     orderReference = database.getReference("DoubleshotCoffeeOrders");
@@ -273,7 +266,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 finish();
                             }else {
                                 // Go to customer orders class
-                                Intent intent = new Intent(ctx, CustomerOrders.class);
+                                Intent intent = new Intent(ctx, UserProfileActivity.class);
                                 startActivity(intent);
                             }
 

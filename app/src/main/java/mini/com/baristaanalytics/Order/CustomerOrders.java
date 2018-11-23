@@ -55,6 +55,7 @@ public class CustomerOrders extends AppCompatActivity {
     private Context ctx;
     private String TAG = "CUSTOMER ORDERS";
     private FirebaseAuth firebaseAuth;
+    private String firebaseUserName;
     private ProgressBar progressBar;
     private RelativeLayout relativeLayout;
     private AnimationDrawable animationDrawable;
@@ -77,6 +78,7 @@ public class CustomerOrders extends AppCompatActivity {
         coffeeOrderArrayList = new ArrayList<>();
         notificationManager = NotificationManagerCompat.from(this);
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUserName = firebaseAuth.getCurrentUser().getEmail().split("@")[0];
         coffee_Order = database.getReference("OkoaCoffeeOrders");
         progressBar = findViewById(R.id.cust_orders_progress);        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCustomerConfirmed);
@@ -94,7 +96,9 @@ public class CustomerOrders extends AppCompatActivity {
                     CoffeeOrder coffeeOrder = snap.getValue(CoffeeOrder.class);
                     if(!exists(coffeeOrder)){
                         // Update to order status
-                        coffeeOrderArrayList.add(coffeeOrder);
+                        if(coffeeOrder.getUUID().equals(firebaseAuth.getUid())){
+                            coffeeOrderArrayList.add(coffeeOrder);
+                        }
                     }
                 }
                 initRecyclerView();
