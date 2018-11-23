@@ -52,6 +52,8 @@ import Services.OrderService;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
+import mini.com.baristaanalytics.Account_Management.RegisterCustomerActivity;
+import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
@@ -101,7 +103,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
      */
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
-    private DatabaseReference coffeeList, coffeeOrdersOkoa,bruce_translations;
+    private DatabaseReference okoaCoffeeOrders,coffeeList, coffeeOrdersOkoa,bruce_translations;
     /**
      * Google speech to text
      */
@@ -335,6 +337,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         helpDialog = new Dialog(this);
         progressBar = findViewById(R.id.okoa_cold_progress);
         database = FirebaseDatabase.getInstance();
+        okoaCoffeeOrders = database.getReference("OkoaCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuOkoa");
         coffeeOrdersOkoa = database.getReference("OkoaCoffeeOrders");
         bruce_translations = database.getReference("TRANSLATE_COFFEE_NAMES");
@@ -445,8 +448,8 @@ public class OkoaCategoryCold extends AppCompatActivity implements
         });
 
     }
-
     private void decodeUserInput(String s) {
+
         String normalized = s.toLowerCase();
         String coffeeName = speechProcessorService.getCoffeeName(normalized,coffeeNames);
 
@@ -457,50 +460,75 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                 validCoffeeSize = true;
                 if(validCoffeeName && validCoffeeSize){
                     Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
-                    // Prepare order
-                    String description = "1x " + coffeeSize + " " + coffeeName;
-
-                    //String[] splitEmail = mAuth.getCurrentUser().getEmail().split("@");
-                    //String userName = splitEmail[0];
-                    String userName = "MO";
-                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
-                        // Proceed to confirm the order
+                    // Proceed to confirm the order
+                    if(coffeePrice != null && coffeeName != null){
+                        String userName = "MO";
+                        String description = "1x " + coffeeSize + " " + coffeeName;
                         coffeeOrder.setOrder_Description(description);
                         coffeeOrder.setOrder_CustomerUsername(userName);
                         coffeeOrder.setOrder_Total(coffeePrice);
                         coffeeOrder.setOrder_State("Ordered");
                         coffeeOrder.setOrder_Store("Okoa Coffee Co.");
-                        if(new Database(ctx).databaseExists(ctx)){
-                            new Database(getBaseContext()).addToCart(coffeeOrder);
-                            if(mAuth.getCurrentUser() != null){
-                                // Process and confirm user order
-                                OrderService orderService = new OrderService();
-                                orderService.process_order(coffeeOrder,coffeeOrdersOkoa);
-                            }else {
-                                // Take to the sign-in service
-                                Intent intent = new Intent(this,LoginActivity.class);
-                                intent.putExtra("order","ordered");
+                        coffeeOrder.setOrder_Rating(Float.valueOf(0));
+                        coffeeOrder.setOrder_Date("23/11/20180");
+                        new Database(getBaseContext()).clearCart();
+                        new Database(getBaseContext()).addToCart(coffeeOrder);
+                    }
+
+
+                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+                        if(mAuth.getCurrentUser() != null){
+                            // Process and confirm user order
+                            OrderService orderService = new OrderService();
+                            coffeeOrder.setUUID(mAuth.getUid());
+                            String[] splitted = mAuth.getCurrentUser().getEmail().split("@");
+                            coffeeOrder.setOrder_CustomerUsername(splitted[0]);
+                            boolean confirmOrder = orderService.process_order(coffeeOrder,okoaCoffeeOrders);
+                            if(confirmOrder){
+                                Intent intent = new Intent(this,CustomerOrders.class);
+                                resetOrder();
                                 startActivity(intent);
+                            }else {
+                                String failedOrder = "Your order could not be processed at this time";
+                                setupPlayButton(failedOrder);
                             }
+
                         }else {
-                            Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
+                            // Take to the sign-in service
+                            Intent intent = new Intent(this,LoginActivity.class);
+                            intent.putExtra("coffeePlaceName","Okoa Coffee Co");
+                            startActivity(intent);
                         }
-                    }else {
-                        String bruceConfirmation = "Just to confirm : That's one " +
-                                coffeeSize + " " + coffeeName + ". Is that correct?";
+                    }else if(s.contains("no") || s.contains("do not")){
+                        Intent intent = new Intent(this,RegisterCustomerActivity.class);
+                        intent.putExtra("coffeePlaceName","Okoa Coffee Co");
+                        startActivity(intent);
+                    }
+                    else {
+                        String bruceConfirmation = "We're almost there. Do ' a sign-in account?";
                         setupPlayButton(bruceConfirmation);
                     }
                 }
-
-            }else {
-                String missedCoffeeSize = "Is that a small or tall size cup of coffee";
-                setupPlayButton(missedCoffeeSize);
+                else {
+                    String missedCoffeeSize = "Is that a small or tall size cup of coffee";
+                    setupPlayButton(missedCoffeeSize);
+                }
             }
         }else {
             String didNotGetEntireOrder = "I'm sorry I didn't get your order. Please include the name " +
                     "and whether you prefer small or tall";
             setupPlayButton(didNotGetEntireOrder);
         }
+    }
+    private void resetOrder() {
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
     }
     /**
      * Initialize amazon polly
