@@ -1,20 +1,16 @@
 package Services;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import Model.Beverage;
-import Model.CoffeeRecognition;
 import Model.Command;
-import mini.com.baristaanalytics.R;
 
 public class SpeechProcessorService {
     private String TAG = "SpeechProcessorService";
