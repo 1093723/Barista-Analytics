@@ -177,7 +177,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="3dp"
                 android:layout_marginRight="3dp"
-                android:onClick="help_tutorial"
+                android:onClick="help_tutorial_cold"
                 android:src="@drawable/ic_help_outline_black_24dp"
                 android:tint="@color/white" />
 

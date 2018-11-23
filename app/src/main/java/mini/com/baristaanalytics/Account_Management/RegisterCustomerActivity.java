@@ -140,7 +140,8 @@ public class RegisterCustomerActivity extends AppCompatActivity {
                                     // Take to doubleshot
                                     orderReference = database.getReference("DoubleshotCoffeeOrders");
                                     submitOrder();
-
+                                    Intent intent = new Intent(ctx,CustomerOrders.class);
+                                    startActivity(intent);
                                 }
                                 Toast.makeText(ctx, from_order, Toast.LENGTH_SHORT).show();
                             }else {

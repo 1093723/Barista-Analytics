@@ -1,7 +1,6 @@
 package mini.com.baristaanalytics.Doubleshot;
 
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
@@ -33,7 +32,6 @@ import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
 import com.amazonaws.services.polly.model.Voice;
-import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,17 +42,18 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import Adapter.OkoaColdMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
+import Services.OrderService;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
-import mini.com.baristaanalytics.Okoa.OkoaCategoryHot;
+import mini.com.baristaanalytics.Account_Management.LoginActivity;
+import mini.com.baristaanalytics.Account_Management.RegisterCustomerActivity;
+import mini.com.baristaanalytics.Order.CustomerOrders;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import mini.com.baristaanalytics.R;
@@ -109,7 +108,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
      */
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
-    private DatabaseReference coffeeList,coffee_Order;
+    private DatabaseReference coffeeList, doubleshotCoffeeOrders;
 
     /**
      * Google speech to text
@@ -352,7 +351,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
         beverageList = new ArrayList<>();
         coffeeOrder = new CoffeeOrder();
         database = FirebaseDatabase.getInstance();
-        coffee_Order = database.getReference("DoubleshotCoffeeOrders");
+        doubleshotCoffeeOrders = database.getReference("DoubleshotCoffeeOrders");
         coffeeList = database.getReference("CoffeeMenuDoubleshot");
     }
 
@@ -433,6 +432,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
     }
 
     private void decodeUserInput(String s) {
+
         String normalized = s.toLowerCase();
         String coffeeName = speechProcessorService.getCoffeeName(normalized,coffeeNames);
 
@@ -443,34 +443,59 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
                 validCoffeeSize = true;
                 if(validCoffeeName && validCoffeeSize){
                     Long coffeePrice = speechProcessorService.getCoffeePrice(coffeeName,coffeeSize,beverageList);
-                    // Prepare order
-                    String description = "1x " + coffeeSize + " " + coffeeName;
-
-                    //String[] splitEmail = mAuth.getCurrentUser().getEmail().split("@");
-                    //String userName = splitEmail[0];
-                    String userName = "MO";
-                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
-                        // Proceed to confirm the order
+                    // Proceed to confirm the order
+                    if(coffeePrice != null && coffeeName != null){
+                        String userName = "";
+                        String description = "1x " + coffeeSize + " " + coffeeName;
                         coffeeOrder.setOrder_Description(description);
                         coffeeOrder.setOrder_CustomerUsername(userName);
                         coffeeOrder.setOrder_Total(coffeePrice);
                         coffeeOrder.setOrder_State("Ordered");
-                        coffeeOrder.setOrder_Store("Doubleshot Coffee & Tea");
-                        if(new Database(ctx).databaseExists(ctx)){
-                            new Database(getBaseContext()).addToCart(coffeeOrder);
+                        coffeeOrder.setOrder_Store("Okoa Coffee Co.");
+                        coffeeOrder.setOrder_Rating(Float.valueOf(0));
+                        coffeeOrder.setOrder_Date("");
+                        new Database(getBaseContext()).clearCart();
+                        new Database(getBaseContext()).addToCart(coffeeOrder);
+                    }
+
+
+                    if(s.contains("yes") || s.contains("yeah") || s.contains("sure")){
+                        if(mAuth.getCurrentUser() != null){
+                            // Process and confirm user order
+                            OrderService orderService = new OrderService();
+                            coffeeOrder.setUUID(mAuth.getUid());
+                            String[] splitted = mAuth.getCurrentUser().getEmail().split("@");
+                            coffeeOrder.setOrder_CustomerUsername(splitted[0]);
+                            boolean confirmOrder = orderService.process_order(coffeeOrder,doubleshotCoffeeOrders);
+                            if(confirmOrder){
+                                Intent intent = new Intent(this,CustomerOrders.class);
+                                resetOrder();
+                                startActivity(intent);
+                            }else {
+                                String failedOrder = "Your order could not be processed at this time";
+                                setupPlayButton(failedOrder);
+                            }
+
                         }else {
-                            Toast.makeText(ctx, "Database does not exist", Toast.LENGTH_SHORT).show();
+                            // Take to the sign-in service
+                            Intent intent = new Intent(this,LoginActivity.class);
+                            intent.putExtra("coffeePlaceName","Doubleshot Coffee & Tea");
+                            startActivity(intent);
                         }
-                    }else {
-                        String bruceConfirmation = "Just to confirm : That's one " +
-                                coffeeSize + " " + coffeeName + ". Is that correct?";
+                    }else if(s.contains("no") || s.contains("do not")){
+                        Intent intent = new Intent(this,RegisterCustomerActivity.class);
+                        intent.putExtra("coffeePlaceName","Doubleshot Coffee & Tea");
+                        startActivity(intent);
+                    }
+                    else {
+                        String bruceConfirmation = "We're almost there. Do ' a sign-in account?";
                         setupPlayButton(bruceConfirmation);
                     }
                 }
-
-            }else {
-                String missedCoffeeSize = "Is that a small or tall size cup of coffee";
-                setupPlayButton(missedCoffeeSize);
+                else {
+                    String missedCoffeeSize = "Is that a small or tall size cup of coffee";
+                    setupPlayButton(missedCoffeeSize);
+                }
             }
         }else {
             String didNotGetEntireOrder = "I'm sorry I didn't get your order. Please include the name " +
@@ -478,33 +503,15 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
             setupPlayButton(didNotGetEntireOrder);
         }
     }
-
-
-    private Long getCoffeePrice(String coffeeName, String size) {
-        for (int i = 0; i < beverageList.size(); i++) {
-            String beverage = beverageList.get(i).getBeverage_name().toLowerCase();
-            if(beverage.contains(coffeeName)){
-                if(size.equals("small")){
-                    return beverageList.get(i).getPrice_small();
-                }else {
-                    return beverageList.get(i).getPrice_tall();
-                }
-            }
-        }
-        return null;
-    }
-
-    private String getCoffeeName(String order) {
-        String[] splittedOrder = order.split(" ");
-        ArrayList<String> tempOrder = new ArrayList<>(Arrays.asList(splittedOrder));
-
-        for (int i = 0; i < tempOrder.size(); i++) {
-            String temp = tempOrder.get(i).toLowerCase();
-            if(coffeeNames.contains(temp)){
-                return temp;
-            }
-        }
-        return "-1";
+    private void resetOrder() {
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
+        this.coffeeOrder.setOrder_Rating(null);
     }
     /**
      * Initialize amazon polly
