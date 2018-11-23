@@ -2,7 +2,6 @@ package mini.com.baristaanalytics;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +13,6 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.speech.RecognitionListener;
@@ -69,12 +67,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import Database.Database;
 import Model.Barista;
-import Adapter.ImageAdapter;
-import Model.CoffeeOrder;
 import Services.MapsServices;
 import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
@@ -85,16 +79,13 @@ import mini.com.baristaanalytics.Okoa.OkoaCategoryHot;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
 import utilities.MyApplication;
-import utilities.Upload;
 
 public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         ConnectivityReceiver.ConnectivityReceiverListener,
         RecognitionListener{
     private RecyclerView mRecyclerView;
-    private ImageAdapter mAdapter;
     private Boolean proceed;
-    private List<Upload> mUploads;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     //Order Specific
@@ -426,7 +417,6 @@ public class MapsActivity extends AppCompatActivity implements
         isHotOrColdQuestionOkoa = false;
         speechProcessorService = new SpeechProcessorService();        ctx = this;
         btn = findViewById(R.id.btnSpeak);
-        mUploads = new ArrayList<>();
         textInputSearch = findViewById(R.id.textInputSearch);
         mapsServices = new MapsServices();
         proceed = false;

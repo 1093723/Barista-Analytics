@@ -21,10 +21,20 @@ public class SpeechProcessorService {
     // List of words which trigger Bruce to show supported coffee places
     private List<String> okoaRequest;
     private List<String>doubleshotRequest;
+
+    public void setGreetings(List<String> greetings) {
+        Greetings = greetings;
+    }
+
     private List<String>Greetings;
     private List<String>requestHelp;
     private List<String>requestHotBeverages;
     private List<String>requestColdBeverages;
+
+    public void setRequestAvailableCoffeePlaces(List<String> requestAvailableCoffeePlaces) {
+        this.requestAvailableCoffeePlaces = requestAvailableCoffeePlaces;
+    }
+
     private List<String> requestAvailableCoffeePlaces;
     private List<Map<List<String>,String>> dictionaryListForCoffeeTranslations;
 
@@ -268,14 +278,14 @@ public class SpeechProcessorService {
      *                    Functionality related to Processing User                  *
      *                                                                              *
      ********************************************************************************/
-    public void initializeBruceCoffeePlaceRecognition(DataSnapshot dataSnapshot){
+    /*public void initializeBruceCoffeePlaceRecognition(DataSnapshot dataSnapshot){
         for (DataSnapshot snap :
                 dataSnapshot.getChildren()) {
             CoffeeRecognition coffeeRecognition = snap.getValue(CoffeeRecognition.class);
             processCoffeeDescription(coffeeRecognition.getBruceIterpretationCoffeeNames(),
                     coffeeRecognition.getCoffeeName());
         }
-    }
+    }*/
 
     /**
      * This method processes the possible ways in which Bruce can translate the users'
@@ -284,14 +294,14 @@ public class SpeechProcessorService {
      *                                      which refer to individual coffee names
      * @param coffeeName is the actual name of the coffee
      */
-    private void processCoffeeDescription(String bruceIterpretationCoffeeNames,
+    /*private void processCoffeeDescription(String bruceIterpretationCoffeeNames,
                                           String coffeeName) {
         String[] coffeeNamesInterpretations = bruceIterpretationCoffeeNames.split(",");
         List<String> intepretations  = Arrays.asList(coffeeNamesInterpretations);
         Map<List<String>, String> tempDict = new HashMap<>();
         tempDict.put(intepretations,coffeeName);
         dictionaryListForCoffeeTranslations.add(tempDict);
-    }
+    }*/
 
     /**
      * Given a single request by a user,
