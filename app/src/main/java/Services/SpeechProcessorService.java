@@ -14,8 +14,18 @@ import Model.Command;
 
 public class SpeechProcessorService {
     private String TAG = "SpeechProcessorService";
+
+    public void setOkoaRequest(List<String> okoaRequest) {
+        this.okoaRequest = okoaRequest;
+    }
+
     // List of words which trigger Bruce to show supported coffee places
     private List<String> okoaRequest;
+
+    public void setDoubleshotRequest(List<String> doubleshotRequest) {
+        this.doubleshotRequest = doubleshotRequest;
+    }
+
     private List<String>doubleshotRequest;
 
     public void setGreetings(List<String> greetings) {
@@ -23,8 +33,23 @@ public class SpeechProcessorService {
     }
 
     private List<String>Greetings;
+
+    public void setRequestHelp(List<String> requestHelp) {
+        this.requestHelp = requestHelp;
+    }
+
     private List<String>requestHelp;
+
+    public void setRequestHotBeverages(List<String> requestHotBeverages) {
+        this.requestHotBeverages = requestHotBeverages;
+    }
+
     private List<String>requestHotBeverages;
+
+    public void setRequestColdBeverages(List<String> requestColdBeverages) {
+        this.requestColdBeverages = requestColdBeverages;
+    }
+
     private List<String>requestColdBeverages;
 
     public void setRequestAvailableCoffeePlaces(List<String> requestAvailableCoffeePlaces) {
