@@ -22,13 +22,13 @@ import java.util.List;
 import Model.Beverage;
 import mini.com.baristaanalytics.R;
 
-public class OkoaColdMenuAdapter extends PagerAdapter{
+public class CoffeeMenuAdapter extends PagerAdapter{
 
     private List<Beverage> models;
     private LayoutInflater layoutInflater;
     private Context context;
 
-    public OkoaColdMenuAdapter(List<Beverage> models, Context context) {
+    public CoffeeMenuAdapter(List<Beverage> models, Context context) {
         this.models = models;
         this.context = context;
     }

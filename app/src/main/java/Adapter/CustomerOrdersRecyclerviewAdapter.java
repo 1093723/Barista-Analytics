@@ -44,9 +44,7 @@ public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<Cust
         holder.date_ordered.setText(coffeeOrders.get(position).getOrder_Date());
         holder.orderSummary.setText("R" + coffeeOrders.get(position).getOrder_Total().toString());
         holder.confirmed.setText(coffeeOrders.get(position).getOrder_State());
-        /*if(!flag){
-            flag = true;
-        }*/holder.ratingBar.setRating(coffeeOrders.get(position).getOrder_Rating());
+        holder.ratingBar.setRating(coffeeOrders.get(position).getOrder_Rating());
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
@@ -71,7 +69,6 @@ public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<Cust
                         tempOrder.setOrder_Rating(rating);
                         String key = snap.getKey();
                         databaseReference.child(key).setValue(tempOrder);
-
                         break;
                     }
                 }
@@ -100,7 +97,7 @@ public class CustomerOrdersRecyclerviewAdapter extends RecyclerView.Adapter<Cust
                         String key = snap.getKey();
                         //holder.ratingBar.setClickable(false);
                         //holder.ratingBar.setActivated(false);
-                        //holder.ratingBar.setEnabled(false);
+                        holder.ratingBar.setEnabled(false);
                         databaseReference.child(key).setValue(barista);
                         break;
                     }

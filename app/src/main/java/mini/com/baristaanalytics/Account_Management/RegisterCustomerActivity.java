@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.twilio.rest.chat.v1.service.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,6 @@ import Model.CoffeeOrder;
 import Services.CustomerService;
 import Services.ActorsServiceHelper;
 import Services.OrderService;
-import mini.com.baristaanalytics.Okoa.OkoaCoffeeDetails;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import mini.com.baristaanalytics.R;
 

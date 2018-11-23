@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import Adapter.OkoaColdMenuAdapter;
+import Adapter.CoffeeMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
@@ -55,7 +55,6 @@ import Services.SpeechProcessorService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.Account_Management.RegisterCustomerActivity;
-import mini.com.baristaanalytics.Okoa.OkoaCategoryCold;
 import mini.com.baristaanalytics.Order.CustomerOrders;
 import utilities.ConnectivityReceiver;
 import utilities.MessageItem;
@@ -95,7 +94,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity implements
     private Context ctx;
     private Beverage beverage;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
-    private OkoaColdMenuAdapter adapter;
+    private CoffeeMenuAdapter adapter;
     private List<Beverage> beverageList;
     private Dialog helpDialog;
     private TableRow tableRow;
@@ -223,7 +222,8 @@ public class DoubleshotCategoryCold extends AppCompatActivity implements
                     String tempCoffeeName = beverage.getBeverage_name().toLowerCase();
                     beverage.setBeverage_name(tempCoffeeName);
                     if(beverageList.size() > 0){
-                        if(!beverageExists(beverage)){
+                        OrderService orderService = new OrderService();
+                        if(!orderService.beverageExists(beverage,beverageList)){
                             if(beverage.getBeverage_category().equals("cold")){
                                 String coffeeName = beverage.getBeverage_name().toLowerCase();
                                 beverage.setBeverage_name(coffeeName);
@@ -245,7 +245,7 @@ public class DoubleshotCategoryCold extends AppCompatActivity implements
                     }
                 }
 
-                adapter = new OkoaColdMenuAdapter(beverageList, DoubleshotCategoryCold.this);
+                adapter = new CoffeeMenuAdapter(beverageList, DoubleshotCategoryCold.this);
 
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
@@ -277,38 +277,22 @@ public class DoubleshotCategoryCold extends AppCompatActivity implements
                             txtViewPriceLarge.setVisibility(View.VISIBLE);
                             txtView_beverage_rands_tall.setVisibility(View.VISIBLE);
                         }
-
-
                     }
-
                     @Override
                     public void onPageSelected(int position) {
-
                     }
 
                     @Override
                     public void onPageScrollStateChanged(int state) {
-
                     }
                 });
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
-    private Boolean beverageExists(Beverage beverage){
-        for (int i = 0; i < beverageList.size(); i++) {
-            if(beverageList.get(i).getBeverage_name().equals(beverage.getBeverage_name())){
-                beverage.setBeverage_name(beverage.getBeverage_name());
-                // Update the array
-                beverageList.set(i,beverage);
-                return true;
-            }
-        }
-        return false;
-    }
+
     private void setupBruce() {
         progressBar.setVisibility(View.INVISIBLE);
         speech = SpeechRecognizer.createSpeechRecognizer(this);

@@ -893,11 +893,6 @@ public class MapsActivity extends AppCompatActivity implements
 
     }
 
-    public void goToOkoaCold(View view) {
-        Intent intent = new Intent(this,OkoaCategoryCold.class);
-        startActivity(intent);
-    }
-
     private class GetPollyVoices extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {

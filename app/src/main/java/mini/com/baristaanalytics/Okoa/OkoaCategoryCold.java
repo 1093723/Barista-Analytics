@@ -44,7 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import Adapter.OkoaColdMenuAdapter;
+import Adapter.CoffeeMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
@@ -93,7 +93,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
     private Context ctx;
     private Beverage beverage;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
-    private OkoaColdMenuAdapter adapter;
+    private CoffeeMenuAdapter adapter;
     private List<Beverage> beverageList;
     private Dialog helpDialog;
     private TableRow tableRow;
@@ -193,7 +193,7 @@ public class OkoaCategoryCold extends AppCompatActivity implements
                     }
                 }
 
-                adapter = new OkoaColdMenuAdapter(beverageList, OkoaCategoryCold.this);
+                adapter = new CoffeeMenuAdapter(beverageList, OkoaCategoryCold.this);
 
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);

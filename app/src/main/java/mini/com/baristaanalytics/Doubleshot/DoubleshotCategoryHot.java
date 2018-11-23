@@ -44,7 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import Adapter.OkoaColdMenuAdapter;
+import Adapter.CoffeeMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
@@ -90,7 +90,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
     private Context ctx;
     private Beverage beverage;
     private ViewPager viewPager;
-    private OkoaColdMenuAdapter adapter;
+    private CoffeeMenuAdapter adapter;
     private List<Beverage> beverageList;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
 
@@ -199,7 +199,7 @@ public class DoubleshotCategoryHot extends AppCompatActivity implements Recognit
                     }
                 }
 
-                adapter = new OkoaColdMenuAdapter(beverageList, DoubleshotCategoryHot.this);
+                adapter = new CoffeeMenuAdapter(beverageList, DoubleshotCategoryHot.this);
 
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);

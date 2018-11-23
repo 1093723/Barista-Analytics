@@ -1,4 +1,4 @@
-package mini.com.baristaanalytics.Order;
+package mini.com.baristaanalytics;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

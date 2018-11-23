@@ -43,20 +43,6 @@
             android:textSize="@dimen/slide_desc" />
 
     </LinearLayout>
-    <Button
-        android:id="@+id/btnMaps"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Go To Maps"
-        />
-    <Button
-        android:id="@+id/button_get_started"
-        android:onClick="toNextMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:background="@color/button_get_started"
-        android:text="@string/button_get_started"
-        android:textColor="#5b4c39" />
+
+
 </RelativeLayout>

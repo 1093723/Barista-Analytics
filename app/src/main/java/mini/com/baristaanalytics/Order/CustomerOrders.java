@@ -10,11 +10,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.NotificationCompat;
-
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import Adapter.CustomerOrdersRecyclerviewAdapter;
-import Adapter.SectionsPagerAdapter;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
@@ -198,19 +194,6 @@ public class CustomerOrders extends AppCompatActivity {
         notificationManager.notify(1,notification);
     }
 
-    private void setupViewPager(){
-        SectionsPagerAdapter adapter  = new SectionsPagerAdapter(getSupportFragmentManager());
-        adapter.addFragments(new CustomerOrderFragment());
-        //adapter.addFragments(new MessagesFragment());
-        //adapter.addFragments(new OrderHistoryFragment());
-        ViewPager viewPager = (ViewPager)findViewById(R.id.container);
-        viewPager.setAdapter(adapter);
-        TabLayout tabLayout = findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_current_orders);
-        //tabLayout.getTabAt(1).setIcon(R.drawable.ic_converation);
-        //tabLayout.getTabAt(2).setIcon(R.drawable.ic_pervious_orders);
-    }
 
     private void initRecyclerView(){
         recyclerView.setHasFixedSize(true);

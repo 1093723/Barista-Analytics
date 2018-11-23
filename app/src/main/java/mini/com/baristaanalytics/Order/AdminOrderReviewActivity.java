@@ -24,7 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import Adapter.OkoaOrdersRecyclerviewAdapter;
+import Adapter.AdminOrderReviewAdapter;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.Account_Management.LoginActivity;
 import mini.com.baristaanalytics.R;
@@ -36,7 +36,7 @@ import static utilities.MyApplication.CHANNEL_2_ID;
 /**
  *This is the admin-side of viewing and managing customer orders
  */
-public class OrderConfirmedActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+public class AdminOrderReviewActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
 
     private String TAG = "ORDER CONFIRMED";
@@ -109,7 +109,7 @@ public class OrderConfirmedActivity extends AppCompatActivity implements Connect
 
         mAuth = FirebaseAuth.getInstance();
         notificationManager = NotificationManagerCompat.from(this);
-        ctx = OrderConfirmedActivity.this;
+        ctx = AdminOrderReviewActivity.this;
         coffeeOrderArrayList = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
         coffee_Order = database.getReference("OkoaCoffeeOrders");
@@ -196,7 +196,7 @@ public class OrderConfirmedActivity extends AppCompatActivity implements Connect
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewConfirmed);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OkoaOrdersRecyclerviewAdapter(coffeeOrderArrayList,this);
+        adapter = new AdminOrderReviewAdapter(coffeeOrderArrayList,this);
         recyclerView.setAdapter(adapter);
     }
 

@@ -47,11 +47,10 @@ import java.util.List;
 
 import Database.Database;
 import Model.CoffeeOrder;
-import Model.Customer;
 import Services.OrderService;
 import maes.tech.intentanim.CustomIntent;
 import mini.com.baristaanalytics.Order.CustomerOrders;
-import mini.com.baristaanalytics.Order.OrderConfirmedActivity;
+import mini.com.baristaanalytics.Order.AdminOrderReviewActivity;
 import mini.com.baristaanalytics.R;
 import utilities.ConnectivityReceiver;
 import utilities.MyApplication;
@@ -254,7 +253,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         showProgress(false);
                         if(email.equals(hardCodedAdmin)){
                             // Administrator
-                            Intent x = new Intent(ctx, OrderConfirmedActivity.class);
+                            Intent x = new Intent(ctx, AdminOrderReviewActivity.class);
                             startActivity(x);
                             finish();
                             showProgress(false);

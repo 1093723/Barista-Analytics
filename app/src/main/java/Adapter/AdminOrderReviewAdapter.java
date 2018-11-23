@@ -22,13 +22,13 @@ import java.util.List;
 import Model.CoffeeOrder;
 import mini.com.baristaanalytics.R;
 
-public class OkoaOrdersRecyclerviewAdapter extends RecyclerView.Adapter<OkoaOrdersRecyclerviewAdapter.ViewHolder>{
+public class AdminOrderReviewAdapter extends RecyclerView.Adapter<AdminOrderReviewAdapter.ViewHolder>{
 
     private List<CoffeeOrder> coffeeOrders;
     private FirebaseAuth mAuth;
     private Context context;
 
-    public OkoaOrdersRecyclerviewAdapter(List<CoffeeOrder> orders, Context context) {
+    public AdminOrderReviewAdapter(List<CoffeeOrder> orders, Context context) {
         this.coffeeOrders = orders;
         this.context = context;
     }

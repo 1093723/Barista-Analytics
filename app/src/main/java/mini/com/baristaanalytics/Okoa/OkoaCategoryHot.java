@@ -42,10 +42,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import Adapter.OkoaColdMenuAdapter;
+import Adapter.CoffeeMenuAdapter;
 import Database.Database;
 import Model.Beverage;
 import Model.CoffeeOrder;
@@ -95,7 +94,7 @@ public class OkoaCategoryHot extends AppCompatActivity implements
     private Context ctx;
     private Beverage beverage;
     private ViewPager viewPager;
-    private OkoaColdMenuAdapter adapter;
+    private CoffeeMenuAdapter adapter;
     private List<Beverage> beverageList;
     private TextView txtViewPriceSmall,txtViewPriceLarge;
 
@@ -202,7 +201,7 @@ public class OkoaCategoryHot extends AppCompatActivity implements
                     }
                 }
 
-                adapter = new OkoaColdMenuAdapter(beverageList, OkoaCategoryHot.this);
+                adapter = new CoffeeMenuAdapter(beverageList, OkoaCategoryHot.this);
 
                 viewPager.setAdapter(adapter);
                 viewPager.setPadding(130,0,130,0);
