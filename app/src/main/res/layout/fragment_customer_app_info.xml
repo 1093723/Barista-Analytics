@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".admin_personal_info">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="56dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="App Info - Customer" />
+
+        <!--  Email Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/input_customer_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                android:inputType="textEmailAddress" />
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Username Name Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/input_customer_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                android:inputType="textPersonName" />
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Password Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            app:passwordToggleEnabled="true">
+
+            <EditText
+                android:id="@+id/input_customer_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/button_customer_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:backgroundTint="@color/floating_action_button"
+            android:src="@drawable/ic_check_24dp" />
+
+
+    </LinearLayout>
+
+</RelativeLayout>

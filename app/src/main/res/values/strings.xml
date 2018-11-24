@@ -2,6 +2,11 @@
     <string name="app_name">Barista Analytics</string>
     <string name="title_activity_login">Sign in</string>
 
+    <string name="btn_sign_up">Don\'t have an account? Sign up!</string>
+    <string name="btn_link_to_login">Already registered? Sign in</string>
+    <string name="email">Email</string>
+    <string name="hint_password">Password</string>
+
     <!-- Strings related to welcome screen -->
 
     <string name="slide_1_title">Coffee Ordering, Redefined</string>

@@ -3,13 +3,18 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
     <style name="TextLabel" parent="TextAppearance.AppCompat">
         <!-- Hint color and label color in FALSE state -->
         <item name="android:textColorHint">@color/white</item>
+    </style>
+    
+    <style name="MaterialTextInputLayout" parent="TextAppearance.AppCompat">
+        <item name="colorControlNormal">#aaaaaa</item>
+        <item name="colorControlActivated">#b85c00</item>
     </style>
 </resources>
