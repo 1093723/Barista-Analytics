@@ -32,7 +32,7 @@ public class customer_app_info extends Fragment {
                 EditText editTextLastName = getActivity().findViewById(R.id.input_last_name_customer);
                 String lastName = editTextLastName.getText().toString();
 
-                EditText editTextAge = getActivity().findViewById(R.id.input_age);
+                EditText editTextAge = getActivity().findViewById(R.id.input_age_customer);
                 String age = editTextAge.getText().toString();
 
                 EditText editTextPhone = getActivity().findViewById(R.id.input_phone_number_customer);
