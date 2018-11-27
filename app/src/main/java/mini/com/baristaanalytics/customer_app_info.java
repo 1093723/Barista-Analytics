@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +23,8 @@ public class customer_app_info extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_customer_app_info, container, false);
 
-        FloatingActionButton floatingActionButton = view.findViewById(R.id.button_customer_check);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floatingActionButtonCheck = view.findViewById(R.id.button_customer_check);
+        floatingActionButtonCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText editTextFirstName = getActivity().findViewById(R.id.input_first_name_customer);
@@ -50,6 +51,17 @@ public class customer_app_info extends Fragment {
                 Log.d(ARG_PARAM1, "First Name is: " + firstName);
                 Log.d(ARG_PARAM1, "Age is: " + age);
                 Log.d(ARG_PARAM1, "Email is: "+ email);
+            }
+        });
+
+        final ViewPager viewPager = RegisterCustomerActivityNew.mInstance.findViewById(R.id.register_customer_new);
+        final int prevFragement = viewPager.getCurrentItem() - 1;
+
+        FloatingActionButton floatingActionButtonBack = view.findViewById(R.id.button_customer_back);
+        floatingActionButtonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(prevFragement);
             }
         });
         return view;

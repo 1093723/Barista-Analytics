@@ -10,10 +10,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical"
         android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingTop="56dp">
+        android:paddingTop="56dp"
+        android:paddingRight="24dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -24,8 +26,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
 
             <EditText
                 android:id="@+id/input_customer_email"
@@ -39,8 +41,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
 
             <EditText
                 android:id="@+id/input_customer_username"
@@ -54,8 +56,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             app:passwordToggleEnabled="true">
 
             <EditText
@@ -66,14 +68,30 @@
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
+        <RelativeLayout
+            android:id="@+id/linear_layout_fab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/button_customer_check"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:backgroundTint="@color/floating_action_button"
-            android:src="@drawable/ic_check_24dp" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/button_customer_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:backgroundTint="@color/floating_action_button"
+                android:src="@drawable/ic_arrow_back_white_24dp" />
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/button_customer_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:backgroundTint="@color/floating_action_button"
+                android:src="@drawable/ic_check_24dp" />
+
+        </RelativeLayout>
 
 
     </LinearLayout>

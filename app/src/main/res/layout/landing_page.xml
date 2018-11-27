@@ -24,9 +24,12 @@
         android:id="@+id/barista_button_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:backgroundTint="@color/regular_button"
+        android:onClick="goToBarista"
         android:text="Barista"
-        android:onClick="goToBarista"/>
+        android:textColor="@color/black" />
 
     <Button
         android:id="@+id/customer_button_main"
@@ -35,8 +38,20 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="168dp"
-        android:text="Customer"
-        android:onClick="goToCustomer"/>
+        android:backgroundTint="@color/regular_button"
+        android:onClick="goToCustomer"
+        android:text="Customer" />
+
+    <TextView
+        android:id="@+id/textView_Saying"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"
+        android:text="Choose Your Path"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
 
 
 </RelativeLayout>

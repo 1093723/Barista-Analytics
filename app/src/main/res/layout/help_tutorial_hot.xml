@@ -26,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        app:bl_bubbleColor="#efeae9"
         android:padding="8dp"
         app:bl_arrowDirection="right"
         app:bl_arrowHeight="8dp"
@@ -40,7 +41,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="4dp"
             android:text="This is the hot category of the menu. This is where you make your hot order."
-            android:textColor="@android:color/holo_red_dark" />
+            android:textColor="@color/black" />
 
     </com.daasuu.bl.BubbleLayout>
 
@@ -48,6 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        app:bl_bubbleColor="#efeae9"
         android:padding="8dp"
         app:bl_arrowDirection="right"
         app:bl_arrowHeight="8dp"
@@ -62,7 +64,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="4dp"
             android:text="You can order as many hot Coffees as you like, from those seen on the menu cards above."
-            android:textColor="@android:color/holo_red_dark" />
+            android:textColor="@color/black" />
 
     </com.daasuu.bl.BubbleLayout>
 
@@ -70,6 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        app:bl_bubbleColor="#efeae9"
         android:padding="8dp"
         app:bl_arrowDirection="right"
         app:bl_arrowHeight="8dp"
@@ -84,7 +87,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="4dp"
             android:text="You can Say &quot; I would Like 1 Small Dirty Chai Latte &quot; and confirm your choice with the barista."
-            android:textColor="@android:color/holo_red_dark" />
+            android:textColor="@color/black" />
     </com.daasuu.bl.BubbleLayout>
 
 
@@ -92,6 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        app:bl_bubbleColor="#efeae9"
         android:padding="8dp"
         app:bl_arrowDirection="right"
         app:bl_arrowHeight="8dp"
@@ -106,7 +110,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="4dp"
             android:text=" For multiple orders, You can Say &quot; I would Like 1 Small Dirty Chai Latte and 3 Large Red Cappuccino and 1 Large Americano &quot; and confirm your choice with the barista."
-            android:textColor="@android:color/holo_red_dark" />
+            android:textColor="@color/black" />
 
     </com.daasuu.bl.BubbleLayout>
 

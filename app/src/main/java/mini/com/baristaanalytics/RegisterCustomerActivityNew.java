@@ -8,13 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 public class RegisterCustomerActivityNew extends AppCompatActivity {
-
     private ViewPager viewPager;
+    public static RegisterCustomerActivityNew mInstance =  null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_customer_new);
-
+        mInstance = this;
         viewPager = findViewById(R.id.register_customer_new);
         viewPager.setAdapter(new RegisterCustomerAdapter(getSupportFragmentManager()));
     }

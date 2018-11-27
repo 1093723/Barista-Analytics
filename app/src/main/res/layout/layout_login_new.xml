@@ -12,7 +12,6 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/coffee_background9"
             android:scaleType="centerCrop"/>
     </FrameLayout>
 

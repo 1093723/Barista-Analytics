@@ -162,6 +162,13 @@
             android:id="@+id/relLayoutConvo"
             android:background="@drawable/animation_list">
 
+            <ImageView
+                android:id="@+id/profile_icon"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/ic_person_black_24dp"/>
+
             <ImageButton
                 android:id="@+id/btnSpeak"
                 android:layout_width="match_parent"

@@ -144,12 +144,13 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:onClick="addAdministrator"
-            android:clickable="true"
             android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:backgroundTint="@color/button_get_started"
+            android:clickable="true"
+            android:onClick="addAdministrator"
             android:text="Register" />
 
     </LinearLayout>

@@ -111,6 +111,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="11dp"
+                android:backgroundTint="@color/button_get_started"
                 android:text="Order Status" />
 
             <RatingBar
